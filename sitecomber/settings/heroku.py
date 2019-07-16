@@ -12,3 +12,9 @@ CSRF_TRUSTED_ORIGINS = (
 )
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+
+del LOGGING['handlers']['file']
+
+LOGGING['loggers']['django']['handlers'] = ['console']
+LOGGING['loggers']['root']['handlers'] = ['console']
