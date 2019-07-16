@@ -130,6 +130,7 @@ class PageResultAdmin(admin.ModelAdmin):
     list_filter = ['site_domain']
     readonly_fields = ['site_domain', 'url', 'created', 'modified',
                        'last_load_time', 'view_site_settings']
+    change_form_template = 'admin/pageresult_change_form.html'
 
     fieldsets = (
         (None, {

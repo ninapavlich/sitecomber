@@ -1,3 +1,4 @@
+import logging
 from urllib.parse import urlparse
 
 from django.db import models
@@ -8,6 +9,8 @@ from django.contrib.auth import get_user_model
 from sitecomber.apps.shared.models import BaseMetaData, BaseURL
 
 from sitecomber.apps.results.models import PageResult
+
+logger = logging.getLogger('django')
 
 
 class Site(BaseMetaData):
@@ -106,11 +109,14 @@ class SiteDomain(BaseMetaData, BaseURL):
         # sitemap_page.load()
 
         # TODO - also limit items so that recently parsed URLs don't get re-parsed
-        pages_to_load = PageResult.objects\
+        pages = PageResult.objects\
             .filter(site_domain=self)\
             .exclude(pk=root_page.pk)\
-            .order_by(F('last_load_time').desc(nulls_last=True)).reverse()[:urls_to_load]
+            .order_by(F('last_load_time').desc(nulls_last=True)).reverse()
 
+        logger.info("Found %s pages within the %s site" % (pages.count(), self))
+
+        pages_to_load = pages[:urls_to_load]
         for page in pages_to_load:
             page.load()
 
