@@ -1,6 +1,6 @@
 {
   "name": "SiteComber",
-  "description": "Tool for crawling and testing websites",
+  "description": "Website crawling and testing platform",
   "repository": "https://github.com/ninapavlich/sitecomber",
   "keywords": ["Django", "Heroku"],
   "addons": ["heroku-postgresql:hobby-dev", "scheduler:standard"],
