@@ -1,4 +1,3 @@
-from django import forms
 from django.contrib import admin
 from django.conf import settings
 
@@ -65,8 +64,8 @@ class SiteForm(AdminAutocompleteFormMixin):
 class SiteAdmin(admin.ModelAdmin):
     form = SiteForm
 
-    list_display_links = list_display = ['owner', 'title', 'created']
-    list_filter = ['owner']
+    list_display_links = list_display = ['owner', 'title', 'created', 'active']
+    list_filter = ['owner', 'active']
     readonly_fields = ['created', 'modified']
 
     fieldsets = (
@@ -74,6 +73,7 @@ class SiteAdmin(admin.ModelAdmin):
             'fields': (
                 'owner',
                 'title',
+                'active',
                 'recursive',
                 'override_user_agent',
                 'override_max_redirects', 'override_max_timeout_seconds'

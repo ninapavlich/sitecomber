@@ -18,8 +18,7 @@ env = environ.Env()  # set default values and casting
 environ.Env.read_env(env_file=root('.env'))
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), os.pardir)
-
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), os.pardir))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
@@ -171,7 +170,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+USE_TZ = True
+TIME_ZONE = env('TIME_ZONE', default='America/New_York')
 
 USE_I18N = True
 
@@ -200,9 +200,6 @@ MEDIA_URL = env("MEDIA_URL", default='/uploads/')
 
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
-
-USE_TZ = True
-TIME_ZONE = env('TIME_ZONE', default='America/New_York')
 
 # Third-party settings
 ONE_HOUR = 60 * 60

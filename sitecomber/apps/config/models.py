@@ -23,6 +23,7 @@ class Site(BaseMetaData):
     title = models.CharField(max_length=255)
 
     # Crawling Settings
+    active = models.BooleanField(default=True)
     recursive = models.BooleanField(default=True)
     override_user_agent = models.TextField(blank=True, null=True)
     override_max_redirects = models.IntegerField(blank=True, null=True)
@@ -43,9 +44,9 @@ class Site(BaseMetaData):
             return self.override_max_timeout_seconds
         return settings.DEFAULT_MAX_TIMEOUT_SECONDS
 
-    def crawl(self, urls_to_load):
+    def crawl(self, load_batch_size):
         for domain in self.sitedomain_set.filter(should_crawl=True):
-            domain.crawl(urls_to_load)
+            domain.crawl(load_batch_size)
 
     @property
     def domains(self):
@@ -94,7 +95,7 @@ class SiteDomain(BaseMetaData, BaseURL):
 
         super(SiteDomain, self).save(*args, **kwargs)
 
-    def crawl(self, urls_to_load):
+    def crawl(self, load_batch_size):
 
         root_page, created = PageResult.objects.get_or_create(
             site_domain=self,
@@ -107,18 +108,19 @@ class SiteDomain(BaseMetaData, BaseURL):
         #     url=urlparse(self.url)._replace(path=self.get_sitemap()).geturl()
         # )
         # sitemap_page.load()
+        if self.site.recursive:
 
-        # TODO - also limit items so that recently parsed URLs don't get re-parsed
-        pages = PageResult.objects\
-            .filter(site_domain=self)\
-            .exclude(pk=root_page.pk)\
-            .order_by(F('last_load_time').desc(nulls_last=True)).reverse()
+            # TODO - also limit items so that recently parsed URLs don't get re-parsed
+            pages = PageResult.objects\
+                .filter(site_domain=self)\
+                .exclude(pk=root_page.pk)\
+                .order_by(F('last_load_time').desc(nulls_last=True)).reverse()
 
-        logger.info("Found %s pages within the %s site" % (pages.count(), self))
+            logger.info("Found %s pages within the %s site, going to load a max of %s" % (pages.count(), self, load_batch_size))
 
-        pages_to_load = pages[:urls_to_load]
-        for page in pages_to_load:
-            page.load()
+            pages_to_load = pages[:load_batch_size]
+            for page in pages_to_load:
+                page.load()
 
     @staticmethod
     def autocomplete_search_fields():

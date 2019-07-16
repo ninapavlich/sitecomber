@@ -131,6 +131,8 @@ class PageResultAdmin(admin.ModelAdmin):
     readonly_fields = ['site_domain', 'url', 'created', 'modified',
                        'last_load_time', 'view_site_settings']
     change_form_template = 'admin/pageresult_change_form.html'
+    filter_horizontal = ['referers']
+    search_fields = ['url']
 
     fieldsets = (
         (None, {
@@ -138,6 +140,7 @@ class PageResultAdmin(admin.ModelAdmin):
                 'view_site_settings',
                 'site_domain',
                 'url',
+                'referers'
             )
         }),
         ('Metadata', {

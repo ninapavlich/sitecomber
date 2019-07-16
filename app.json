@@ -1,0 +1,34 @@
+{
+  "name": "SiteComber",
+  "description": "Tool for crawling and testing websites",
+  "repository": "https://github.com/ninapavlich/sitecomber",
+  "keywords": ["Django", "Heroku"],
+  "addons": ["heroku-postgresql:hobby-dev", "scheduler:standard"],
+  "env": {
+    "SECRET_KEY": {
+      "description": "A secret key for encryption used on this application.",
+      "generator": "secret"
+    },
+    "FIELD_ENCRYPTION_KEY": {
+      "description": "A secret key for field encryption used on this application. You can generate one using 'python manage.py generate_encryption_key'",
+      "generator": "secret"
+    },
+    "ENVIRONMENT":{
+      "description": "An environmental variable indicating which set of settings to use. Leave this as 'heroku'",
+      "value": "heroku"
+    },
+    "TIME_ZONE":{
+      "description": "The timezone the server will be based out of. See the list of valid values here: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones",
+      "value": "US/Pacific"
+    },
+    "APP_HOST_NAME":{
+      "description": "<App Name as entered above>.herokuapp.com. For Example: my-heroku-app-name.herokuapp.com",
+      "value": "REPLACE ME.herokuapp.com"
+    }
+
+  },
+  "scripts": {
+    "postdeploy": "python manage.py migrate"
+  }
+
+}

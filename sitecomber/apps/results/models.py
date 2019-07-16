@@ -120,6 +120,7 @@ class PageRequest(BaseMetaData, BaseRequest):
                 site_domain=self.page_result.site_domain,
                 url=link
             )
+            link_page.referers.add(self.page_result)
 
         previous_item = None
         for item in response.history:
@@ -136,6 +137,7 @@ class PageResult(BaseMetaData, BaseURL):
         on_delete=models.CASCADE
     )
     last_load_time = models.DateTimeField(blank=True, null=True)
+    referers = models.ManyToManyField('self')
 
     def load(self):
         logger.info(u"Loading %s" % (self))
