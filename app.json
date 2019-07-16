@@ -23,7 +23,7 @@
     },
     "APP_HOST_NAME":{
       "description": "<App Name as entered above>.herokuapp.com. For Example: my-heroku-app-name.herokuapp.com",
-      "value": "REPLACE ME.herokuapp.com"
+      "value": "REPLACE_ME.herokuapp.com"
     }
 
   },
