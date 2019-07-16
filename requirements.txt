@@ -11,7 +11,7 @@ django-encrypted-model-fields==0.5.8
 django-environ==0.4.5
 django-filter==2.1.0
 django-js-asset==1.2.2
-django-list-wrestler==6.2
+django-list-wrestler==6.3
 djangorestframework==3.9.2
 gunicorn==19.9.0
 idna==2.8
