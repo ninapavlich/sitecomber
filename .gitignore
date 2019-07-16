@@ -119,3 +119,4 @@ logs/*
 uploads/*
 
 data.json
+.DS_Store

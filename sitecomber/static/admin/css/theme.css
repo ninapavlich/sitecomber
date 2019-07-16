@@ -1,0 +1,93 @@
+:root {
+  --color-offwhite: #f9f9f9;
+  --color-black: #000;
+  
+  --color-grey-dark: #222;
+  --color-grey: #666;
+  --color-grey-light: #ccc;
+
+  --color-teal: #00adba;
+  --color-teal-dark: #077f88;
+  --color-teal-xlight: #e0f8f9;
+
+}
+
+body{
+  background: var(--color-offwhite);
+}
+#header{
+  background: var(--color-black);
+  color: #fff;
+}
+#branding h1, #branding h1 a:link, #branding h1 a:visited{
+  color: var(--color-teal); 
+}
+#header a:link, #header a:visited {
+  color: var(--color-teal); 
+}
+a:link, a:visited {
+  color: var(--color-teal);
+  transition:all 150ms ease-out;
+}
+a:visited {
+  color: var(--color-teal);
+  transition:all 150ms ease-out;
+}
+a:focus {
+  color: var(--color-teal-dark);
+}
+a:hover {
+  color: var(--color-teal-dark); 
+}
+#user-tools a{
+  border-bottom-color: var(--color-black);
+}
+#user-tools a:focus,
+#user-tools a:hover{
+  border-bottom-color: var(--color-teal-dark);
+}
+
+.module h2, .module caption, .inline-group h2{
+  background-color: var(--color-grey-dark);
+}
+.selector-chosen h2{
+  background-color: var(--color-teal) !important;
+}
+div.breadcrumbs {
+  background-color: var(--color-grey-dark);
+  color: var(--color-offwhite);
+}
+div.breadcrumbs a:focus, 
+div.breadcrumbs a:hover{
+  color: var(--color-grey-light); 
+}
+.button, input[type=submit], input[type=button], .submit-row input, a.button {
+  background-color: var(--color-teal-dark);
+  transition:all 150ms ease-out;
+}
+.button:focus, input[type=submit]:focus, input[type=button]:focus, .submit-row input:focus, a.button:focus,
+.button:hover, input[type=submit]:hover, input[type=button]:hover, .submit-row input:hover, a.button:hover {
+  background-color: var(--color-black);
+}
+.button.default, input[type=submit].default, .submit-row input.default{
+  background-color: var(--color-teal);
+}
+.submit-row a.deletelink{
+  transition:all 150ms ease-out;
+  background-color: var(--color-grey) !important;
+}
+.submit-row a.deletelink:focus,
+.submit-row a.deletelink:hover{
+  background-color: var(--color-black) !important;
+}
+.button.default:focus, input[type=submit].default:focus, .submit-row input.default:focus,
+.button.default:hover, input[type=submit].default:hover, .submit-row input.default:hover{
+  background-color: var(--color-black);
+}
+.object-tools a:focus, .object-tools a:hover{
+  background-color:var(--color-teal-dark);
+}
+/* hack to make this more specific: */
+body .has_unsaved_data {
+  background-color: var(--color-teal-xlight) !important;
+}

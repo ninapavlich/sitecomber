@@ -6,7 +6,7 @@ from django.conf import settings
 # from rest_framework import routers
 
 # from sitecomber.post.api import PostViewSet, APIHealthView
-from sitecomber.apps.shared.admin import UserAdminAutocomplete
+from sitecomber.apps.shared.admin import AdminAutocomplete
 
 # router = routers.DefaultRouter()
 # router.register(r'posts', PostViewSet)
@@ -15,10 +15,10 @@ from sitecomber.apps.shared.admin import UserAdminAutocomplete
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path(
-        r'admin/user-autocomplete/',
-        UserAdminAutocomplete.as_view(),
-        name='user-autocomplete',
+    re_path(
+        r'^admin/admin-autocomplete/$',
+        AdminAutocomplete.as_view(),
+        name='admin-autocomplete',
     ),
 
     # re_path(r'^', include(router.urls)),
@@ -26,6 +26,9 @@ urlpatterns = [
 
 ]
 
+
+admin.site.site_title = admin.site.site_header = settings.SITE_TITLE
+admin.site.index_title = 'Configuration'
 
 if settings.DEBUG:
 

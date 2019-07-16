@@ -1,16 +1,35 @@
 from django import forms
 from django.contrib import admin
+from django.conf import settings
 
-from dal import autocomplete
+from dal import forward
 
-from django_list_wrestler.admin import AdminListOrderable, AdminListCollapsible
+from sitecomber.apps.shared.forms import AdminAutocompleteFormMixin
+from sitecomber.apps.shared.admin import AdminModelSelect2
 
 from .models import Site, SiteDomain, IgnoreURL, IgnoreQueryParam
 
 
+class SiteDomainForm(AdminAutocompleteFormMixin):
+
+    class Meta:
+        model = SiteDomain
+        fields = ('__all__')
+
+        widgets = {
+            # 'alias_of': AdminModelSelect2(
+            #     url='admin-autocomplete',
+            #     attrs={'data-html': True},
+            #     forward=(forward.Const(
+            #         val="config.SiteDomain", dst="model"),)
+            # ),
+        }
+
+
 class SiteDomainInline(admin.TabularInline):
     model = SiteDomain
-    fields = ['title', 'url', 'canonical', 'authentication_type', 'authentication_data']
+    form = SiteDomainForm
+    fields = ['title', 'url', 'should_crawl', 'alias_of', 'override_sitemap']  # , 'authentication_type', 'authentication_data']
     extra = 0
 
 
@@ -26,21 +45,24 @@ class IgnoreQueryParamInline(admin.TabularInline):
     extra = 0
 
 
-class SiteForm(forms.ModelForm):
+class SiteForm(AdminAutocompleteFormMixin):
 
     class Meta:
         model = Site
         fields = ('__all__')
+
         widgets = {
-            'owner': autocomplete.ModelSelect2(
-                url='user-autocomplete',
-                attrs={'data-html': True}
-            )
+            'owner': AdminModelSelect2(
+                url='admin-autocomplete',
+                attrs={'data-html': True},
+                forward=(forward.Const(
+                    val=settings.AUTH_USER_MODEL, dst="model"),)
+            ),
         }
 
 
 @admin.register(Site)
-class SiteAdmin(AdminListCollapsible):
+class SiteAdmin(admin.ModelAdmin):
     form = SiteForm
 
     list_display_links = list_display = ['owner', 'title', 'created']

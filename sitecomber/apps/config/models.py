@@ -1,14 +1,13 @@
 from urllib.parse import urlparse
 
 from django.db import models
+from django.db.models import F
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ImproperlyConfigured
-from django.utils.functional import cached_property
 
 from sitecomber.apps.shared.models import BaseMetaData, BaseURL
 
-from sitecomber.apps.results.models import Page
+from sitecomber.apps.results.models import PageResult
 
 
 class Site(BaseMetaData):
@@ -26,10 +25,6 @@ class Site(BaseMetaData):
     override_max_redirects = models.IntegerField(blank=True, null=True)
     override_max_timeout_seconds = models.IntegerField(blank=True, null=True)
 
-    @cached_property
-    def canonical_domain(self):
-        return self.sitedomain_set.filter(canonical=True).first()
-
     def get_user_agent(self):
         if self.override_user_agent:
             return self.override_user_agent
@@ -45,17 +40,13 @@ class Site(BaseMetaData):
             return self.override_max_timeout_seconds
         return settings.DEFAULT_MAX_TIMEOUT_SECONDS
 
-    def crawl(self):
+    def crawl(self, urls_to_load):
+        for domain in self.sitedomain_set.filter(should_crawl=True):
+            domain.crawl(urls_to_load)
 
-        if not self.canonical_domain:
-            raise ImproperlyConfigured(u"Site %s is missing a canonical domain. Please define at least one domain for this site." % (self))
-
-        root_page, created = Page.objects.get_or_create(
-            site=self,
-            url=self.canonical_domain.url
-        )
-
-        root_page.load()
+    @property
+    def domains(self):
+        return [item.url for item in self.sitedomain_set.all()]
 
     def __str__(self):
         return self.title
@@ -63,31 +54,82 @@ class Site(BaseMetaData):
 
 class SiteDomain(BaseMetaData, BaseURL):
 
-    project = models.ForeignKey(
+    site = models.ForeignKey(
         Site,
         null=False,
         on_delete=models.CASCADE
     )
-    canonical = models.BooleanField(default=False)
+    alias_of = models.ForeignKey(
+        'self',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL
+    )
+
+    should_crawl = models.BooleanField(default=True)
+
+    override_sitemap = models.CharField(max_length=255, blank=True, null=True, help_text='Name of sitemap file relative to the root, e.g. sitemap.xml')
+
+    def get_sitemap(self):
+        if self.override_sitemap:
+            return self.override_sitemap
+        return settings.DEFAULT_SITEMAP_URL
 
     def save(self, *args, **kwargs):
 
-        # Remove path from domain
+        # Remove path and query from domain
         if self.url:
-            self.url = urlparse(self.url)._replace(path='').geturl()
+            self.url = urlparse(self.url)._replace(path='', query='', fragment='').geturl()
 
-        # Make sure one and only one site domain in the project is canonical
-        if self.canonical:
-            self.project.sitedomain_set.all().exclude(pk=self.pk).filter(canonical=True).update(canonical=False)
-        elif self.project.sitedomain_set.all().filter(canonical=True).count() == 0:
-            self.canonical = True
+        # Don't allow alias to point to self
+        if self.alias_of and self.alias_of == self:
+            self.alias_of = None
+
+        # Don't crawl domains that are simply aliases
+        if self.alias_of:
+            self.crawl = False
 
         super(SiteDomain, self).save(*args, **kwargs)
+
+    def crawl(self, urls_to_load):
+
+        root_page, created = PageResult.objects.get_or_create(
+            site_domain=self,
+            url=self.url
+        )
+        root_page.load()
+
+        # sitemap_page, created = PageResult.objects.get_or_create(
+        #     site_domain=self,
+        #     url=urlparse(self.url)._replace(path=self.get_sitemap()).geturl()
+        # )
+        # sitemap_page.load()
+
+        # TODO - also limit items so that recently parsed URLs don't get re-parsed
+        pages_to_load = PageResult.objects\
+            .filter(site_domain=self)\
+            .exclude(pk=root_page.pk)\
+            .order_by(F('last_load_time').desc(nulls_last=True)).reverse()[:urls_to_load]
+
+        for page in pages_to_load:
+            page.load()
+
+    @staticmethod
+    def autocomplete_search_fields():
+        return ("url__icontains", "site__title__icontains",)
+
+    @classmethod
+    def autocomplete_text(cls, item):
+        return str(item)
+
+    @classmethod
+    def autocomplete_selected_text(cls, item):
+        return str(item)
 
 
 class IgnoreURL(BaseMetaData, BaseURL):
 
-    project = models.ForeignKey(
+    site = models.ForeignKey(
         Site,
         null=False,
         on_delete=models.CASCADE
@@ -100,7 +142,7 @@ class IgnoreQueryParam(BaseMetaData):
     recognized as a different / unique URL
     """
 
-    project = models.ForeignKey(
+    site = models.ForeignKey(
         Site,
         null=False,
         on_delete=models.CASCADE

@@ -111,6 +111,9 @@ class BaseRequest(models.Model):
 
         create_headers(self, self.request_header_model, dict)
 
+    def get_request_header_by_key(self, key):
+        return self.request_header_model.objects.filter(parent=self, key=key).first()
+
     class Meta:
         abstract = True
 
@@ -119,6 +122,8 @@ class BaseResponse(models.Model):
 
     response_url = models.URLField()
     status_code = models.CharField(max_length=255, blank=True, null=True)
+    content_type = models.CharField(max_length=255, blank=True, null=True)
+    content_length = models.IntegerField(blank=True, null=True)
     http_version = models.CharField(max_length=255, blank=True, null=True)
     remote_address = models.CharField(max_length=255, blank=True, null=True)
 
@@ -127,6 +132,9 @@ class BaseResponse(models.Model):
             raise ImproperlyConfigured(u"%s doesn't define its corresponding self.response_header_model" % (self._meta.model_name))
 
         create_headers(self, self.response_header_model, dict)
+
+    def get_response_header_by_key(self, key):
+        return self.response_header_model.objects.filter(parent=self, key=key).first()
 
     class Meta:
         abstract = True

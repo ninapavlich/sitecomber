@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django.utils.text import Truncator
 
-from .models import Page, PageRequest, PageResponse, ResponseHeader, RequestHeader
+from .models import PageResult, PageRequest, PageResponse, ResponseHeader, RequestHeader
 
 
 class ResponseHeaderInline(admin.TabularInline):
@@ -28,6 +28,7 @@ class PageResponseAdmin(admin.ModelAdmin):
                 'response_url',
                 'status_code',
                 ('load_start_time', 'load_end_time',),
+                ('content_type', 'content_length'),
                 'view_text'
             )
         }),
@@ -38,6 +39,7 @@ class PageResponseAdmin(admin.ModelAdmin):
                        'response_url',
                        'status_code',
                        'load_start_time', 'load_end_time',
+                       'content_type', 'content_length',
                        'view_text']
 
     def view_text(self, obj):
@@ -55,7 +57,7 @@ class PageResponseAdmin(admin.ModelAdmin):
 
 class PageResponseInline(admin.TabularInline):
     model = PageResponse
-    readonly_fields = fields = ['load_start_time', 'response_url', 'status_code', 'view_item']
+    readonly_fields = fields = ['load_start_time', 'response_url', 'status_code', 'content_type', 'view_item']
     extra = 0
 
     def view_item(self, obj):
@@ -75,7 +77,8 @@ class PageRequestAdmin(admin.ModelAdmin):
                 'view_page',
                 'request_url',
                 'method',
-                'status_code',
+                ('status_code', 'content_type'),
+                'view_response',
                 ('load_start_time', 'load_end_time',),
             )
         }),
@@ -84,33 +87,55 @@ class PageRequestAdmin(admin.ModelAdmin):
     readonly_fields = ['view_page',
                        'request_url',
                        'method',
-                       'status_code',
+                       'status_code', 'content_type',
+                       'view_response',
                        'load_start_time', 'load_end_time', ]
 
     def view_page(self, obj):
         return format_html(u'<a href="%s">< Back to %s</a>' % (obj.page.get_edit_url(), obj.page))
 
+    def status_code(self, obj):
+        if obj.response:
+            return obj.response.status_code
+
+    def content_type(self, obj):
+        if obj.response:
+            return obj.response.content_type
+
+    def view_response(self, obj):
+        return format_html(u'<a href="%s">View Response</a>' % (obj.response.get_edit_url()))
+
 
 class PageRequestInline(admin.TabularInline):
     model = PageRequest
-    readonly_fields = fields = ['request_url', 'method', 'load_start_time', 'load_end_time', 'view_item']
+    readonly_fields = fields = ['request_url', 'method', 'status_code', 'content_type', 'load_start_time', 'view_item']
     extra = 0
+
+    def status_code(self, obj):
+        if obj.response:
+            return obj.response.status_code
+
+    def content_type(self, obj):
+        if obj.response:
+            return obj.response.content_type
 
     def view_item(self, obj):
         return format_html(u'<a href="%s">View Request Details +</a>' % (obj.get_edit_url()))
 
 
-@admin.register(Page)
-class PageAdmin(admin.ModelAdmin):
+@admin.register(PageResult)
+class PageResultAdmin(admin.ModelAdmin):
 
-    list_display_links = list_display = ['site', 'url', 'created']
-    list_filter = ['site']
-    readonly_fields = ['site', 'url', 'created', 'modified', 'view_site']
+    list_display_links = list_display = ['site_domain', 'url', 'last_load_time']
+    list_filter = ['site_domain']
+    readonly_fields = ['site_domain', 'url', 'created', 'modified',
+                       'last_load_time', 'view_site_settings']
 
     fieldsets = (
         (None, {
             'fields': (
-                'view_site',
+                'view_site_settings',
+                'site_domain',
                 'url',
             )
         }),
@@ -125,5 +150,5 @@ class PageAdmin(admin.ModelAdmin):
     inlines = [PageRequestInline]
     custom_list_order_by = 'title'
 
-    def view_site(self, obj):
-        return format_html(u'<a href="%s">View Settings for %s</a>' % (obj.site.get_edit_url(), obj.site))
+    def view_site_settings(self, obj):
+        return format_html(u'<a href="%s">< View Settings for %s</a>' % (obj.site_domain.site.get_edit_url(), obj.site_domain.site))

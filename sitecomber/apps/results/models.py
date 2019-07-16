@@ -1,10 +1,13 @@
+import logging
 from django.db import models
-from django.conf import settings
 from django.utils import timezone
 
 import requests
 
 from sitecomber.apps.shared.models import BaseMetaData, BaseURL, BaseHeader, BaseRequest, BaseResponse
+from sitecomber.apps.shared.utils import LinkParser
+
+logger = logging.getLogger('django')
 
 
 class RequestHeader(BaseHeader):
@@ -54,6 +57,8 @@ class PageResponse(BaseMetaData, BaseResponse):
         r = cls(
             response_url=response.url,
             status_code=response.status_code,
+            content_type=response.headers.get('content-type'),
+            content_length=response.headers.get('content-length'),
             text_content=response.text,
             request=request,
             load_start_time=request.load_start_time,
@@ -73,12 +78,17 @@ class PageRequest(BaseMetaData, BaseRequest):
     """
     request_header_model = RequestHeader
 
-    page = models.ForeignKey(
-        'results.Page',
+    page_result = models.ForeignKey(
+        'results.PageResult',
         on_delete=models.CASCADE
     )
+    response = models.ForeignKey(
+        'results.PageResponse',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
 
-    status_code = models.CharField(max_length=255, blank=True, null=True)
     load_start_time = models.DateTimeField(blank=True, null=True)
     load_end_time = models.DateTimeField(blank=True, null=True)
 
@@ -88,36 +98,53 @@ class PageRequest(BaseMetaData, BaseRequest):
     def load(self):
         self.load_start_time = timezone.now()
         self.method = BaseRequest.METHOD_GET
-        self.request_url = self.page.url
+        self.request_url = self.page_result.url
         self.save()
 
-        request_headers = {'user-agent': self.page.site.get_user_agent()}
+        request_headers = {'user-agent': self.page_result.site_domain.site.get_user_agent()}
         self.create_request_headers(request_headers)
 
-        response = requests.get(self.page.url,
+        response = requests.get(self.page_result.url,
                                 headers=request_headers,
-                                timeout=self.page.site.get_max_timeout_seconds()
+                                timeout=self.page_result.site_domain.site.get_max_timeout_seconds()
                                 )
 
         self.load_end_time = timezone.now()
-        self.status_code = response.status_code
-        self.save()
+
+        # Identify links within page:
+        parser = LinkParser(self.page_result.site_domain.url, self.page_result.site_domain.site.domains)
+        parser.feed(response.text)
+
+        for link in parser.internal_links:
+            link_page, created = PageResult.objects.get_or_create(
+                site_domain=self.page_result.site_domain,
+                url=link
+            )
 
         previous_item = None
         for item in response.history:
             previous_item = PageResponse.parse_response(self, previous_item, item)
 
-        PageResponse.parse_response(self, previous_item, response)
+        self.response = PageResponse.parse_response(self, previous_item, response)
+        self.save()
 
 
-class Page(BaseMetaData, BaseURL):
+class PageResult(BaseMetaData, BaseURL):
 
-    site = models.ForeignKey(
-        'config.Site',
+    site_domain = models.ForeignKey(
+        'config.SiteDomain',
         on_delete=models.CASCADE
     )
+    last_load_time = models.DateTimeField(blank=True, null=True)
 
     def load(self):
-        result = PageRequest(page=self)
+        logger.info(u"Loading %s" % (self))
+        result = PageRequest(page_result=self)
         result.save()
         result.load()
+
+        self.last_load_time = timezone.now()
+        self.save()
+
+    class Meta:
+        ordering = ['site_domain', 'url']

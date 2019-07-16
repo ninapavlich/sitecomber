@@ -29,6 +29,8 @@ DEBUG = bool(env('DEBUG', default=False))
 
 ALLOWED_HOSTS = []
 
+SITE_TITLE = env('SITE_TITLE', default="SiteComber")
+
 # Logging
 LOGGING = {
     'version': 1,
@@ -121,7 +123,7 @@ ROOT_URLCONF = 'sitecomber.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'sitecomber', 'apps', 'shared', 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -239,3 +241,4 @@ CKEDITOR_CONFIGS = {
 DEFAULT_USER_AGENT = env('DEFAULT_USER_AGENT', default='Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:68.0) Gecko/20100101 Firefox/68.0 Sitecomber')
 DEFAULT_MAX_REDIRECTS = int(env('DEFAULT_MAX_REDIRECTS', default=6))
 DEFAULT_MAX_TIMEOUT_SECONDS = int(env('DEFAULT_MAX_TIMEOUT_SECONDS', default=15))
+DEFAULT_SITEMAP_URL = 'sitemap.xml'
