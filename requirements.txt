@@ -11,7 +11,7 @@ django-encrypted-model-fields==0.5.8
 django-environ==0.4.5
 django-filter==2.1.0
 django-js-asset==1.2.2
--e git+https://github.com/ninapavlich/django-list-wrestler.git@93d7313c60641809ae837fff10df425c3ffb8f7f#egg=django_list_wrestler
+-e git+https://github.com/ninapavlich/django-list-wrestler.git@6.1#egg=django_list_wrestler
 djangorestframework==3.9.2
 idna==2.8
 lorem==0.1.1
