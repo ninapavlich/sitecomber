@@ -10,3 +10,5 @@ CORS_ORIGIN_WHITELIST = (
 CSRF_TRUSTED_ORIGINS = (
     env('APP_HOST_NAME')
 )
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
