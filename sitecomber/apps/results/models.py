@@ -72,6 +72,21 @@ class PageResponse(BaseMetaData, BaseResponse):
         r.create_response_headers(response.headers)
         return r
 
+    @classmethod
+    def parse_error_response(cls, request, redirected_from, error_message):
+        r = cls(
+            response_url=request.request_url,
+            status_code=0,
+            text_content=error_message,
+            request=request,
+            load_start_time=request.load_start_time,
+            load_end_time=request.load_start_time,
+            redirected_from=redirected_from
+        )
+
+        r.save()
+        return r
+
 
 class PageRequest(BaseMetaData, BaseRequest):
     """
@@ -107,28 +122,46 @@ class PageRequest(BaseMetaData, BaseRequest):
         request_headers = {'user-agent': self.page_result.site_domain.site.get_user_agent()}
         self.create_request_headers(request_headers)
 
-        response = requests.get(self.page_result.url,
-                                headers=request_headers,
-                                timeout=self.page_result.site_domain.site.get_max_timeout_seconds()
-                                )
+        response = None
+        error_message = None
+        previous_item = None
+        try:
+            response = requests.get(
+                self.page_result.url,
+                headers=request_headers,
+                timeout=self.page_result.site_domain.site.get_max_timeout_seconds()
+            )
+        except requests.exceptions.ConnectionError as e:
+            error_message = "ERROR: Connection Error when trying to load %s: %s" % (self.page_result.url, e)
+        except requests.exceptions.Timeout as e:
+            error_message = "ERROR: Timeout when trying to load %s: %s" % (self.page_result.url, e)
+        except requests.exceptions.RequestException as e:
+            error_message = "ERROR: Request Exception when trying to load %s: %s" % (self.page_result.url, e)
+        except requests.exceptions.TooManyRedirects as e:
+            error_message = "ERROR: Too many redirects when trying to load %s: %s" % (self.page_result.url, e)
 
         self.load_end_time = timezone.now()
 
-        # Identify links within page:
-        parser = LinkParser(self.page_result.site_domain.url, self.page_result.site_domain.site.domains, self.page_result.site_domain.site.ignored_query_params)
-        parser.feed(response.text)
+        # If this is an internal page, then parse its contents:
+        if response and self.page_result.is_internal:
+            parser = LinkParser(self.page_result.site_domain.url, self.page_result.site_domain.site.domains, self.page_result.site_domain.site.ignored_query_params)
+            parser.feed(response.text)
 
-        for link in parser.internal_links:
-            self.page_result.site_domain.handle_link(link, self.page_result, True)
+            for link in parser.internal_links:
+                self.page_result.site_domain.handle_link(link, self.page_result, True)
 
-        for link in parser.external_links:
-            self.page_result.site_domain.handle_link(link, self.page_result, False)
+            for link in parser.external_links:
+                self.page_result.site_domain.handle_link(link, self.page_result, False)
 
-        previous_item = None
-        for item in response.history:
-            previous_item = PageResponse.parse_response(self, previous_item, item)
+            for item in response.history:
+                previous_item = PageResponse.parse_response(self, previous_item, item)
 
-        self.response = PageResponse.parse_response(self, previous_item, response)
+        if error_message:
+            self.response = PageResponse.parse_error_response(self, previous_item, error_message)
+            logger.error(error_message)
+        else:
+            self.response = PageResponse.parse_response(self, previous_item, response)
+
         self.save()
 
 

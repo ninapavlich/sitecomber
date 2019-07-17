@@ -30,18 +30,12 @@ class Site(BaseMetaData):
     active = models.BooleanField(default=True)
     recursive = models.BooleanField(default=True)
     override_user_agent = models.TextField(blank=True, null=True)
-    override_max_redirects = models.IntegerField(blank=True, null=True)
     override_max_timeout_seconds = models.IntegerField(blank=True, null=True)
 
     def get_user_agent(self):
         if self.override_user_agent:
             return self.override_user_agent
         return settings.DEFAULT_USER_AGENT
-
-    def getmax_redirects(self):
-        if self.override_max_redirects:
-            return self.override_max_redirects
-        return settings.DEFAULT_MAX_REDIRECTS
 
     def get_max_timeout_seconds(self):
         if self.override_max_timeout_seconds:
@@ -146,7 +140,7 @@ class SiteDomain(BaseMetaData, BaseURL):
         if self.site.recursive:
 
             pages = PageResult.objects\
-                .filter(site_domain=self, is_internal=True)\
+                .filter(site_domain=self)\
                 .exclude(pk=root_page.pk)\
                 .order_by(F('last_load_time').desc(nulls_last=True)).reverse()
 

@@ -78,6 +78,12 @@ To run the worker locally, follow the "Local Development Quickstart" instruction
 
 ## Development Tools
 
+#### Manually crawl a single page result:
+```
+    # Crawl page result with primary key = 1
+    crawl_page 1
+```
+
 #### Manually crawl a batch of URLs within a site:
 ```
     # Crawl 5 URLs on the Site with primary key = 1

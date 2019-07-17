@@ -133,8 +133,8 @@ class PageTestResultInline(admin.TabularInline):
 
 @admin.register(PageTestResult)
 class PageTestResultAdmin(admin.ModelAdmin):
-    list_display = fields = readonly_fields = ['test', 'status', 'message', 'data', 'modified']
-    list_filter = ['status']
+    list_display = fields = readonly_fields = ['test', 'page', 'status', 'message', 'data', 'modified']
+    list_filter = ['status', 'test', 'page']
 
 
 @admin.register(PageResult)

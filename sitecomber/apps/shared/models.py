@@ -161,7 +161,7 @@ class BaseTestResult(models.Model):
     status = models.CharField(max_length=16, choices=STATUSES, default=STATUS_INFO)
 
     def __str__(self):
-        return u'%s on %s' % (self.status, self.test)
+        return u'%s. %s on %s' % (self.pk, self.status, self.test)
 
     class Meta:
         abstract = True

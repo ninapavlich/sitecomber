@@ -93,7 +93,7 @@ class SiteAdmin(admin.ModelAdmin):
                 'active',
                 'recursive',
                 'override_user_agent',
-                'override_max_redirects', 'override_max_timeout_seconds'
+                'override_max_timeout_seconds'
             )
         }),
         ('Metadata', {
