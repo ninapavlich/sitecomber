@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.template import Template, Context
 from django.utils.html import format_html
 from django.utils.text import Truncator
 
@@ -75,6 +76,7 @@ class PageRequestAdmin(admin.ModelAdmin):
         (None, {
             'fields': (
                 'view_page',
+                'retain',
                 'request_url',
                 'method',
                 ('status_code', 'content_type'),
@@ -108,7 +110,8 @@ class PageRequestAdmin(admin.ModelAdmin):
 
 class PageRequestInline(admin.TabularInline):
     model = PageRequest
-    readonly_fields = fields = ['request_url', 'method', 'status_code', 'content_type', 'load_start_time', 'view_item']
+    fields = ['request_url', 'method', 'status_code', 'content_type', 'load_start_time', 'retain', 'view_item']
+    readonly_fields = ['request_url', 'method', 'status_code', 'content_type', 'load_start_time', 'view_item']
     extra = 0
 
     def status_code(self, obj):
@@ -126,12 +129,16 @@ class PageRequestInline(admin.TabularInline):
 @admin.register(PageResult)
 class PageResultAdmin(admin.ModelAdmin):
 
-    list_display_links = list_display = ['site_domain', 'url', 'last_load_time']
-    list_filter = ['site_domain']
+    list_display_links = ['url', 'last_load_time']
+    list_display = ['site_domain', 'url', 'last_load_time', 'visit_url']
+    list_filter = ['site_domain', 'is_sitemap', 'is_root', 'is_internal']
     readonly_fields = ['site_domain', 'url', 'created', 'modified',
-                       'last_load_time', 'view_site_settings']
+                       'last_load_time', 'view_site_settings',
+                       'incoming_links', 'outgoing_links',
+                       'view_incoming_links', 'view_outgoing_links',
+                       'is_sitemap', 'is_root', 'is_internal']
     change_form_template = 'admin/pageresult_change_form.html'
-    filter_horizontal = ['referers']
+    # filter_horizontal = ['incoming_links', 'outgoing_links']
     search_fields = ['url']
 
     fieldsets = (
@@ -140,13 +147,16 @@ class PageResultAdmin(admin.ModelAdmin):
                 'view_site_settings',
                 'site_domain',
                 'url',
-                'referers'
+                'is_sitemap',
+                'is_root',
+                'is_internal',
+                'view_incoming_links',
+                'view_outgoing_links',
             )
         }),
         ('Metadata', {
             'fields': (
-                'created',
-                'modified'
+                ('created', 'modified'),
             ),
         }),
     )
@@ -154,5 +164,28 @@ class PageResultAdmin(admin.ModelAdmin):
     inlines = [PageRequestInline]
     custom_list_order_by = 'title'
 
+    def view_incoming_links(self, obj):
+        template = Template("""<table>
+        {% for link in links %}
+        <td><td>{{forloop.counter}}. <a href="{{link.get_edit_url}}">{{link.url}}</td><td><a href="{{link.url}}" target="_blank">Visit ></a></td></tr>
+        {% endfor %}
+        </table>""")
+        context = Context({"links": obj.incoming_links.all()})
+
+        return format_html(template.render(context))
+
+    def view_outgoing_links(self, obj):
+        template = Template("""<table>
+        {% for link in links %}
+        <td><td>{{forloop.counter}}. <a href="{{link.get_edit_url}}">{{link.url}}</td><td><a href="{{link.url}}" target="_blank">Visit ></a></td></tr>
+        {% endfor %}
+        </table>""")
+        context = Context({"links": obj.outgoing_links.all()})
+
+        return format_html(template.render(context))
+
     def view_site_settings(self, obj):
         return format_html(u'<a href="%s">< View Settings for %s</a>' % (obj.site_domain.site.get_edit_url(), obj.site_domain.site))
+
+    def visit_url(self, obj):
+        return format_html(u'<a href="%s" target="_blank">Visit ></a>' % (obj.url))

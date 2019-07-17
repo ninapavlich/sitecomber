@@ -70,7 +70,7 @@ Log in with the credentials you provided when you ran the 'createsuperuser' comm
 
 A background worker can run along side the web server to execute the crawling.
 
-To run the server locally, follow the "Local Development Quickstart" instructions above, and then run:
+To run the worker locally, follow the "Local Development Quickstart" instructions above, and then run:
 
 ```bash
     python site_comber_worker.py

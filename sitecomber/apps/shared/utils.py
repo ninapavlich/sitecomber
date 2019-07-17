@@ -1,11 +1,35 @@
 from html.parser import HTMLParser
-from urllib.parse import urlparse, urljoin
+from urllib.parse import urlparse, urljoin, parse_qs, urlencode
+
+
+def get_domain(url):
+    return urlparse(url)._replace(path='', query='', fragment='').geturl()
+
+
+def standardize_url(url, ignored_query_params):
+    # First removed any frontend fragments:
+    url = urlparse(url)._replace(fragment='').geturl()
+
+    # If path = "/" then remove it
+    if urlparse(url).path == '/':
+        url = urlparse(url)._replace(path='').geturl()
+
+    # Next remove unwanted QS
+    parsed_url = urlparse(url)
+    parsed_qs = parse_qs(parsed_url.query)
+
+    for param in ignored_query_params:
+        if param in parsed_qs:
+            del(parsed_qs[param])
+
+    return urlparse(url)._replace(query=urlencode(parsed_qs, True)).geturl()
 
 
 class LinkParser(HTMLParser):
 
     canonical_domain = None
     alias_domains = []
+    ignored_query_params = []
 
     links = []
     mailto_links = []
@@ -14,10 +38,11 @@ class LinkParser(HTMLParser):
     internal_links = []
     external_links = []
 
-    def __init__(self, canonical_domain, alias_domains):
+    def __init__(self, canonical_domain, alias_domains, ignored_query_params):
         self.canonical_domain = canonical_domain
         alias_domains.append(canonical_domain)
         self.alias_domains = list(set(alias_domains))
+        self.ignored_query_params = ignored_query_params
         super().__init__()
 
     def reset(self):
@@ -36,8 +61,8 @@ class LinkParser(HTMLParser):
 
     def handle_link(self, url):
 
-        # Remove front end fragment
-        url = urlparse(url)._replace(fragment='').geturl()
+        # standardize URL:
+        url = standardize_url(url, self.ignored_query_params)
 
         self.links.append(url)
 
@@ -52,18 +77,21 @@ class LinkParser(HTMLParser):
 
         else:
             if '//' not in url.lower():
-                self.internal_links.append(urljoin(self.canonical_domain, url))
+                self.handle_internal_link(url)
             else:
 
                 is_internal = False
 
-                url_domain = urlparse(url)._replace(path='', query='', fragment='').geturl()
+                url_domain = get_domain(url)
 
                 for domain in self.alias_domains:
                     if domain.lower() in url_domain.lower():
                         is_internal = True
 
                 if is_internal:
-                    self.internal_links.append(urljoin(self.canonical_domain, url))
+                    self.handle_internal_link(url)
                 else:
                     self.external_links.append(url)
+
+    def handle_internal_link(self, url):
+        self.internal_links.append(urljoin(self.canonical_domain, url))

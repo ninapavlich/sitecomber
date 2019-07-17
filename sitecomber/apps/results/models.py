@@ -1,4 +1,5 @@
 import logging
+from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
@@ -91,6 +92,7 @@ class PageRequest(BaseMetaData, BaseRequest):
 
     load_start_time = models.DateTimeField(blank=True, null=True)
     load_end_time = models.DateTimeField(blank=True, null=True)
+    retain = models.BooleanField(default=False)
 
     def __str__(self):
         return u'%s at %s' % (self.request_url, self.load_start_time)
@@ -112,15 +114,14 @@ class PageRequest(BaseMetaData, BaseRequest):
         self.load_end_time = timezone.now()
 
         # Identify links within page:
-        parser = LinkParser(self.page_result.site_domain.url, self.page_result.site_domain.site.domains)
+        parser = LinkParser(self.page_result.site_domain.url, self.page_result.site_domain.site.domains, self.page_result.site_domain.site.ignored_query_params)
         parser.feed(response.text)
 
         for link in parser.internal_links:
-            link_page, created = PageResult.objects.get_or_create(
-                site_domain=self.page_result.site_domain,
-                url=link
-            )
-            link_page.referers.add(self.page_result)
+            self.page_result.site_domain.handle_link(link, self.page_result, True)
+
+        for link in parser.external_links:
+            self.page_result.site_domain.handle_link(link, self.page_result, False)
 
         previous_item = None
         for item in response.history:
@@ -137,10 +138,21 @@ class PageResult(BaseMetaData, BaseURL):
         on_delete=models.CASCADE
     )
     last_load_time = models.DateTimeField(blank=True, null=True)
-    referers = models.ManyToManyField('self')
+    incoming_links = models.ManyToManyField('self', symmetrical=False, related_name="page_incoming_links",)
+    outgoing_links = models.ManyToManyField('self', symmetrical=False, related_name="page_outgoing_links",)
+
+    is_sitemap = models.BooleanField(default=False)
+    is_root = models.BooleanField(default=False)
+    is_internal = models.BooleanField(default=True)
 
     def load(self):
         logger.info(u"Loading %s" % (self))
+
+        # First clean old records
+        old_records = PageRequest.objects.filter(page_result=self).exclude(retain=True).order_by('-created')
+        for old_record in old_records[settings.DEFAULT_MAINTAIN_PREVIOUS_RECORD_COUNT:]:
+            old_record.delete()
+
         result = PageRequest(page_result=self)
         result.save()
         result.load()

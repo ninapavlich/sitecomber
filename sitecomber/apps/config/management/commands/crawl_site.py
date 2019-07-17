@@ -22,7 +22,6 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('site_pk', nargs='+', type=int)
         parser.add_argument('load_batch_size', nargs='+', type=int)
-        # parser.add_argument('--example_bool', action='store_true', default=False)
 
     def handle(self, *args, **options):
 
@@ -36,4 +35,5 @@ class Command(BaseCommand):
             logger.error(u"Could not find site with primary key = %s" % (site_pk))
             return
 
+        site.parse_sitemap()
         site.crawl(load_batch_size)

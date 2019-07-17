@@ -38,6 +38,8 @@ class Worker:
     loop_timer = Event()
     loop_duration = 1
 
+    sites = None
+
     def __init__(self, pidfile, stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):
         self.stdin = stdin
         self.stdout = stdout
@@ -106,13 +108,14 @@ class Worker:
             self.loop_timer.wait(self.loop_duration)
 
     def on_start(self):
-        # Custom Logic Here
-        pass
+        self.sites = Site.objects.filter(active=True)
+        for site in self.sites:
+            if not self.running:
+                return
+            site.parse_sitemap()
 
     def on_loop(self):
-
-        sites = Site.objects.filter(active=True)
-        for site in sites:
+        for site in self.sites:
             if not self.running:
                 return
             site.crawl(settings.LOAD_BATCH_SIZE)
