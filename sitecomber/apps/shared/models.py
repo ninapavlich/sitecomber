@@ -46,7 +46,7 @@ class BaseAuthenticationCredentials(models.Model):
 class BaseURL(BaseAuthenticationCredentials):
 
     title = models.CharField(max_length=255, blank=True, null=True)
-    url = models.URLField()
+    url = models.URLField(max_length=2000)
 
     def __str__(self):
         return self.url
