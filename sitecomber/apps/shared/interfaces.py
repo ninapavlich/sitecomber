@@ -6,7 +6,7 @@ class BaseSiteTest:
 
     @property
     def class_path(self):
-        return u'%s.%s' % (self.__class.__module__, self.__class.__name__)
+        return u'%s.%s' % (self.__class__.__module__, self.__class__.__name__)
 
     def on_page_parsed(self, page):
         # print("Page parsed on site!")

@@ -3,7 +3,7 @@ from django.template import Template, Context
 from django.utils.html import format_html
 from django.utils.text import Truncator
 
-from .models import PageResult, PageRequest, PageResponse, ResponseHeader, RequestHeader
+from .models import PageResult, PageRequest, PageResponse, ResponseHeader, RequestHeader, PageTestResult
 
 
 class ResponseHeaderInline(admin.TabularInline):
@@ -124,6 +124,13 @@ class PageRequestInline(admin.TabularInline):
         return format_html(u'<a href="%s">View Request Details +</a>' % (obj.get_edit_url()))
 
 
+class PageTestResult(admin.TabularInline):
+    model = PageTestResult
+    extra = 0
+    max_num = 0
+    fields = readonly_fields = ['test', 'status', 'message', 'data']
+
+
 @admin.register(PageResult)
 class PageResultAdmin(admin.ModelAdmin):
 
@@ -159,7 +166,7 @@ class PageResultAdmin(admin.ModelAdmin):
         }),
     )
 
-    inlines = [PageRequestInline]
+    inlines = [PageRequestInline, PageTestResult]
     custom_list_order_by = 'title'
 
     def view_incoming_links(self, obj):

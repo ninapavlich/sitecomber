@@ -162,3 +162,6 @@ class BaseTestResult(models.Model):
 
     def __str__(self):
         return u'%s on %s' % (self.status, self.test)
+
+    class Meta:
+        abstract = True

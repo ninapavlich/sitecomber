@@ -10,19 +10,15 @@ class BrokenLinkTest(BaseSiteTest):
         if page.latest_request and page.latest_request.response:
             status_code = page.latest_request.response.status_code
 
-            print(self.class_path)
             status = PageTestResult.STATUS_SUCCESS if status_code == 200 else PageTestResult.STATUS_ERROR
-            message = 'Okay'
+            message = 'Okay' if status_code == 200 else 'Error loading URL'
 
             r, created = PageTestResult.objects.get_or_create(
                 page=page,
-                test=self,
+                test=self.class_path,
                 defaults={
                     'data': status_code,
                     'message': message,
                     'status': status,
                 }
             )
-
-            print(r)
-        pass
