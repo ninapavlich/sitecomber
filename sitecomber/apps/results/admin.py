@@ -124,11 +124,17 @@ class PageRequestInline(admin.TabularInline):
         return format_html(u'<a href="%s">View Request Details +</a>' % (obj.get_edit_url()))
 
 
-class PageTestResult(admin.TabularInline):
+class PageTestResultInline(admin.TabularInline):
     model = PageTestResult
     extra = 0
     max_num = 0
-    fields = readonly_fields = ['test', 'status', 'message', 'data']
+    fields = readonly_fields = ['test', 'status', 'message', 'data', 'modified']
+
+
+@admin.register(PageTestResult)
+class PageTestResultAdmin(admin.ModelAdmin):
+    list_display = fields = readonly_fields = ['test', 'status', 'message', 'data', 'modified']
+    list_filter = ['status']
 
 
 @admin.register(PageResult)
@@ -166,7 +172,7 @@ class PageResultAdmin(admin.ModelAdmin):
         }),
     )
 
-    inlines = [PageRequestInline, PageTestResult]
+    inlines = [PageRequestInline, PageTestResultInline]
     custom_list_order_by = 'title'
 
     def view_incoming_links(self, obj):
