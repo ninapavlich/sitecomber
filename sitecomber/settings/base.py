@@ -85,6 +85,7 @@ INSTALLED_APPS = [
     'dal',
     'dal_select2',
     'ckeditor',
+    'django_ace',
     'django_list_wrestler',
 
     'rest_framework',
@@ -95,7 +96,9 @@ INSTALLED_APPS = [
     # Application components
     'sitecomber.apps.shared',
     'sitecomber.apps.config',
-    'sitecomber.apps.results'
+    'sitecomber.apps.results',
+
+    'sitecomber.apps.tests.core'
 ]
 
 

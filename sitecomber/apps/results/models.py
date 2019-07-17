@@ -2,10 +2,11 @@ import logging
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
+from django.utils.functional import cached_property
 
 import requests
 
-from sitecomber.apps.shared.models import BaseMetaData, BaseURL, BaseHeader, BaseRequest, BaseResponse
+from sitecomber.apps.shared.models import BaseMetaData, BaseURL, BaseHeader, BaseRequest, BaseResponse, BaseTestResult
 from sitecomber.apps.shared.utils import LinkParser
 
 logger = logging.getLogger('django')
@@ -160,5 +161,33 @@ class PageResult(BaseMetaData, BaseURL):
         self.last_load_time = timezone.now()
         self.save()
 
+    @cached_property
+    def latest_request(self):
+        return self.pagerequest_set.order_by('-created').first()
+
     class Meta:
         ordering = ['site_domain', 'url']
+
+
+class SiteTestResult(BaseMetaData, BaseTestResult):
+
+    site = models.ForeignKey(
+        'config.Site',
+        on_delete=models.CASCADE
+    )
+
+
+class SiteDomainTestResult(BaseMetaData, BaseTestResult):
+
+    site_domain = models.ForeignKey(
+        'config.SiteDomain',
+        on_delete=models.CASCADE
+    )
+
+
+class PageTestResult(BaseMetaData, BaseTestResult):
+
+    page = models.ForeignKey(
+        'results.PageResult',
+        on_delete=models.CASCADE
+    )

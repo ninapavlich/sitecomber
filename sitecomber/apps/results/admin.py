@@ -64,13 +64,11 @@ class PageResponseInline(admin.TabularInline):
     def view_item(self, obj):
         return format_html(u'<a href="%s">View Response Details +</a>' % (obj.get_edit_url()))
 
-    inlines = [RequestHeaderInline]
-
 
 @admin.register(PageRequest)
 class PageRequestAdmin(admin.ModelAdmin):
 
-    inlines = [PageResponseInline]
+    inlines = [RequestHeaderInline, PageResponseInline]
 
     fieldsets = (
         (None, {

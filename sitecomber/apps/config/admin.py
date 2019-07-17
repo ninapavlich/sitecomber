@@ -1,12 +1,13 @@
 from django.contrib import admin
-from django.conf import settings
+from django import forms
 
-from dal import forward
+# from dal import forward
+from django_ace import AceWidget
 
 from sitecomber.apps.shared.forms import AdminAutocompleteFormMixin
-from sitecomber.apps.shared.admin import AdminModelSelect2
+# from sitecomber.apps.shared.admin import AdminModelSelect2
 
-from .models import Site, SiteDomain, IgnoreURL, IgnoreQueryParam
+from .models import Site, SiteDomain, IgnoreURL, IgnoreQueryParam, SiteTestSetting
 
 
 class SiteDomainForm(AdminAutocompleteFormMixin):
@@ -60,6 +61,22 @@ class SiteForm(AdminAutocompleteFormMixin):
         }
 
 
+class SiteTestSettingAdminForm(forms.ModelForm):
+    settings = forms.CharField(
+        widget=AceWidget(mode='json', width="600px", height="200px", showprintmargin=True, wordwrap=True), required=False)
+
+    class Meta:
+        model = SiteTestSetting
+        fields = '__all__'
+
+
+class SiteTestSettingInline(admin.TabularInline):
+    model = SiteTestSetting
+    form = SiteTestSettingAdminForm
+    fields = ['test', 'settings', 'active']
+    extra = 0
+
+
 @admin.register(Site)
 class SiteAdmin(admin.ModelAdmin):
     form = SiteForm
@@ -87,5 +104,5 @@ class SiteAdmin(admin.ModelAdmin):
         }),
     )
 
-    inlines = [SiteDomainInline, IgnoreURLInline, IgnoreQueryParamInline]
+    inlines = [SiteDomainInline, IgnoreURLInline, IgnoreQueryParamInline, SiteTestSettingInline]
     custom_list_order_by = 'title'

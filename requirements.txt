@@ -5,6 +5,7 @@ cffi==1.12.3
 chardet==3.0.4
 cryptography==2.7
 Django==2.2.3
+django-ace==1.0.5
 django-autocomplete-light==3.3.2
 django-ckeditor==5.6.1
 django-debug-toolbar==1.11

@@ -4,6 +4,8 @@ from django.urls import reverse
 
 from encrypted_model_fields.fields import EncryptedCharField
 
+from .utils import get_test_choices
+
 
 class BaseMetaData(models.Model):
     """A base class to manage metadata shared between models
@@ -121,7 +123,7 @@ class BaseRequest(models.Model):
 class BaseResponse(models.Model):
 
     response_url = models.URLField()
-    status_code = models.CharField(max_length=255, blank=True, null=True)
+    status_code = models.IntegerField(blank=True, null=True)
     content_type = models.CharField(max_length=255, blank=True, null=True)
     content_length = models.IntegerField(blank=True, null=True)
     http_version = models.CharField(max_length=255, blank=True, null=True)
@@ -138,3 +140,25 @@ class BaseResponse(models.Model):
 
     class Meta:
         abstract = True
+
+
+class BaseTestResult(models.Model):
+
+    test = models.CharField(max_length=255, choices=get_test_choices())
+    data = models.TextField(blank=True, null=True)
+    message = models.TextField(blank=True, null=True)
+
+    STATUS_INFO = 'info'
+    STATUS_WARNING = 'warning'
+    STATUS_SUCCESS = 'success'
+    STATUS_ERROR = 'error'
+    STATUSES = (
+        (STATUS_INFO, 'Info'),
+        (STATUS_WARNING, 'Warning'),
+        (STATUS_SUCCESS, 'Success'),
+        (STATUS_ERROR, 'Error'),
+    )
+    status = models.CharField(max_length=16, choices=STATUSES, default=STATUS_INFO)
+
+    def __str__(self):
+        return u'%s on %s' % (self.status, self.test)

@@ -1,16 +1,18 @@
 import logging
+import importlib
 
 from django.db import models
 from django.db.models import F
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.utils.functional import cached_property
 
 from usp.tree import sitemap_tree_for_homepage
 
 from sitecomber.apps.shared.models import BaseMetaData, BaseURL
-from sitecomber.apps.shared.utils import get_domain
-
+from sitecomber.apps.shared.utils import get_domain, get_test_choices
 from sitecomber.apps.results.models import PageResult
+
 
 logger = logging.getLogger('django')
 
@@ -47,18 +49,24 @@ class Site(BaseMetaData):
         return settings.DEFAULT_MAX_TIMEOUT_SECONDS
 
     def parse_sitemap(self):
+        tests = self.tests
         for domain in self.sitedomain_set.filter(should_crawl=True):
-            domain.parse_sitemap()
+            domain.parse_sitemap(tests)
 
     def crawl(self, load_batch_size):
+        tests = self.tests
         for domain in self.sitedomain_set.filter(should_crawl=True):
-            domain.crawl(load_batch_size)
+            domain.crawl(tests, load_batch_size)
 
-    @property
+    @cached_property
+    def tests(self):
+        return [item.class_instance for item in self.sitetestsetting_set.all()]
+
+    @cached_property
     def domains(self):
         return [item.url for item in self.sitedomain_set.all()]
 
-    @property
+    @cached_property
     def ignored_query_params(self):
         return [item.param for item in self.ignorequeryparam_set.all()]
 
@@ -98,7 +106,7 @@ class SiteDomain(BaseMetaData, BaseURL):
 
         super(SiteDomain, self).save(*args, **kwargs)
 
-    def parse_sitemap(self):
+    def parse_sitemap(self, tests):
 
         root_page, created = PageResult.objects.get_or_create(
             site_domain=self,
@@ -106,6 +114,9 @@ class SiteDomain(BaseMetaData, BaseURL):
             defaults={'is_root': True}
         )
         root_page.load()
+        for test in tests:
+            test.on_page_parsed(root_page)
+            test.on_root_parsed(root_page)
 
         sitemap_ctr = 0
         page_ctr = 0
@@ -119,9 +130,12 @@ class SiteDomain(BaseMetaData, BaseURL):
                 self.handle_link(sitemap_item_url.url, sitemap_item)
                 page_ctr += 1
 
+            for test in tests:
+                test.on_sitemap_parsed(sitemap_item)
+
         logger.info("Found %s pages in %s sitemap(s)" % (page_ctr, sitemap_ctr))
 
-    def crawl(self, load_batch_size):
+    def crawl(self, tests, load_batch_size):
 
         root_page, created = PageResult.objects.get_or_create(
             site_domain=self,
@@ -141,6 +155,12 @@ class SiteDomain(BaseMetaData, BaseURL):
             pages_to_load = pages[:load_batch_size]
             for page in pages_to_load:
                 page.load()
+                for test in tests:
+                    test.on_page_parsed(page)
+                    if page.is_internal:
+                        test.on_internal_page_parsed(page)
+                    else:
+                        test.on_external_page_parsed(page)
 
     def handle_link(self, url, source_page=None, is_internal=True):
 
@@ -192,3 +212,26 @@ class IgnoreQueryParam(BaseMetaData):
 
     def __str__(self):
         return self.param
+
+
+class SiteTestSetting(BaseMetaData):
+
+    site = models.ForeignKey(
+        'config.Site',
+        on_delete=models.CASCADE
+    )
+    test = models.CharField(max_length=255, choices=get_test_choices())
+    active = models.BooleanField(default=True)
+    settings = models.TextField(null=True, blank=True)
+
+    @property
+    def class_instance(self):
+        if not self.test:
+            return None
+        module_name, class_name = self.test.rsplit('.', 1)
+        module = importlib.import_module(module_name)
+        class_ = getattr(module, class_name)
+        return class_(self.site, self.settings)
+
+    def __str__(self):
+        return u'%s for %s' % (self.test, self.site)

@@ -1,5 +1,10 @@
+import logging
 from html.parser import HTMLParser
 from urllib.parse import urlparse, urljoin, parse_qs, urlencode
+
+from .interfaces import BaseSiteTest
+
+logger = logging.getLogger('django')
 
 
 def get_domain(url):
@@ -95,3 +100,18 @@ class LinkParser(HTMLParser):
 
     def handle_internal_link(self, url):
         self.internal_links.append(urljoin(self.canonical_domain, url))
+
+
+def class_to_path(cls):
+    return u'%s.%s' % (cls.__module__, cls.__name__)
+
+
+def get_test_choices():
+    """
+    Returns a list of all items that extend the BaseSiteTest base class
+    """
+    subclasses = BaseSiteTest.__subclasses__()
+    if len(subclasses) == 0:
+        logger.warn("No classes found that extend BaseSiteTest. Please verify that you have installed some tests.")
+
+    return [(class_to_path(cls), cls.__name__) for cls in subclasses]
