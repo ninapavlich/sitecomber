@@ -20,8 +20,7 @@ LOGGING['loggers'][WORKER_ID] = {
     'level': 'WARNING',
     'propagate': True,
 }
-if 'file' in LOGGING['handlers']:
-    LOGGING['handlers']['file']['filename'] = LOG_FILE
+
 
 if DEBUG:
     LOGGING['loggers'][WORKER_ID]['level'] = 'INFO'
