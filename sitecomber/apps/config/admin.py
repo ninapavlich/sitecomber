@@ -51,12 +51,12 @@ class SiteForm(AdminAutocompleteFormMixin):
         fields = ('__all__')
 
         widgets = {
-            'owner': AdminModelSelect2(
-                url='admin-autocomplete',
-                attrs={'data-html': True},
-                forward=(forward.Const(
-                    val=settings.AUTH_USER_MODEL, dst="model"),)
-            ),
+            # 'owner': AdminModelSelect2(
+            #     url='admin-autocomplete',
+            #     attrs={'data-html': True},
+            #     forward=(forward.Const(
+            #         val=settings.AUTH_USER_MODEL, dst="model"),)
+            # ),
         }
 
 
