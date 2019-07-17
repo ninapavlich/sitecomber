@@ -27,6 +27,7 @@ if DEBUG:
     LOGGING['loggers']['django']['level'] = 'INFO'
     LOGGING['loggers']['root']['level'] = 'INFO'
     LOGGING['handlers']['console']['level'] = 'INFO'
-    LOGGING['handlers']['file']['level'] = 'INFO'
+    if 'file' in LOGGING['handlers']:
+        LOGGING['handlers']['file']['level'] = 'INFO'
 
 LOAD_BATCH_SIZE = int(env('LOAD_BATCH_SIZE', default=10))
