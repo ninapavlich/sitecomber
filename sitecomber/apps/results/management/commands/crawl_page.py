@@ -37,7 +37,3 @@ class Command(BaseCommand):
         tests = page.site_domain.site.tests
         for test in tests:
             test.on_page_parsed(page)
-            if page.is_internal:
-                test.on_internal_page_parsed(page)
-            else:
-                test.on_external_page_parsed(page)

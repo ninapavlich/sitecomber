@@ -110,7 +110,6 @@ class SiteDomain(BaseMetaData, BaseURL):
         root_page.load()
         for test in tests:
             test.on_page_parsed(root_page)
-            test.on_root_parsed(root_page)
 
         sitemap_ctr = 0
         page_ctr = 0
@@ -151,10 +150,6 @@ class SiteDomain(BaseMetaData, BaseURL):
                 page.load()
                 for test in tests:
                     test.on_page_parsed(page)
-                    if page.is_internal:
-                        test.on_internal_page_parsed(page)
-                    else:
-                        test.on_external_page_parsed(page)
 
     def handle_link(self, url, source_page=None, is_internal=True):
 

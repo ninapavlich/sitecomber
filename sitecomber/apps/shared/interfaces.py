@@ -15,15 +15,3 @@ class BaseSiteTest:
     def on_sitemap_parsed(self, page):
         # print("Sitemap parsed on site!")
         pass
-
-    def on_root_parsed(self, page):
-        # print("root page parsed on site!")
-        pass
-
-    def on_internal_page_parsed(self, page):
-        # print("internal page parsed on site!")
-        pass
-
-    def on_external_page_parsed(self, page):
-        # print("external page parsed on site!")
-        pass

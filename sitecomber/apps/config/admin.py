@@ -80,6 +80,7 @@ class SiteTestSettingInline(admin.TabularInline):
 @admin.register(Site)
 class SiteAdmin(admin.ModelAdmin):
     form = SiteForm
+    change_form_template = 'admin/site_change_form.html'
 
     list_display_links = list_display = ['owner', 'title', 'created', 'active']
     list_filter = ['owner', 'active']

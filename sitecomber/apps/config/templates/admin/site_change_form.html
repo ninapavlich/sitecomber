@@ -1,0 +1,14 @@
+{% extends 'admin/change_form.html' %}
+
+
+
+{% block object-tools-items %}
+{{block.super}}
+<li>
+    <a href="/admin/results/pageresult/?site_domain__site__id__exact={{original.pk}}" class="viewsitelink" target="_blank">View Pages</a>
+</li>
+<li>
+    <a href="/admin/results/pagetestresult/?page__site_domain__site__id__exact={{original.pk}}" class="viewsitelink" target="_blank">View Test Results</a>
+</li>
+{% endblock %}
+a

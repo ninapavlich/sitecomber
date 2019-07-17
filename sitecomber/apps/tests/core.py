@@ -29,6 +29,10 @@ class BrokenOutgoingLinkTest(BaseSiteTest):
 
     def on_page_parsed(self, page):
 
+        # Only apply to internal pages
+        if not page.is_internal:
+            return
+
         from sitecomber.apps.results.models import PageTestResult
 
         broken_outgoing_links = []

@@ -76,8 +76,8 @@ class PageRequestAdmin(admin.ModelAdmin):
                 'view_page',
                 'retain',
                 'request_url',
-                'method',
-                ('status_code', 'content_type'),
+                ('method', 'status_code'),
+                ('content_type', 'content_length'),
                 'view_response',
                 ('load_start_time', 'load_end_time',),
             )
@@ -86,8 +86,8 @@ class PageRequestAdmin(admin.ModelAdmin):
     )
     readonly_fields = ['view_page',
                        'request_url',
-                       'method',
-                       'status_code', 'content_type',
+                       'method', 'status_code',
+                       'content_type', 'content_length',
                        'view_response',
                        'load_start_time', 'load_end_time', ]
 
@@ -102,14 +102,18 @@ class PageRequestAdmin(admin.ModelAdmin):
         if obj.response:
             return obj.response.content_type
 
+    def content_length(self, obj):
+        if obj.response:
+            return obj.response.content_length
+
     def view_response(self, obj):
         return format_html(u'<a href="%s">View Response</a>' % (obj.response.get_edit_url()))
 
 
 class PageRequestInline(admin.TabularInline):
     model = PageRequest
-    fields = ['request_url', 'method', 'status_code', 'content_type', 'load_start_time', 'retain', 'view_item']
-    readonly_fields = ['request_url', 'method', 'status_code', 'content_type', 'load_start_time', 'view_item']
+    fields = ['request_url', 'method', 'status_code', 'content_type', 'content_length', 'load_start_time', 'retain', 'view_item']
+    readonly_fields = ['request_url', 'method', 'status_code', 'content_type', 'content_length', 'load_start_time', 'view_item']
     extra = 0
 
     def status_code(self, obj):
@@ -119,6 +123,10 @@ class PageRequestInline(admin.TabularInline):
     def content_type(self, obj):
         if obj.response:
             return obj.response.content_type
+
+    def content_length(self, obj):
+        if obj.response:
+            return obj.response.content_length
 
     def view_item(self, obj):
         return format_html(u'<a href="%s">View Request Details +</a>' % (obj.get_edit_url()))
@@ -133,8 +141,17 @@ class PageTestResultInline(admin.TabularInline):
 
 @admin.register(PageTestResult)
 class PageTestResultAdmin(admin.ModelAdmin):
-    list_display = fields = readonly_fields = ['test', 'page', 'status', 'message', 'data', 'modified']
-    list_filter = ['status', 'test', 'page']
+
+    def view_page(self, obj):
+        return format_html('<div title="%s">%s</div> <a href="%s" target="_blank">View Page Results ></a>' % (
+            obj.page.url,
+            Truncator(obj.page.url).chars(80),
+            obj.page.get_edit_url()
+        ))
+
+    list_display = ['test', 'view_page', 'status', 'message', 'modified']
+    fields = readonly_fields = ['test', 'view_page', 'status', 'message', 'data', 'modified']
+    list_filter = ['page__site_domain__site', 'status', 'test', 'page']
 
 
 @admin.register(PageResult)
@@ -142,7 +159,7 @@ class PageResultAdmin(admin.ModelAdmin):
 
     list_display_links = ['url', 'last_load_time']
     list_display = ['site_domain', 'url', 'last_load_time', 'visit_url']
-    list_filter = ['site_domain', 'is_sitemap', 'is_root', 'is_internal']
+    list_filter = ['site_domain__site', 'site_domain', 'is_sitemap', 'is_root', 'is_internal']
     readonly_fields = ['site_domain', 'url', 'created', 'modified',
                        'last_load_time', 'view_site_settings',
                        'incoming_links', 'outgoing_links',
