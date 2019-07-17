@@ -28,7 +28,7 @@ class SiteDomainForm(AdminAutocompleteFormMixin):
 class SiteDomainInline(admin.TabularInline):
     model = SiteDomain
     form = SiteDomainForm
-    fields = ['title', 'url', 'should_crawl', 'alias_of', 'override_sitemap']  # , 'authentication_type', 'authentication_data']
+    fields = ['title', 'url', 'should_crawl', 'alias_of', ]  # , 'authentication_type', 'authentication_data']
     extra = 0
 
 
