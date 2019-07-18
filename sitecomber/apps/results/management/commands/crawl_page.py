@@ -36,4 +36,4 @@ class Command(BaseCommand):
         page.load()
         tests = page.site_domain.site.tests
         for test in tests:
-            test.on_page_parsed(page)
+            test.page_parsed(page)

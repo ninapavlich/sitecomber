@@ -111,7 +111,7 @@ class SiteDomain(BaseMetaData, BaseURL):
             )
             root_page.load()
             for test in tests:
-                test.on_page_parsed(root_page)
+                test.page_parsed(root_page)
         except MultipleObjectsReturned as e:
             logger.error("MultipleObjectsReturned when creating root page for site %s with url %s: %s" % (self, self.url, e))
 
@@ -156,7 +156,7 @@ class SiteDomain(BaseMetaData, BaseURL):
             for page in pages_to_load:
                 page.load()
                 for test in tests:
-                    test.on_page_parsed(page)
+                    test.page_parsed(page)
 
     def handle_link(self, url, source_page=None, is_internal=True):
 
