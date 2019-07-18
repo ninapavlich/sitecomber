@@ -41,10 +41,10 @@ class PageResponseAdmin(admin.ModelAdmin):
                        'status_code',
                        'load_start_time', 'load_end_time',
                        'content_type', 'content_length',
-                       'view_text', 'view_url']
+                       'view_text', 'view_url', 'request_method']
 
-    list_display = list_display_links = ['view_url', 'status_code']
-    list_filter = ['status_code', 'content_type']
+    list_display = list_display_links = ['view_url', 'request_method', 'status_code']
+    list_filter = ['request__method', 'status_code', 'content_type']
     search_fields = ['response_url']
 
     def view_url(self, obj):
@@ -52,6 +52,10 @@ class PageResponseAdmin(admin.ModelAdmin):
 
     def view_text(self, obj):
         return Truncator(obj.text_content).chars(1000)
+
+    def request_method(self, obj):
+        if obj.request:
+            return obj.request.method
 
     def view_request(self, obj):
         return format_html(u'<a href="%s">< Back to Request</a>' % (obj.request.get_edit_url()))
@@ -99,7 +103,7 @@ class PageRequestAdmin(admin.ModelAdmin):
                        'load_start_time', 'load_end_time', 'view_url']
 
     list_display = list_display_links = ['view_url', 'method', 'status_code']
-    list_filter = ['method', 'status_code']
+    list_filter = ['method', 'response__status_code', 'response__content_type']
     search_fields = ['request_url']
 
     def view_url(self, obj):
@@ -165,7 +169,8 @@ class PageTestResultAdmin(admin.ModelAdmin):
 
     list_display = ['test', 'view_page', 'status', 'message', 'modified']
     fields = readonly_fields = ['test', 'view_page', 'status', 'message', 'data', 'modified']
-    list_filter = ['page__site_domain__site', 'status', 'test', 'page']
+    list_filter = ['page__site_domain__site', 'status', 'test']
+    search_fields = ['page__url']
 
 
 @admin.register(PageResult)
