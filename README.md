@@ -1,15 +1,15 @@
 # SiteComber
 This tool crawls an entire domain (or set of domain) to create a living snapshot of a website. A worker script is constantly crawling and re-crawing to provide the most up-to-date snapshot.
 
-With this snapshot you are able to see problems that may arise from content entry or underlying code problems.
+With this snapshot you are able to see problems that may arise from content entry or underlying code problems. For example, you can use this tool to identify problems like broken links, spelling errors, slow load times, or SEO issues. 
 
-You can use this tool to identify problems like broken links, spelling errors, slow load times, or SEO issues. A whole suite of tests are available out of the box, but you can also write your own custom tests to fit your own needs. Some examples: You could use natural language processing to make sure your language doesn't exceed a certain reading level. Or you could hook into the Google Analytics API to correlate search performance to load times. Or you could use Selenium to generate snapshots at different window sizes.
+A whole suite of tests are available out of the box, but you can also write your own custom tests to fit your own needs. Some examples: You could use natural language processing to make sure your language doesn't exceed a certain reading level. Or you could hook into the Google Analytics API to correlate search performance to load times. Or you could use Selenium to generate snapshots at different window sizes.
 
 ## Featured Tests
 
-*Built-In* Built into the core code is "PageUpTest," which will tell you if an internal page isn't returning a 200 status code, and "BrokenOutgoingLinkTest," which will tell you if a page contains broken outgoing links.
+**Built-In Tests** Built into the core code is "PageUpTest," which will tell you if an internal page isn't returning a 200 status code, and "BrokenOutgoingLinkTest," which will tell you if a page contains broken outgoing links.
 
-*[Article Content Test](https://github.com/ninapavlich/sitecomber-article-tests)* These tests provide tools for ensuring that articles are optimized for Reader View, no misspellings or placeholder text is found, and estimating article read time.
+**[Article Content Test](https://github.com/ninapavlich/sitecomber-article-tests)** These tests provide tools for ensuring that articles are optimized for Reader View, no misspellings or placeholder text is found, and estimating article read time.
 
 ## Heroku One-Click Deployment Quickstart
 
