@@ -41,7 +41,13 @@ class PageResponseAdmin(admin.ModelAdmin):
                        'status_code',
                        'load_start_time', 'load_end_time',
                        'content_type', 'content_length',
-                       'view_text']
+                       'view_text', 'view_url']
+
+    list_display = list_display_links = ['view_url', 'status_code']
+    list_filter = ['status_code', 'content_type']
+
+    def view_url(self, obj):
+        return Truncator(obj.response_url).chars(80)
 
     def view_text(self, obj):
         return Truncator(obj.text_content).chars(1000)
@@ -89,7 +95,13 @@ class PageRequestAdmin(admin.ModelAdmin):
                        'method', 'status_code',
                        'content_type', 'content_length',
                        'view_response',
-                       'load_start_time', 'load_end_time', ]
+                       'load_start_time', 'load_end_time', 'view_url']
+
+    list_display = list_display_links = ['view_url', 'method', 'status_code']
+    list_filter = ['method']
+
+    def view_url(self, obj):
+        return Truncator(obj.request_url).chars(80)
 
     def view_page(self, obj):
         return format_html(u'<a href="%s">< Back to %s</a>' % (obj.page.get_edit_url(), obj.page))
@@ -157,10 +169,10 @@ class PageTestResultAdmin(admin.ModelAdmin):
 @admin.register(PageResult)
 class PageResultAdmin(admin.ModelAdmin):
 
-    list_display_links = ['url', 'last_load_time']
-    list_display = ['site_domain', 'url', 'last_load_time', 'visit_url']
+    list_display_links = ['view_url', 'last_load_time']
+    list_display = ['site_domain', 'view_url', 'last_load_time', 'visit_url']
     list_filter = ['site_domain__site', 'site_domain', 'is_sitemap', 'is_root', 'is_internal']
-    readonly_fields = ['site_domain', 'url', 'created', 'modified',
+    readonly_fields = ['site_domain', 'url', 'view_url', 'created', 'modified',
                        'last_load_time', 'view_site_settings',
                        'incoming_links', 'outgoing_links',
                        'view_incoming_links', 'view_outgoing_links',
@@ -191,6 +203,9 @@ class PageResultAdmin(admin.ModelAdmin):
 
     inlines = [PageRequestInline, PageTestResultInline]
     custom_list_order_by = 'title'
+
+    def view_url(self, obj):
+        return Truncator(obj.url).chars(80)
 
     def view_incoming_links(self, obj):
         template = Template("""<table>
