@@ -128,7 +128,7 @@ class SiteDomain(BaseMetaData, BaseURL):
                 page_ctr += 1
 
             for test in tests:
-                test.on_sitemap_parsed(sitemap_item)
+                test.sitemap_parsed(sitemap_item)
 
         logger.info("Found %s pages in %s sitemap(s)" % (page_ctr, sitemap_ctr))
 
