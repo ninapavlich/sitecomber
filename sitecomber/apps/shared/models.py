@@ -1,10 +1,14 @@
+import logging
+
 from django.db import models
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, MultipleObjectsReturned
 from django.urls import reverse
 
 from encrypted_model_fields.fields import EncryptedCharField
 
 from .utils import get_test_choices
+
+logger = logging.getLogger('django')
 
 
 class BaseMetaData(models.Model):
@@ -72,11 +76,15 @@ class BaseHeader(models.Model):
 
 def create_headers(parent_instance, header_model, dict):
     for key, val in dict.items():
-        obj, created = header_model.objects.get_or_create(
-            parent=parent_instance,
-            key=key,
-            defaults={'value': val},
-        )
+
+        try:
+            obj, created = header_model.objects.get_or_create(
+                parent=parent_instance,
+                key=key,
+                defaults={'value': val},
+            )
+        except MultipleObjectsReturned as e:
+            logger.error("MultipleObjectsReturned when header for item %s with key %s: %s" % (parent_instance, key, e))
 
 
 class BaseRequest(models.Model):

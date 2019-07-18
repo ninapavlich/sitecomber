@@ -56,7 +56,7 @@ class PageResponse(BaseMetaData, BaseResponse):
 
     @classmethod
     def parse_response(cls, request, redirected_from, response):
-        r = cls(
+        r = PageResponse(
             response_url=response.url,
             status_code=response.status_code,
             content_type=response.headers.get('content-type'),
@@ -74,7 +74,7 @@ class PageResponse(BaseMetaData, BaseResponse):
 
     @classmethod
     def parse_error_response(cls, request, redirected_from, error_message):
-        r = cls(
+        r = PageResponse(
             response_url=request.request_url,
             status_code=0,
             text_content=error_message,

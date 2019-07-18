@@ -1,4 +1,10 @@
+import logging
+
+from django.core.exceptions import MultipleObjectsReturned
+
 from sitecomber.apps.shared.interfaces import BaseSiteTest
+
+logger = logging.getLogger('django')
 
 
 class PageUpTest(BaseSiteTest):
@@ -15,14 +21,17 @@ class PageUpTest(BaseSiteTest):
             status = PageTestResult.STATUS_SUCCESS if status_code == 200 else PageTestResult.STATUS_ERROR
             message = 'Okay' if status_code == 200 else 'Error loading %s - Returned code %s' % (page.url, status_code)
 
-            r, created = PageTestResult.objects.get_or_create(
-                page=page,
-                test=self.class_path
-            )
-            r.data = status_code  # TODO -- perhaps more structure info
-            r.message = message
-            r.status = status
-            r.save()
+            try:
+                r, created = PageTestResult.objects.get_or_create(
+                    page=page,
+                    test=self.class_path
+                )
+                r.data = status_code  # TODO -- perhaps more structure info
+                r.message = message
+                r.status = status
+                r.save()
+            except MultipleObjectsReturned as e:
+                logger.error("MultipleObjectsReturned when trying to create PageTestResult for test %s on page %s: %s" % (self, page, e))
 
 
 class BrokenOutgoingLinkTest(BaseSiteTest):
@@ -44,11 +53,14 @@ class BrokenOutgoingLinkTest(BaseSiteTest):
         status = PageTestResult.STATUS_SUCCESS if broken_link_count == 0 else PageTestResult.STATUS_ERROR
         message = 'Okay' if broken_link_count == 0 else 'Found %s broken links on %s' % (broken_link_count, page.url)
 
-        r, created = PageTestResult.objects.get_or_create(
-            page=page,
-            test=self.class_path
-        )
-        r.data = broken_outgoing_links  # TODO -- perhaps more structure info
-        r.message = message
-        r.status = status
-        r.save()
+        try:
+            r, created = PageTestResult.objects.get_or_create(
+                page=page,
+                test=self.class_path
+            )
+            r.data = broken_outgoing_links  # TODO -- perhaps more structure info
+            r.message = message
+            r.status = status
+            r.save()
+        except MultipleObjectsReturned as e:
+            logger.error("MultipleObjectsReturned when trying to create PageTestResult for test %s on page %s: %s" % (self, page, e))

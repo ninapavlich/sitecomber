@@ -5,6 +5,7 @@ from django.db import models
 from django.db.models import F
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.exceptions import MultipleObjectsReturned
 from django.utils.functional import cached_property
 
 from usp.tree import sitemap_tree_for_homepage
@@ -102,14 +103,17 @@ class SiteDomain(BaseMetaData, BaseURL):
 
     def parse_sitemap(self, tests):
 
-        root_page, created = PageResult.objects.get_or_create(
-            site_domain=self,
-            url=self.url,
-            defaults={'is_root': True}
-        )
-        root_page.load()
-        for test in tests:
-            test.on_page_parsed(root_page)
+        try:
+            root_page, created = PageResult.objects.get_or_create(
+                site_domain=self,
+                url=self.url,
+                defaults={'is_root': True}
+            )
+            root_page.load()
+            for test in tests:
+                test.on_page_parsed(root_page)
+        except MultipleObjectsReturned as e:
+            logger.error("MultipleObjectsReturned when creating root page for site %s with url %s: %s" % (self, self.url, e))
 
         sitemap_ctr = 0
         page_ctr = 0
@@ -130,11 +134,14 @@ class SiteDomain(BaseMetaData, BaseURL):
 
     def crawl(self, tests, load_batch_size):
 
-        root_page, created = PageResult.objects.get_or_create(
-            site_domain=self,
-            url=self.url,
-            defaults={'is_root': True}
-        )
+        try:
+            root_page, created = PageResult.objects.get_or_create(
+                site_domain=self,
+                url=self.url,
+                defaults={'is_root': True}
+            )
+        except MultipleObjectsReturned as e:
+            logger.error("MultipleObjectsReturned when creating root page for site %s with url %s: %s" % (self, self.url, e))
 
         if self.site.recursive:
 
@@ -153,16 +160,19 @@ class SiteDomain(BaseMetaData, BaseURL):
 
     def handle_link(self, url, source_page=None, is_internal=True):
 
-        link_page, created = PageResult.objects.get_or_create(
-            site_domain=self,
-            url=url,
-            defaults={'is_internal': is_internal}
-        )
-        if source_page:
-            link_page.incoming_links.add(source_page)
-            source_page.outgoing_links.add(link_page)
+        try:
+            link_page, created = PageResult.objects.get_or_create(
+                site_domain=self,
+                url=url,
+                defaults={'is_internal': is_internal}
+            )
+            if source_page:
+                link_page.incoming_links.add(source_page)
+                source_page.outgoing_links.add(link_page)
+            return link_page
 
-        return link_page
+        except MultipleObjectsReturned as e:
+            logger.error("MultipleObjectsReturned when creating page result for site %s with url %s: %s" % (self, self.url, e))
 
     @staticmethod
     def autocomplete_search_fields():
