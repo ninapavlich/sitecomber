@@ -74,8 +74,6 @@ class PageResponse(BaseMetaData, BaseResponse):
 
         if response.headers.get('content-length'):
             r.content_length = response.headers.get('content-length')
-        else:
-            logger.warn(u"Response from URL %s missing the content-length header" % (response.url))
 
         try:
             r.save()
