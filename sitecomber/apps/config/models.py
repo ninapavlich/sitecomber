@@ -1,5 +1,6 @@
 import logging
 import importlib
+import json
 
 from django.db import models
 from django.db.models import F
@@ -230,7 +231,28 @@ class SiteTestSetting(BaseMetaData):
         module_name, class_name = self.test.rsplit('.', 1)
         module = importlib.import_module(module_name)
         class_ = getattr(module, class_name)
-        return class_(self.site, self.settings)
+
+        if self.settings:
+            try:
+                settings_json = json.loads(self.settings)
+            except ValueError:
+                logger.error(u"Error validating test settings JSON: %s" % (self.settings))
+        else:
+            settings_json = {}
+
+        return class_(self.site, settings_json)
+
+    def save(self, *args, **kwargs):
+
+        # Validate settings JSON
+        if self.settings:
+            try:
+                settings_json = json.loads(self.settings)
+                self.settings = json.dumps(settings_json, sort_keys=True, indent=2)
+            except ValueError:
+                logger.error(u"Error validating test settings JSON: %s" % (self.settings))
+
+        super(SiteTestSetting, self).save(*args, **kwargs)
 
     def __str__(self):
         return u'%s for %s' % (self.test, self.site)
