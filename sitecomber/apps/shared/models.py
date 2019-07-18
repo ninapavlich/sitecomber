@@ -96,7 +96,7 @@ def create_headers(parent_instance, header_model, dict):
 
 class BaseRequest(models.Model):
 
-    request_url = models.URLField()
+    request_url = models.URLField(max_length=2000)
 
     METHOD_GET = 'GET'
     METHOD_HEAD = 'HEAD'
@@ -137,7 +137,7 @@ class BaseRequest(models.Model):
 
 class BaseResponse(models.Model):
 
-    response_url = models.URLField()
+    response_url = models.URLField(max_length=2000)
     status_code = models.IntegerField(blank=True, null=True)
     content_type = models.CharField(max_length=255, blank=True, null=True)
     content_length = models.IntegerField(blank=True, null=True)
