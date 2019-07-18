@@ -45,6 +45,7 @@ class PageResponseAdmin(admin.ModelAdmin):
 
     list_display = list_display_links = ['view_url', 'status_code']
     list_filter = ['status_code', 'content_type']
+    search_fields = ['response_url']
 
     def view_url(self, obj):
         return Truncator(obj.response_url).chars(80)
@@ -98,7 +99,8 @@ class PageRequestAdmin(admin.ModelAdmin):
                        'load_start_time', 'load_end_time', 'view_url']
 
     list_display = list_display_links = ['view_url', 'method', 'status_code']
-    list_filter = ['method']
+    list_filter = ['method', 'status_code']
+    search_fields = ['request_url']
 
     def view_url(self, obj):
         return Truncator(obj.request_url).chars(80)
