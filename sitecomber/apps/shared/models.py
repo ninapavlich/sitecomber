@@ -68,7 +68,7 @@ class BaseHeader(models.Model):
     response
     """
     key = models.CharField(max_length=255)
-    value = models.CharField(max_length=255, blank=True, null=True)
+    value = models.TextField(blank=True, null=True)
 
     class Meta:
         abstract = True
@@ -78,11 +78,8 @@ def create_headers(parent_instance, header_model, dict):
     for key, val in dict.items():
 
         if len(key) > 255:
-            logger.error("Header key %s is too long and will be truncated to 255 characters." % (key))
+            logger.error(u"Header key %s is too long (%s) and will be truncated to 255 characters." % (key, len(key)))
             key = key[:255]
-        if len(val) > 255:
-            logger.error("Header val %s is too long and will be truncated to 255 characters." % (key))
-            val = val[:255]
 
         try:
             obj, created = header_model.objects.get_or_create(

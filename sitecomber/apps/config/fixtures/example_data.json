@@ -1,0 +1,172 @@
+[
+{
+    "model": "auth.user",
+    "pk": 1,
+    "fields": {
+        "password": "pbkdf2_sha256$150000$Uf3wsFfwbb4u$znJkD8nxpoMp13Ec2UNxH9J2ZSfUuV0ujcgtZtaCwkk=",
+        "last_login": null,
+        "is_superuser": true,
+        "username": "admin",
+        "first_name": "",
+        "last_name": "",
+        "email": "admin@example.com",
+        "is_staff": true,
+        "is_active": true,
+        "date_joined": "2019-07-18T18:36:53.213Z",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "config.site",
+    "pk": 1,
+    "fields": {
+        "created": "2019-07-18T18:37:54.304Z",
+        "modified": "2019-07-18T18:38:41.674Z",
+        "owner": [
+            "admin"
+        ],
+        "title": "NYT Parenting",
+        "active": true,
+        "recursive": true,
+        "override_user_agent": "",
+        "override_max_timeout_seconds": null
+    }
+},
+{
+    "model": "config.sitedomain",
+    "pk": 1,
+    "fields": {
+        "created": "2019-07-18T18:37:54.331Z",
+        "modified": "2019-07-18T18:37:54.332Z",
+        "authentication_type": "none",
+        "authentication_data": null,
+        "title": "Parenting Site Secure",
+        "url": "https://parenting.nytimes.com",
+        "site": 1,
+        "alias_of": null,
+        "should_crawl": true
+    }
+},
+{
+    "model": "config.sitedomain",
+    "pk": 2,
+    "fields": {
+        "created": "2019-07-18T18:37:54.366Z",
+        "modified": "2019-07-18T18:38:41.682Z",
+        "authentication_type": "none",
+        "authentication_data": null,
+        "title": "Parenting Site",
+        "url": "http://parenting.nytimes.com",
+        "site": 1,
+        "alias_of": 1,
+        "should_crawl": false
+    }
+},
+{
+    "model": "config.ignorequeryparam",
+    "pk": 1,
+    "fields": {
+        "created": "2019-07-18T18:37:54.398Z",
+        "modified": "2019-07-18T18:37:54.398Z",
+        "site": 1,
+        "param": "module"
+    }
+},
+{
+    "model": "config.ignorequeryparam",
+    "pk": 2,
+    "fields": {
+        "created": "2019-07-18T18:37:54.433Z",
+        "modified": "2019-07-18T18:37:54.434Z",
+        "site": 1,
+        "param": "topic"
+    }
+},
+{
+    "model": "config.ignorequeryparam",
+    "pk": 3,
+    "fields": {
+        "created": "2019-07-18T18:37:54.461Z",
+        "modified": "2019-07-18T18:37:54.462Z",
+        "site": 1,
+        "param": "rank"
+    }
+},
+{
+    "model": "config.ignorequeryparam",
+    "pk": 4,
+    "fields": {
+        "created": "2019-07-18T18:38:23.282Z",
+        "modified": "2019-07-18T18:38:23.282Z",
+        "site": 1,
+        "param": "position"
+    }
+},
+{
+    "model": "config.ignorequeryparam",
+    "pk": 5,
+    "fields": {
+        "created": "2019-07-18T18:38:23.359Z",
+        "modified": "2019-07-18T18:38:23.359Z",
+        "site": 1,
+        "param": "region"
+    }
+},
+{
+    "model": "config.ignorequeryparam",
+    "pk": 6,
+    "fields": {
+        "created": "2019-07-18T18:38:23.416Z",
+        "modified": "2019-07-18T18:38:23.416Z",
+        "site": 1,
+        "param": "action"
+    }
+},
+{
+    "model": "config.ignorequeryparam",
+    "pk": 7,
+    "fields": {
+        "created": "2019-07-18T18:38:23.459Z",
+        "modified": "2019-07-18T18:38:23.459Z",
+        "site": 1,
+        "param": "subtopic"
+    }
+},
+{
+    "model": "config.sitetestsetting",
+    "pk": 1,
+    "fields": {
+        "created": "2019-07-18T18:38:23.484Z",
+        "modified": "2019-07-18T18:38:23.484Z",
+        "site": 1,
+        "test": "sitecomber.apps.tests.core.PageUpTest",
+        "active": true,
+        "settings": ""
+    }
+},
+{
+    "model": "config.sitetestsetting",
+    "pk": 2,
+    "fields": {
+        "created": "2019-07-18T18:38:23.495Z",
+        "modified": "2019-07-18T18:38:23.495Z",
+        "site": 1,
+        "test": "sitecomber.apps.tests.core.BrokenOutgoingLinkTest",
+        "active": true,
+        "settings": ""
+    }
+},
+{
+    "model": "config.sitetestsetting",
+    "pk": 3,
+    "fields": {
+        "created": "2019-07-18T18:38:23.514Z",
+        "modified": "2019-07-18T18:38:23.514Z",
+        "site": 1,
+        "test": "sitecomber_article_tests.tests.ReaderViewTest",
+        "active": true,
+        "settings": ""
+    }
+}
+]

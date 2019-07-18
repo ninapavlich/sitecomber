@@ -13,20 +13,15 @@ When configuring the fields, be sure to take note of the App Name, as you will b
 
 After your application has deployed, run the following commands through the command line Heroku CLI and follow the prompts:
 
-    > heroku run python manage.py createsuperuser --app=<replace-with-app-name>
     > heroku run python manage.py drf_create_token <replace-with-username> --app=<replace-with-app-name>
     > heroku run python manage.py generate_encryption_key
     > heroku config:set FIELD_ENCRYPTION_KEY='<replace-with-value-from-previous-command>'
-    > heroku ps:scale web=1 --app=<replace-with-app-name>
+    > heroku run python manage.py migrate
+    > heroku run python manage.py loaddata sitecomber/apps/config/fixtures/example_data.json --app=<replace-with-app-name>
+    > heroku run python manage.py setpassword admin --app=<replace-with-app-name>
+    > heroku ps:scale web=1 worker=1 --app=<replace-with-app-name>
 
-## Manual Heroku Configuration:
-    
-    > heroku create
-    > heroku addons:create heroku-postgresql:hobby-dev
-    > heroku config:set ENVIRONMENT='heroku' AWS_ACCESS_KEY_ID='REPLACEME' AWS_SECRET_ACCESS_KEY='REPLACEME' AWS_STORAGE_BUCKET_NAME='REPLACEME' SECRET_KEY='REPLACEME' APP_HOST_NAME='my-heroku-app-name.herokuapp.com'
-    > heroku run python manage.py generate_encryption_key
-    > heroku config:set FIELD_ENCRYPTION_KEY='<replace-with-value-from-previous-command>'
-    > git push heroku master
+    You may now log in and configure your sites at https://<replace-with-app-name>.herokuapp.com/admin/config/site/
 
 ## Local Development Quickstart
 
@@ -54,9 +49,9 @@ Then run the following commands:
     source venv/bin/activate
     pip install -r requirements.txt
     python manage.py migrate
-    python manage.py createsuperuser
-    # Follow interactive commands to create a super user
-    python manage.py loaddata sitecomber/post/fixtures/example_data.json
+    python manage.py loaddata sitecomber/apps/config/fixtures/example_data.json
+    python manage.py setpassword admin
+    # Follow interactive commands to reset admin password
     python manage.py runserver
 ```
 
@@ -92,5 +87,5 @@ To run the worker locally, follow the "Local Development Quickstart" instruction
 
 #### Update Example Data Fixture
 ```
-    python manage.py dumpdata config --natural-foreign --indent=4 > sitecomber/apps/config/fixtures/example_data.json
+    python manage.py dumpdata auth.user config --natural-foreign --indent=4 > sitecomber/apps/config/fixtures/example_data.json
 ```

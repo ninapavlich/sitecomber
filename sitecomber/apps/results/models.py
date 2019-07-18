@@ -68,9 +68,12 @@ class PageResponse(BaseMetaData, BaseResponse):
             redirected_from=redirected_from
         )
 
-        r.save()
-        r.create_response_headers(response.headers)
-        return r
+        try:
+            r.save()
+            r.create_response_headers(response.headers)
+            return r
+        except Exception as e:
+            logger.error(u"Error saving response for URL %s: %s" % (response.url, e))
 
     @classmethod
     def parse_error_response(cls, request, redirected_from, error_message):
@@ -83,9 +86,11 @@ class PageResponse(BaseMetaData, BaseResponse):
             load_end_time=request.load_start_time,
             redirected_from=redirected_from
         )
-
-        r.save()
-        return r
+        try:
+            r.save()
+            return r
+        except Exception as e:
+            logger.error(u"Error saving error response for URL %s - %s: %s" % (request.request_url, error_message, e))
 
 
 class PageRequest(BaseMetaData, BaseRequest):
