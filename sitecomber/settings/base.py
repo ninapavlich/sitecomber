@@ -98,7 +98,8 @@ INSTALLED_APPS = [
     'sitecomber.apps.config',
     'sitecomber.apps.results',
 
-    'sitecomber.apps.tests.core'
+    'sitecomber.apps.tests.core',
+    'sitecomber_article_tests.tests'
 ]
 
 
