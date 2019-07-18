@@ -59,14 +59,23 @@ class PageResponse(BaseMetaData, BaseResponse):
         r = PageResponse(
             response_url=response.url,
             status_code=response.status_code,
-            content_type=response.headers.get('content-type'),
-            content_length=response.headers.get('content-length'),
-            text_content=response.text,
             request=request,
             load_start_time=request.load_start_time,
             load_end_time=request.load_start_time + response.elapsed,
             redirected_from=redirected_from
         )
+        if response.text:
+            r.text_content = response.text
+
+        if response.headers.get('content-type'):
+            r.content_type = response.headers.get('content-type')
+        else:
+            logger.warn(u"Response from URL %s missing the content-type header" % (response.url))
+
+        if response.headers.get('content-length'):
+            r.content_length = response.headers.get('content-length')
+        else:
+            logger.warn(u"Response from URL %s missing the content-length header" % (response.url))
 
         try:
             r.save()
