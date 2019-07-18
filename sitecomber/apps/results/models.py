@@ -4,10 +4,9 @@ from django.db import models
 from django.utils import timezone
 from django.utils.functional import cached_property
 
-import requests
 
 from sitecomber.apps.shared.models import BaseMetaData, BaseURL, BaseHeader, BaseRequest, BaseResponse, BaseTestResult
-from sitecomber.apps.shared.utils import LinkParser
+from sitecomber.apps.shared.utils import LinkParser, load_url
 
 logger = logging.getLogger('django')
 
@@ -81,6 +80,8 @@ class PageResponse(BaseMetaData, BaseResponse):
             return r
         except Exception as e:
             logger.error(u"Error saving response for URL %s: %s" % (response.url, e))
+            logger.error(response.url)
+            logger.error(response.status_code)
 
     @classmethod
     def parse_error_response(cls, request, redirected_from, error_message):
@@ -134,25 +135,23 @@ class PageRequest(BaseMetaData, BaseRequest):
         request_headers = {'user-agent': self.page_result.site_domain.site.get_user_agent()}
         self.create_request_headers(request_headers)
 
-        response = None
-        error_message = None
         previous_item = None
-        try:
-
-            response = requests.request(
+        response, error_message = load_url(
+            self.method,
+            self.page_result.url,
+            request_headers,
+            self.page_result.site_domain.site.get_max_timeout_seconds()
+        )
+        if error_message or response.status_code != 200 and self.method == BaseRequest.METHOD_HEAD:
+            logger.warn("HEAD Request was unsuccessful on %s, falling back to normal GET request." % (self.page_result.url))
+            self.method = BaseRequest.METHOD_GET
+            self.save()
+            response, error_message = load_url(
                 self.method,
                 self.page_result.url,
-                headers=request_headers,
-                timeout=self.page_result.site_domain.site.get_max_timeout_seconds()
+                request_headers,
+                self.page_result.site_domain.site.get_max_timeout_seconds()
             )
-        except requests.exceptions.ConnectionError as e:
-            error_message = "ERROR: Connection Error when trying to load %s: %s" % (self.page_result.url, e)
-        except requests.exceptions.Timeout as e:
-            error_message = "ERROR: Timeout when trying to load %s: %s" % (self.page_result.url, e)
-        except requests.exceptions.RequestException as e:
-            error_message = "ERROR: Request Exception when trying to load %s: %s" % (self.page_result.url, e)
-        except requests.exceptions.TooManyRedirects as e:
-            error_message = "ERROR: Too many redirects when trying to load %s: %s" % (self.page_result.url, e)
 
         self.load_end_time = timezone.now()
 

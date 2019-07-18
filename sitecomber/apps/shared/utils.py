@@ -2,6 +2,8 @@ import logging
 from html.parser import HTMLParser
 from urllib.parse import urlparse, urljoin, parse_qs, urlencode
 
+import requests
+
 from .interfaces import BaseSiteTest
 
 logger = logging.getLogger('django')
@@ -115,3 +117,25 @@ def get_test_choices():
         logger.warn("No classes found that extend BaseSiteTest. Please verify that you have installed some tests.")
 
     return [(class_to_path(cls), cls.__name__) for cls in subclasses]
+
+
+def load_url(method, url, request_headers, timeout):
+    response = None
+    error_message = None
+    try:
+        response = requests.request(
+            method,
+            url,
+            headers=request_headers,
+            timeout=timeout
+        )
+    except requests.exceptions.ConnectionError as e:
+        error_message = "ERROR: Connection Error when trying to load %s: %s" % (url, e)
+    except requests.exceptions.Timeout as e:
+        error_message = "ERROR: Timeout when trying to load %s: %s" % (url, e)
+    except requests.exceptions.RequestException as e:
+        error_message = "ERROR: Request Exception when trying to load %s: %s" % (url, e)
+    except requests.exceptions.TooManyRedirects as e:
+        error_message = "ERROR: Too many redirects when trying to load %s: %s" % (url, e)
+
+    return response, error_message
