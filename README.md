@@ -1,5 +1,5 @@
 # SiteComber
-This tool crawls an entire domain (or set of domain) to create a living snapshot of a website. A worker script is constantly crawling and re-crawing to provide the most up-to-date snapshot.
+This tool crawls an entire domain (or set of domains) to create a living snapshot of a website. A worker script is constantly crawling and re-crawing to provide the most up-to-date snapshot.
 
 With this snapshot you are able to see problems that may arise from content entry or underlying code problems. For example, you can use this tool to identify problems like broken links, spelling errors, slow load times, or SEO issues. 
 
