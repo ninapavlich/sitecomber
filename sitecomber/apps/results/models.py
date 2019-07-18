@@ -127,7 +127,7 @@ class PageRequest(BaseMetaData, BaseRequest):
 
     def load(self):
         self.load_start_time = timezone.now()
-        self.method = BaseRequest.METHOD_GET
+        self.method = BaseRequest.METHOD_GET if self.page_result.is_internal else BaseRequest.METHOD_HEAD
         self.request_url = self.page_result.url
         self.save()
 
@@ -138,7 +138,9 @@ class PageRequest(BaseMetaData, BaseRequest):
         error_message = None
         previous_item = None
         try:
-            response = requests.get(
+
+            response = requests.request(
+                self.method,
                 self.page_result.url,
                 headers=request_headers,
                 timeout=self.page_result.site_domain.site.get_max_timeout_seconds()
