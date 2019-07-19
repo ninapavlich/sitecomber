@@ -148,7 +148,7 @@
           <h4>Incoming links from within {{object.site_domain.site}}</h4>
           <ul class="list-unstyled">
             {% for link in object.incoming_links.all %}
-            <li class="my-1 clearfix"><a href="{% url 'page-result-detail' link.site_domain.site.pk link.pk %}">{{link.url}}</a> <a class="float-right badge badge-info p-2" href="{{link.url}}" target="_blank">Visit</a></li>
+            <li class="my-1 clearfix"><a href="{% url 'page-result-detail' link.site_domain.site.pk link.pk %}">{{link.url}} <span class="status-code status-code-{{link.latest_status_code}}" title="{{link.latest_status_code}}"></span></a> <a class="float-right badge badge-info p-2" href="{{link.url}}" target="_blank">Visit</a></li>
             {% empty %}
             <li>No internal links to this page found yet.</li>
             {% endfor %}
@@ -156,7 +156,7 @@
           <h4>Outgoing links</h4>
           <ul class="list-unstyled">
             {% for link in object.outgoing_links.all %}
-            <li class="my-1 clearfix"><a href="{% url 'page-result-detail' link.site_domain.site.pk link.pk %}">{{link.url}}</a> <a class="float-right badge badge-info p-2" href="{{link.url}}" target="_blank">Visit</a></li>
+            <li class="my-1 clearfix"><a href="{% url 'page-result-detail' link.site_domain.site.pk link.pk %}">{{link.url}} <span class="status-code status-code-{{link.latest_status_code}}" title="{{link.latest_status_code}}"></span></a> <a class="float-right badge badge-info p-2" href="{{link.url}}" target="_blank">Visit</a></li>
             {% empty %}
             <li>No outgoing links found on this page.</li>
             {% endfor %}

@@ -108,7 +108,7 @@ class PageResponse(BaseMetaData, BaseResponse):
     def parse_error_response(cls, request, redirected_from, error_message):
         r = PageResponse(
             response_url=request.request_url,
-            status_code=0,
+            status_code=-1,
             text_content=error_message,
             request=request,
             load_start_time=request.load_start_time,
@@ -235,7 +235,13 @@ class PageResult(BaseMetaData, BaseURL):
 
     @cached_property
     def latest_request(self):
-        return self.pagerequest_set.order_by('-created').first()
+        return self.pagerequest_set.select_related('response').order_by('-created').first()
+
+    @cached_property
+    def latest_status_code(self):
+        if self.latest_request and self.latest_request.response:
+            return self.latest_request.response.status_code
+        return 0
 
     @cached_property
     def response_list(self):

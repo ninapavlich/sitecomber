@@ -21,6 +21,32 @@ dl{
     border-bottom: 1px solid transparent;
   }
 }
+
+.status-code{
+    
+  &:before{
+    content: '';
+    display: inline-block;
+    width: 0.5em;
+    height: 0.5em;
+    -moz-border-radius: 0.25em;
+    -webkit-border-radius: 0.25em;
+    border-radius: 0.25em;
+    background-color: $yellow;
+  }
+
+  &.status-code-0:before{
+    background-color: $gray-300;
+  }
+  &.status-code-200:before{
+    background-color: $green;
+  }
+  &.status-code-404:before,
+  &.status-code-500:before{
+    background-color: $red;
+  }
+  
+}
 .site-detail{
 
 }

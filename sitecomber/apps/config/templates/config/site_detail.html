@@ -47,7 +47,7 @@
             <div class="d-flex bd-highlight">
               <div class="p-2 flex-fill">
                 <a class="card-title" href="{% url 'page-result-detail' object.pk page_result.pk %}">
-                  <h1 class="h5 text-light m-0">{{page_result.title}}</h1>
+                  <h1 class="h5 text-light m-0">{{page_result.title}} <span class="status-code status-code-{{page_result.latest_status_code}}" title="{{page_result.latest_status_code}}"></span></h1>
                   <h2 class="h6 text-white-50 m-0">{{page_result.url}}</h2>
                 </a>
               </div>

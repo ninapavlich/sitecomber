@@ -7025,3 +7025,22 @@ dl {
     padding-left: 0.5em;
     margin-bottom: 1em;
     border-bottom: 1px solid transparent; }
+
+.status-code:before {
+  content: '';
+  display: inline-block;
+  width: 0.5em;
+  height: 0.5em;
+  -moz-border-radius: 0.25em;
+  -webkit-border-radius: 0.25em;
+  border-radius: 0.25em;
+  background-color: #ffc107; }
+
+.status-code.status-code-0:before {
+  background-color: #dee2e6; }
+
+.status-code.status-code-200:before {
+  background-color: #67a728; }
+
+.status-code.status-code-404:before, .status-code.status-code-500:before {
+  background-color: #dc3560; }

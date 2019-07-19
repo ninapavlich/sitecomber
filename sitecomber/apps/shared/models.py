@@ -180,11 +180,13 @@ class BaseTestResult(models.Model):
     data = models.TextField(blank=True, null=True)
     message = models.TextField(blank=True, null=True)
 
+    STATUS_NONE = 'none'
     STATUS_INFO = 'info'
     STATUS_WARNING = 'warning'
     STATUS_SUCCESS = 'success'
     STATUS_ERROR = 'error'
     STATUSES = (
+        (STATUS_NONE, 'None'),
         (STATUS_INFO, 'Info'),
         (STATUS_WARNING, 'Warning'),
         (STATUS_SUCCESS, 'Success'),
