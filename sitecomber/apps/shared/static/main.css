@@ -6971,7 +6971,8 @@ body {
   min-height: 100%; }
 
 .cover-container {
-  max-width: 42em; }
+  width: 90%;
+  max-width: 75em; }
 
 /*
  * Header
@@ -7006,8 +7007,21 @@ body {
   .nav-masthead {
     float: right; } }
 
-.site-detail h2 {
-  font-size: 1rem; }
-
-.site-detail ul article h1 {
-  font-size: 1rem; }
+dl {
+  display: block;
+  padding: 1em;
+  line-height: 1em; }
+  dl dt {
+    float: left;
+    clear: left;
+    width: 25%;
+    text-align: right;
+    font-weight: bold;
+    padding-right: 0.5em;
+    margin-bottom: 1em; }
+  dl dd {
+    width: 75%;
+    float: right;
+    padding-left: 0.5em;
+    margin-bottom: 1em;
+    border-bottom: 1px solid transparent; }

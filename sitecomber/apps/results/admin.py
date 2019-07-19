@@ -3,19 +3,7 @@ from django.template import Template, Context
 from django.utils.html import format_html
 from django.utils.text import Truncator
 
-from .models import PageResult, PageRequest, PageResponse, ResponseHeader, RequestHeader, PageTestResult
-
-
-class ResponseHeaderInline(admin.TabularInline):
-    model = ResponseHeader
-    readonly_fields = fields = ['key', 'value']
-    extra = 0
-
-
-class RequestHeaderInline(admin.TabularInline):
-    model = RequestHeader
-    readonly_fields = fields = ['key', 'value']
-    extra = 0
+from .models import PageResult, PageRequest, PageResponse, PageTestResult
 
 
 @admin.register(PageResponse)
@@ -30,6 +18,7 @@ class PageResponseAdmin(admin.ModelAdmin):
                 'status_code',
                 ('load_start_time', 'load_end_time',),
                 ('content_type', 'content_length'),
+                'response_headers',
                 'view_text'
             )
         }),
@@ -40,7 +29,7 @@ class PageResponseAdmin(admin.ModelAdmin):
                        'response_url',
                        'status_code',
                        'load_start_time', 'load_end_time',
-                       'content_type', 'content_length',
+                       'content_type', 'content_length', 'response_headers',
                        'view_text', 'view_url', 'request_method']
 
     list_display = list_display_links = ['view_url', 'request_method', 'status_code']
@@ -64,8 +53,6 @@ class PageResponseAdmin(admin.ModelAdmin):
         if self.reqdirected_from:
             return format_html(u'<a href="%s">View %s</a>' % (obj.redirected_from.get_edit_url(), obj.redirected_from))
 
-    inlines = [ResponseHeaderInline]
-
 
 class PageResponseInline(admin.TabularInline):
     model = PageResponse
@@ -79,7 +66,7 @@ class PageResponseInline(admin.TabularInline):
 @admin.register(PageRequest)
 class PageRequestAdmin(admin.ModelAdmin):
 
-    inlines = [RequestHeaderInline, PageResponseInline]
+    inlines = [PageResponseInline]
 
     fieldsets = (
         (None, {
@@ -91,6 +78,7 @@ class PageRequestAdmin(admin.ModelAdmin):
                 ('content_type', 'content_length'),
                 'view_response',
                 ('load_start_time', 'load_end_time',),
+                'request_headers'
             )
         }),
 
@@ -99,7 +87,7 @@ class PageRequestAdmin(admin.ModelAdmin):
                        'request_url',
                        'method', 'status_code',
                        'content_type', 'content_length',
-                       'view_response',
+                       'view_response', 'request_headers',
                        'load_start_time', 'load_end_time', 'view_url']
 
     list_display = list_display_links = ['view_url', 'method', 'status_code']
@@ -176,11 +164,11 @@ class PageTestResultAdmin(admin.ModelAdmin):
 @admin.register(PageResult)
 class PageResultAdmin(admin.ModelAdmin):
 
-    list_display_links = ['view_url', 'last_load_time']
-    list_display = ['site_domain', 'view_url', 'last_load_time', 'visit_url']
+    list_display_links = ['title', 'view_url', 'last_load_time']
+    list_display = ['site_domain', 'title', 'view_url', 'last_load_time', 'visit_url']
     list_filter = ['site_domain__site', 'site_domain', 'is_sitemap', 'is_root', 'is_internal']
     readonly_fields = ['site_domain', 'url', 'view_url', 'created', 'modified',
-                       'last_load_time', 'view_site_settings',
+                       'title', 'last_load_time', 'view_site_settings',
                        'incoming_links', 'outgoing_links',
                        'view_incoming_links', 'view_outgoing_links',
                        'is_sitemap', 'is_root', 'is_internal']
@@ -193,6 +181,7 @@ class PageResultAdmin(admin.ModelAdmin):
             'fields': (
                 'view_site_settings',
                 'site_domain',
+                'title',
                 'url',
                 'is_sitemap',
                 'is_root',

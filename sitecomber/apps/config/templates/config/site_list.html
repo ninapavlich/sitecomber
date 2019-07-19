@@ -3,7 +3,7 @@
 {% block bodyclass %}{{block.super}} site-list{% endblock %}
 
 {% block inner %}
-<h1>Sites</h1>
+<h1 class="mt-4">Sites</h1>
 <ul class="list-unstyled">
   {% for object in object_list %}
     <li><a href="{% url 'site-detail' object.pk %}">{{object}}</a></li>

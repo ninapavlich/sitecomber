@@ -1,16 +1,28 @@
+dl{
+  display: block;
+  padding: 1em;
+  line-height: 1em;
+
+  dt{
+    float: left;
+    clear: left;
+    width: 25%;
+    
+    text-align: right;
+    font-weight: bold;
+    padding-right: 0.5em;
+    margin-bottom: 1em;
+  }
+  dd{
+    width: 75%;
+    float:right;
+    padding-left:0.5em;
+    margin-bottom: 1em;
+    border-bottom: 1px solid transparent;
+  }
+}
 .site-detail{
 
-  h2{
-    font-size:$h6-font-size;
-  }
-
-  ul{
-    article{
-      h1{
-        font-size:$h6-font-size;
-      }
-    }
-  }
 }
 .site-list{
 

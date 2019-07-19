@@ -3,36 +3,35 @@ from django.conf import settings
 from django.db import models
 from django.utils import timezone
 from django.utils.functional import cached_property
+from django.utils.text import Truncator
 
 
-from sitecomber.apps.shared.models import BaseMetaData, BaseURL, BaseHeader, BaseRequest, BaseResponse, BaseTestResult
-from sitecomber.apps.shared.utils import LinkParser, load_url
+from sitecomber.apps.shared.models import BaseMetaData, BaseURL, BaseRequest, BaseResponse, BaseTestResult
+from sitecomber.apps.shared.utils import LinkParser, TitleParser, load_url
 
 logger = logging.getLogger('django')
 
 
-class RequestHeader(BaseHeader):
-    parent = models.ForeignKey(
-        'results.PageRequest',
-        null=False,
-        on_delete=models.CASCADE
-    )
+# class RequestHeader(BaseHeader):
+#     parent = models.ForeignKey(
+#         'results.PageRequest',
+#         null=False,
+#         on_delete=models.CASCADE
+#     )
 
 
-class ResponseHeader(BaseHeader):
-    parent = models.ForeignKey(
-        'results.PageResponse',
-        null=False,
-        on_delete=models.CASCADE
-    )
+# class ResponseHeader(BaseHeader):
+#     parent = models.ForeignKey(
+#         'results.PageResponse',
+#         null=False,
+#         on_delete=models.CASCADE
+#     )
 
 
 class PageResponse(BaseMetaData, BaseResponse):
     """
     Represents a single request and response from the server
     """
-
-    response_header_model = ResponseHeader
 
     request = models.ForeignKey(
         'results.PageRequest',
@@ -52,6 +51,13 @@ class PageResponse(BaseMetaData, BaseResponse):
 
     def __str__(self):
         return u'%s at %s' % (self.response_url, self.load_end_time)
+
+    @property
+    def time_elapsed_ms(self):
+        if self.load_end_time and self.load_start_time:
+            dt = self.load_end_time - self.load_start_time
+            return int(round(dt.total_seconds() * 1000))
+        return None
 
     @classmethod
     def parse_response(cls, request, redirected_from, response):
@@ -75,8 +81,8 @@ class PageResponse(BaseMetaData, BaseResponse):
             r.content_length = response.headers.get('content-length')
 
         try:
+            r.response_headers = r.prepare_header_dict_for_db(dict(response.headers))
             r.save()
-            r.create_response_headers(response.headers)
             return r
         except Exception as e:
             logger.error(u"Error saving response for URL %s: %s" % (response.url, e))
@@ -106,7 +112,6 @@ class PageRequest(BaseMetaData, BaseRequest):
     Represents an entire chain of requests and responses until finally
     a non-redirecting response is given
     """
-    request_header_model = RequestHeader
 
     page_result = models.ForeignKey(
         'results.PageResult',
@@ -130,10 +135,10 @@ class PageRequest(BaseMetaData, BaseRequest):
         self.load_start_time = timezone.now()
         self.method = BaseRequest.METHOD_GET if self.page_result.is_internal else BaseRequest.METHOD_HEAD
         self.request_url = self.page_result.url
-        self.save()
 
         request_headers = {'user-agent': self.page_result.site_domain.site.get_user_agent()}
-        self.create_request_headers(request_headers)
+        self.request_headers = self.prepare_header_dict_for_db(request_headers)
+        self.save()
 
         previous_item = None
         response, error_message = load_url(
@@ -180,6 +185,7 @@ class PageRequest(BaseMetaData, BaseRequest):
 
 class PageResult(BaseMetaData, BaseURL):
 
+    title = models.CharField(max_length=1000, blank=True, null=True)
     site_domain = models.ForeignKey(
         'config.SiteDomain',
         on_delete=models.CASCADE
@@ -204,6 +210,11 @@ class PageResult(BaseMetaData, BaseURL):
         result.save()
         result.load()
 
+        if result.response and result.response.text_content:
+            parser = TitleParser()
+            parser.feed(result.response.text_content)
+            self.title = parser.title
+
         self.last_load_time = timezone.now()
         self.save()
 
@@ -220,6 +231,7 @@ class PageResult(BaseMetaData, BaseURL):
                 output.append(response)
                 response = response.redirected_from
 
+        output.reverse()
         return output
 
     @cached_property
@@ -241,6 +253,18 @@ class PageResult(BaseMetaData, BaseURL):
     @cached_property
     def error_test_results(self):
         return self.test_results.filter(status=BaseTestResult.STATUS_ERROR)
+
+    def save(self, *args, **kwargs):
+
+        if not self.title:
+            self.title = self.url
+
+        super(PageResult, self).save(*args, **kwargs)
+
+    def __str__(self):
+        if self.title and self.title != self.url:
+            return u'%s (%s)' % (self.title, Truncator(self.url).chars(80))
+        return self.url
 
     class Meta:
         ordering = ['site_domain', 'url']

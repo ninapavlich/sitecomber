@@ -1,4 +1,5 @@
 import logging
+import traceback
 
 logger = logging.getLogger('django')
 
@@ -17,13 +18,13 @@ class BaseSiteTest:
         try:
             self.on_page_parsed(page)
         except Exception as e:
-            logger.error("Error applying test %s to page %s: %s" % (self, page, e))
+            logger.error("Error applying test %s to page %s: %s %s" % (self, page, e, traceback.format_exc()))
 
     def sitemap_parsed(self, sitemap_item):
         try:
             self.on_sitemap_parsed(sitemap_item)
         except Exception as e:
-            logger.error("Error applying test %s to sitemap %s: %s" % (self, sitemap_item, e))
+            logger.error("Error applying test %s to sitemap %s: %s %s" % (self, sitemap_item, e, traceback.format_exc()))
 
     def on_page_parsed(self, page):
         pass

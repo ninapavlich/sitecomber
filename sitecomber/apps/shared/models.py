@@ -1,8 +1,9 @@
 import logging
+import json
 
 from django.db import models
-from django.core.exceptions import ImproperlyConfigured, MultipleObjectsReturned
 from django.urls import reverse
+from django.utils.functional import cached_property
 
 from encrypted_model_fields.fields import EncryptedCharField
 
@@ -61,37 +62,44 @@ class BaseURL(BaseAuthenticationCredentials):
         abstract = True
 
 
-class BaseHeader(models.Model):
-    """
-    If header is used with a request or response, make sure to define
-    a field called 'parent' which is an FK to the corresponding request or
-    response
-    """
-    key = models.CharField(max_length=255)
-    value = models.TextField(blank=True, null=True)
+class BaseHeaders(models.Model):
+
+    def validate_header_string_for_db(self, raw_headers):
+        try:
+            headers_json = json.loads(raw_headers)
+            return json.dumps(headers_json, sort_keys=True, indent=2)
+        except ValueError:
+            logger.error(u"Error validating response headers JSON: %s" % (self.response_headers))
+
+        return raw_headers
+
+    def prepare_header_dict_for_db(self, header_dict):
+        try:
+            return json.dumps(header_dict, sort_keys=True, indent=2)
+        except ValueError:
+            logger.error(u"Error creating headers JSON from: %s" % (header_dict))
+            return None
+
+    def get_header_by_key(self, raw_headers, key):
+        try:
+            headers_json = json.loads(raw_headers)
+            return headers_json.get(key)
+        except ValueError:
+            logger.error(u"Error parsing headers JSON: %s" % (raw_headers))
+        return None
+
+    def get_header_json(self, raw_headers):
+        try:
+            return json.loads(raw_headers)
+        except ValueError:
+            logger.error(u"Error parsing headers JSON: %s" % (raw_headers))
+        return None
 
     class Meta:
         abstract = True
 
 
-def create_headers(parent_instance, header_model, dict):
-    for key, val in dict.items():
-
-        if len(key) > 255:
-            logger.error(u"Header key %s is too long (%s) and will be truncated to 255 characters." % (key, len(key)))
-            key = key[:255]
-
-        try:
-            obj, created = header_model.objects.get_or_create(
-                parent=parent_instance,
-                key=key,
-                defaults={'value': val},
-            )
-        except MultipleObjectsReturned as e:
-            logger.error("MultipleObjectsReturned when header for item %s with key %s: %s" % (parent_instance, key, e))
-
-
-class BaseRequest(models.Model):
+class BaseRequest(BaseHeaders):
 
     request_url = models.URLField(max_length=2000)
 
@@ -119,20 +127,26 @@ class BaseRequest(models.Model):
     method = models.CharField(max_length=255, choices=REQUEST_METHODS,
                               blank=True, null=True)
 
-    def create_request_headers(self, dict):
-        if not self.request_header_model:
-            raise ImproperlyConfigured(u"%s doesn't define its corresponding self.request_header_model" % (self._meta.model_name))
+    request_headers = models.TextField(blank=True, null=True)
 
-        create_headers(self, self.request_header_model, dict)
+    @cached_property
+    def request_header_json(self):
+        if self.request_headers:
+            return self.get_header_json(self.request_headers)
 
-    def get_request_header_by_key(self, key):
-        return self.request_header_model.objects.filter(parent=self, key=key).first()
+    def save(self, *args, **kwargs):
+
+        # Validate JSON
+        if self.request_headers:
+            self.request_headers = self.validate_header_string_for_db(self.request_headers)
+
+        super(BaseRequest, self).save(*args, **kwargs)
 
     class Meta:
         abstract = True
 
 
-class BaseResponse(models.Model):
+class BaseResponse(BaseHeaders):
 
     response_url = models.URLField(max_length=2000)
     status_code = models.IntegerField(blank=True, null=True)
@@ -141,14 +155,20 @@ class BaseResponse(models.Model):
     http_version = models.CharField(max_length=255, blank=True, null=True)
     remote_address = models.CharField(max_length=255, blank=True, null=True)
 
-    def create_response_headers(self, dict):
-        if not self.response_header_model:
-            raise ImproperlyConfigured(u"%s doesn't define its corresponding self.response_header_model" % (self._meta.model_name))
+    response_headers = models.TextField(blank=True, null=True)
 
-        create_headers(self, self.response_header_model, dict)
+    @cached_property
+    def response_header_json(self):
+        if self.response_headers:
+            return self.get_header_json(self.response_headers)
 
-    def get_response_header_by_key(self, key):
-        return self.response_header_model.objects.filter(parent=self, key=key).first()
+    def save(self, *args, **kwargs):
+
+        # Validate JSON
+        if self.response_headers:
+            self.response_headers = self.validate_header_string_for_db(self.response_headers)
+
+        super(BaseResponse, self).save(*args, **kwargs)
 
     class Meta:
         abstract = True

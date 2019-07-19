@@ -14,17 +14,19 @@
 
 <article class="main">
   <h1>{{object}}</h1>
-  <h2>{% for url in object.domains %}{{url}}{% if not forloop.last %}, {% endif %}{% endfor %}</h2>
+  <h2 class="text-secondary h5">{% for url in object.domains %}{{url}}{% if not forloop.last %}, {% endif %}{% endfor %}</h2>
 
   <aside>
-    <h2>Overview</h2>
-
+    
     <ul class="list-unstyled">
-      <li><strong>{{object.internal_page_results|length}}</strong> internal pages, <strong>{{object.external_page_results|length}}</strong> external pages</li>
+      
       {% if object.has_fully_crawled_site %}
-      <li>Site has been <strong>fully crawled</strong></li>
+      <li>Found <strong>{{object.internal_page_results|length}}</strong> internal pages, with <strong>{{object.external_page_results|length}}</strong> outgoing links.</li>
+      
       {% else %}
-      <li><strong>{{object.uncrawled_page_results|length}}</strong> pages left to crawl</li>
+
+      <li>(So far) Found <strong>{{object.internal_page_results|length}}</strong> internal pages, with <strong>{{object.external_page_results|length}}</strong> outgoing links. <strong>{{object.uncrawled_page_results|length}}</strong> pages left to crawl</li>
+
       {% endif %}
 
       <li><strong class="text-danger">{{object.pages_with_errors|length}}</strong> pages with errors</li>
@@ -36,24 +38,30 @@
   <div>
     <ul class="list-unstyled">
       {% for page_result in object.internal_page_results %}
+      {% if not page_result.is_root %}
       <li>
         <article class="card bg-secondary p-1">
           
           <div class="card-body p-1">
             
             <div class="d-flex bd-highlight">
-              <div class="p-2 flex-fill"><h5 class="card-title m-0"><a class="text-light" href="{% url 'page-result-detail' object.pk page_result.pk %}">{{page_result.url}}</a></h5></div>
+              <div class="p-2 flex-fill">
+                <a class="card-title" href="{% url 'page-result-detail' object.pk page_result.pk %}">
+                  <h1 class="h5 text-light m-0">{{page_result.title}}</h1>
+                  <h2 class="h6 text-white-50 m-0">{{page_result.url}}</h2>
+                </a>
+              </div>
               <div class="p-2 flex-fill text-right">
 
                 {% with errors=page_result.error_test_results %}
                 {% if errors|length > 0 %}
-                <span class="badge badge-danger p-1">{{errors|length}} error{% if errors|length > 1 %}s{% endif %}</span>
+                <span class="badge badge-danger p-1" title="{% for error in errors %}{{error.message}}{% if not forloop.last %}, {%endif %}{% endfor %}">{{errors|length}} error{% if errors|length > 1 %}s{% endif %}</span>
                 {% endif %}
                 {% endwith %}
 
                 {% with errors=page_result.warning_test_results %}
                 {% if errors|length > 0 %}
-                <span class="badge badge-warning p-1">{{errors|length}} warning{% if errors|length > 1 %}s{% endif %}</span>
+                <span class="badge badge-warning p-1" title="{% for error in errors %}{{error.message}}{% if not forloop.last %}, {%endif %}{% endfor %}">{{errors|length}} warning{% if errors|length > 1 %}s{% endif %}</span>
                 {% endif %}
                 {% endwith %}
 
@@ -65,6 +73,7 @@
 
         </article>
       </li>
+      {% endif %}
       {% endfor %}
     </ul>
   </div>

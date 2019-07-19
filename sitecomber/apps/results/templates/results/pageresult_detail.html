@@ -13,7 +13,19 @@
 </nav>
 
 <article class="main">
-  <h1>{{object}}</h1>
+  <div class="clearfix my-4">
+    <div class="float-left">
+      <h1 class="h3">{{object.title}}</h1>
+      <h2 class="h5 text-secondary"><a class="text-secondary" href="{{object.url}}" target="_blank">{{object.url}}</a></h2>
+
+      {% if object.latest_request and object.latest_request.response %}
+      <span class="text-muted">Last crawled on {{object.latest_request.load_start_time}}</span>
+      {% else %}
+      <span class="text-muted">Page has not yet been crawled</span>
+      {% endif %}
+    </div>
+    <a href="{{object.url}}" target="_blank" class="float-right badge badge-info p-2">Visit</a>
+  </div>
 
   
 
@@ -21,10 +33,10 @@
     <div class="card-header">
       <ul class="nav nav-tabs card-header-tabs" role="tablist">
         <li class="nav-item">
-          <a class="nav-link active" href="#tests" role="tab" aria-controls="description" aria-selected="true">Test Results</a>
+          <a class="nav-link" href="#tests" role="tab" aria-controls="description" aria-selected="false">Test Results</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link"  href="#request" role="tab" aria-controls="history" aria-selected="false">Request Details</a>
+          <a class="nav-link active"  href="#request" role="tab" aria-controls="history" aria-selected="true">Request Details</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="#links" role="tab" aria-controls="deals" aria-selected="false">Incoming &amp; Outgoing Links</a>
@@ -36,7 +48,7 @@
       
       
        <div class="tab-content mt-3">
-        <div class="tab-pane active" id="tests" role="tabpanel">
+        <div class="tab-pane " id="tests" role="tabpanel">
           <ul class="list-unstyled">
             {% for result in object.test_results %}
             <li class="p-2 my-2 alert alert-{{result.bootstrap_class}}">
@@ -47,36 +59,41 @@
           </ul>
         </div>
          
-        <div class="tab-pane" id="request" role="tabpanel" aria-labelledby="history-tab">  
+        <div class="tab-pane active" id="request" role="tabpanel" aria-labelledby="history-tab">  
           {% if object.latest_request %}
           {% if object.latest_request.response %}
-          <h4>Response Path</h4>
+          <h4>Request Path</h4>
           <ul class="list-unstyled">
-          {% for response in object.response_list %}
-          <li><strong>{{response.status_code}}</strong> {{response.response_url}} [{{response.content_type}} {% if response.content_length %}- {{response.content_length}}{% endif %}] </li>
-          {% endfor %}
+            <li><strong>{{object.latest_request.method}}</strong> on {{object.latest_request.load_start_time}}</li>
+            {% for response in object.response_list %}
+            <li><strong>{{response.status_code}}</strong> {{response.response_url}} [{{response.content_type}}{% if response.content_length %} - {{response.content_length}}{% endif %}] <em>{{response.time_elapsed_ms}}ms</em></li>
+            {% endfor %}
           </ul>
           {% endif %}
 
-          <h4>Request Headers</h4>
-          <dl>
-          {% for header in object.latest_request.requestheader_set.all %}
-            <dt>{{header.key}}</dt>
-            <dd>{{header.value}}</dd>
-          {% endfor %}
-          </dl>
+          <div class="clearfix">
+            <h4>Request Headers</h4>
+            <dl>
+            {% for key, value in object.latest_request.request_header_json.items %}
+              <dt>{{key}}</dt>
+              <dd>{{value}}</dd>
+            {% endfor %}
+            </dl>
+          </div>
 
-          <h4>Response Headers</h4>
-          {% if object.latest_request.response %}
-          <dl>
-          {% for header in object.latest_request.response.responseheader_set.all %}
-            <dt>{{header.key}}</dt>
-            <dd>{{header.value}}</dd>
-          {% endfor %}
-          </dl>
-          {% else %}
-          <p>Page response hasn't been recorded</p>
-          {% endif %}
+          <div class="clearfix">
+            <h4>Response Headers</h4>
+            {% if object.latest_request.response %}
+            <dl>
+            {% for key, value in object.latest_request.response.response_header_json.items %}
+              <dt>{{key}}</dt>
+              <dd>{{value}}</dd>
+            {% endfor %}
+            </dl>
+            {% else %}
+            <p>Page response hasn't been recorded</p>
+            {% endif %}
+          </div>
 
           {% else %}
           <p>Page hasn't been loaded yet</p>
@@ -86,20 +103,20 @@
          
         <div class="tab-pane" id="links" role="tabpanel" aria-labelledby="deals-tab">
 
-          <h2>Incoming Links</h2>
+          <h4>Incoming links from within {{object.site_domain.site}}</h4>
           <ul class="list-unstyled">
             {% for link in object.incoming_links.all %}
-            <li class="my-1"><a href="{% url 'page-result-detail' link.site_domain.site.pk link.pk %}">{{link.url}}</a> <a class="badge badge-info p-1" href="{{link.url}}" target="_blank">Visit ></a></li>
+            <li class="my-1 clearfix"><a href="{% url 'page-result-detail' link.site_domain.site.pk link.pk %}">{{link.url}}</a> <a class="float-right badge badge-info p-2" href="{{link.url}}" target="_blank">Visit</a></li>
             {% endfor %}
           </ul>
 
-          <h2>Outgoing Links</h2>
+          <h4>Outgoing links</h4>
           <ul class="list-unstyled">
             {% for link in object.outgoing_links.all %}
-            <li class="my-1"><a href="{% url 'page-result-detail' link.site_domain.site.pk link.pk %}">{{link.url}}</a> <a class="badge badge-info p-1" href="{{link.url}}" target="_blank">Visit ></a></li>
+            <li class="my-1 clearfix"><a href="{% url 'page-result-detail' link.site_domain.site.pk link.pk %}">{{link.url}}</a> <a class="float-right badge badge-info p-2" href="{{link.url}}" target="_blank">Visit</a></li>
             {% endfor %}
           </ul>
-          
+
         </div>
       </div>
     </div>

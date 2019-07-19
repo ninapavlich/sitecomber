@@ -104,6 +104,22 @@ class LinkParser(HTMLParser):
         self.internal_links.append(urljoin(self.canonical_domain, url))
 
 
+class TitleParser(HTMLParser):
+
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.match = False
+        self.title = ''
+
+    def handle_starttag(self, tag, attributes):
+        self.match = True if tag == 'title' else False
+
+    def handle_data(self, data):
+        if self.match:
+            self.title = data
+            self.match = False
+
+
 def class_to_path(cls):
     return u'%s.%s' % (cls.__module__, cls.__name__)
 
