@@ -71,6 +71,18 @@ http://localhost:8000/admin/
 
 Log in with the credentials you provided when you ran the 'createsuperuser' command.
 
+To bootstrap the frontend for development:
+
+```bash
+    cd frontend
+    npm install
+    npm install webpack -g
+    npm run watch
+
+    # Create a development build
+    npm run build
+```
+
 ## SiteComber Worker
 
 A background worker can run along side the web server to execute the crawling.

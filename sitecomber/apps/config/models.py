@@ -11,9 +11,9 @@ from django.utils.functional import cached_property
 
 from usp.tree import sitemap_tree_for_homepage
 
-from sitecomber.apps.shared.models import BaseMetaData, BaseURL
+from sitecomber.apps.shared.models import BaseMetaData, BaseURL, BaseTestResult
 from sitecomber.apps.shared.utils import get_domain, get_test_choices
-from sitecomber.apps.results.models import PageResult
+from sitecomber.apps.results.models import PageResult, PageTestResult
 
 
 logger = logging.getLogger('django')
@@ -65,6 +65,51 @@ class Site(BaseMetaData):
     @cached_property
     def ignored_query_params(self):
         return [item.param for item in self.ignorequeryparam_set.all()]
+
+    @cached_property
+    def page_results(self):
+        return PageResult.objects.filter(site_domain__site=self)
+
+    @cached_property
+    def internal_page_results(self):
+        return self.page_results.filter(is_internal=True)
+
+    @cached_property
+    def external_page_results(self):
+        return self.page_results.filter(is_internal=False)
+
+    @cached_property
+    def uncrawled_page_results(self):
+        return self.page_results.filter(last_load_time=None)
+
+    @cached_property
+    def has_fully_crawled_site(self):
+        return self.uncrawled_page_results.count() == 0
+
+    @cached_property
+    def page_test_results(self):
+        return PageTestResult.objects.filter(page__site_domain__site=self).select_related('page')
+
+    @cached_property
+    def successful_page_test_results(self):
+        return self.page_test_results.filter(status=BaseTestResult.STATUS_SUCCESS)
+
+    @cached_property
+    def info_page_test_results(self):
+        return self.page_test_results.filter(status=BaseTestResult.STATUS_INFO)
+
+    @cached_property
+    def warning_page_test_results(self):
+        return self.page_test_results.filter(status=BaseTestResult.STATUS_WARNING)
+
+    @cached_property
+    def error_page_test_results(self):
+        return self.page_test_results.filter(status=BaseTestResult.STATUS_ERROR)
+
+    @cached_property
+    def pages_with_errors(self):
+        # TODO -- optimize
+        return list(set([item.page for item in self.error_page_test_results]))
 
     def __str__(self):
         return self.title

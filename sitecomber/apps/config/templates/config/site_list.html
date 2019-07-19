@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block bodyclass %}{{block.super}} site-list{% endblock %}
+
+{% block inner %}
+<h1>Sites</h1>
+<ul class="list-unstyled">
+  {% for object in object_list %}
+    <li><a href="{% url 'site-detail' object.pk %}">{{object}}</a></li>
+{% empty %}
+    <li>No sites configured yet. <a href="/admin/config/site/add/">Add one here.</a></li>
+{% endfor %}
+</ul>
+{% endblock %}

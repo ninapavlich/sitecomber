@@ -211,6 +211,37 @@ class PageResult(BaseMetaData, BaseURL):
     def latest_request(self):
         return self.pagerequest_set.order_by('-created').first()
 
+    @cached_property
+    def response_list(self):
+        output = []
+        if self.latest_request:
+            response = self.latest_request.response
+            while response:
+                output.append(response)
+                response = response.redirected_from
+
+        return output
+
+    @cached_property
+    def test_results(self):
+        return self.pagetestresult_set.all()
+
+    @cached_property
+    def successful_test_results(self):
+        return self.test_results.filter(status=BaseTestResult.STATUS_SUCCESS)
+
+    @cached_property
+    def info_test_results(self):
+        return self.test_results.filter(status=BaseTestResult.STATUS_INFO)
+
+    @cached_property
+    def warning_test_results(self):
+        return self.test_results.filter(status=BaseTestResult.STATUS_WARNING)
+
+    @cached_property
+    def error_test_results(self):
+        return self.test_results.filter(status=BaseTestResult.STATUS_ERROR)
+
     class Meta:
         ordering = ['site_domain', 'url']
 

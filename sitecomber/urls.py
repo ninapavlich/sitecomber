@@ -21,9 +21,12 @@ urlpatterns = [
         name='admin-autocomplete',
     ),
 
+
     # re_path(r'^', include(router.urls)),
     # re_path(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 
+    re_path(r'', include('sitecomber.apps.config.urls')),
+    re_path(r'', include('sitecomber.apps.results.urls'))
 ]
 
 

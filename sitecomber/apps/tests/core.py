@@ -51,7 +51,7 @@ class BrokenOutgoingLinkTest(BaseSiteTest):
 
         broken_link_count = len(broken_outgoing_links)
         status = PageTestResult.STATUS_SUCCESS if broken_link_count == 0 else PageTestResult.STATUS_ERROR
-        message = 'Okay' if broken_link_count == 0 else 'Found %s broken links on %s' % (broken_link_count, page.url)
+        message = 'Okay' if broken_link_count == 0 else 'Found %s broken link(s) on %s' % (broken_link_count, page.url)
 
         try:
             r, created = PageTestResult.objects.get_or_create(

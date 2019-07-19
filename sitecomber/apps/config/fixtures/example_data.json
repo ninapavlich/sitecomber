@@ -4,7 +4,7 @@
     "pk": 1,
     "fields": {
         "password": "pbkdf2_sha256$150000$Uf3wsFfwbb4u$znJkD8nxpoMp13Ec2UNxH9J2ZSfUuV0ujcgtZtaCwkk=",
-        "last_login": null,
+        "last_login": "2019-07-18T19:00:31.817Z",
         "is_superuser": true,
         "username": "admin",
         "first_name": "",
@@ -22,7 +22,7 @@
     "pk": 1,
     "fields": {
         "created": "2019-07-18T18:37:54.304Z",
-        "modified": "2019-07-18T18:38:41.674Z",
+        "modified": "2019-07-18T22:54:13.528Z",
         "owner": [
             "admin"
         ],
@@ -168,5 +168,40 @@
         "active": true,
         "settings": ""
     }
-}
-]
+},
+{
+    "model": "config.sitetestsetting",
+    "pk": 4,
+    "fields": {
+        "created": "2019-07-18T22:48:24.885Z",
+        "modified": "2019-07-18T22:54:13.532Z",
+        "site": 1,
+        "test": "sitecomber_article_tests.tests.PlaceholderTextTest",
+        "active": true,
+        "settings": "{\n  \"placeholder_words\": [\n    \"lorem\",\n    \"ipsum\",\n    \"tk\",\n    \"todo\",\n    \"tbd\"\n  ]\n}"
+    }
+},
+{
+    "model": "config.sitetestsetting",
+    "pk": 5,
+    "fields": {
+        "created": "2019-07-18T22:48:24.888Z",
+        "modified": "2019-07-18T22:48:24.888Z",
+        "site": 1,
+        "test": "sitecomber_article_tests.tests.ArticleReadTimeInfo",
+        "active": true,
+        "settings": ""
+    }
+},
+{
+    "model": "config.sitetestsetting",
+    "pk": 6,
+    "fields": {
+        "created": "2019-07-18T22:48:24.889Z",
+        "modified": "2019-07-18T22:54:13.533Z",
+        "site": 1,
+        "test": "sitecomber_article_tests.tests.SpellCheckTest",
+        "active": true,
+        "settings": "{\n  \"known_words\": [\n    \"nyt\"\n  ]\n}"
+    }
+}]

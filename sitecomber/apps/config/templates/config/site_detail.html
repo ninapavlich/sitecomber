@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block bodyclass %}{{block.super}} site-detail{% endblock %}
+
+{% block inner %}
+
+<nav aria-label="breadcrumb" class="my-4">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/">All Sites</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{object}}</li>
+  </ol>
+</nav>
+
+
+<article class="main">
+  <h1>{{object}}</h1>
+  <h2>{% for url in object.domains %}{{url}}{% if not forloop.last %}, {% endif %}{% endfor %}</h2>
+
+  <aside>
+    <h2>Overview</h2>
+
+    <ul class="list-unstyled">
+      <li><strong>{{object.internal_page_results|length}}</strong> internal pages, <strong>{{object.external_page_results|length}}</strong> external pages</li>
+      {% if object.has_fully_crawled_site %}
+      <li>Site has been <strong>fully crawled</strong></li>
+      {% else %}
+      <li><strong>{{object.uncrawled_page_results|length}}</strong> pages left to crawl</li>
+      {% endif %}
+
+      <li><strong class="text-danger">{{object.pages_with_errors|length}}</strong> pages with errors</li>
+
+    </ul>
+
+  </aside>
+
+  <div>
+    <ul class="list-unstyled">
+      {% for page_result in object.internal_page_results %}
+      <li>
+        <article class="card bg-secondary p-1">
+          
+          <div class="card-body p-1">
+            
+            <div class="d-flex bd-highlight">
+              <div class="p-2 flex-fill"><h5 class="card-title m-0"><a class="text-light" href="{% url 'page-result-detail' object.pk page_result.pk %}">{{page_result.url}}</a></h5></div>
+              <div class="p-2 flex-fill text-right">
+
+                {% with errors=page_result.error_test_results %}
+                {% if errors|length > 0 %}
+                <span class="badge badge-danger p-1">{{errors|length}} error{% if errors|length > 1 %}s{% endif %}</span>
+                {% endif %}
+                {% endwith %}
+
+                {% with errors=page_result.warning_test_results %}
+                {% if errors|length > 0 %}
+                <span class="badge badge-warning p-1">{{errors|length}} warning{% if errors|length > 1 %}s{% endif %}</span>
+                {% endif %}
+                {% endwith %}
+
+              </div>
+            </div>
+
+            
+          </div>
+
+        </article>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+
+</article>
+{% endblock %}

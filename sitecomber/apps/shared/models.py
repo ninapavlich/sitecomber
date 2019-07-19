@@ -172,6 +172,16 @@ class BaseTestResult(models.Model):
     )
     status = models.CharField(max_length=16, choices=STATUSES, default=STATUS_INFO)
 
+    @property
+    def test_title(self):
+        return (self.test.split('.')[-1])
+
+    @property
+    def bootstrap_class(self):
+        if self.status == 'error':
+            return 'danger'
+        return self.status
+
     def __str__(self):
         return u'%s. %s on %s' % (self.pk, self.status, self.test)
 

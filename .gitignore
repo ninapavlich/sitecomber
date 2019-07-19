@@ -121,3 +121,5 @@ uploads/*
 data.json
 .DS_Store
 *.pid
+
+node_modules/
