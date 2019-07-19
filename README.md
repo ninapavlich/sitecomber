@@ -95,6 +95,12 @@ To run the worker locally, follow the "Local Development Quickstart" instruction
 
 ## Development Tools
 
+#### Manually re-run tests after a configuration change:
+``` 
+    # Re-run tests on site with primary key = 1
+    python manage.py rerun_tests 1
+```
+
 #### Manually crawl a single page result:
 ```
     # Crawl page result with primary key = 1
