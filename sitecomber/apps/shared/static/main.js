@@ -4517,13 +4517,15 @@
 /* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function($) {console.log("HELLO UI!")
-
-$('.card-header-tabs a').on('click', function (e) {
+/* WEBPACK VAR INJECTION */(function($) {$('.card-header-tabs a').on('click', function (e) {
   e.preventDefault()
   $(this).tab('show')
-  console.log("TAB CLICKED")
+  window.location.hash = this.hash;
 })
+
+if(window.location.hash){
+  $('a[href="'+window.location.hash+'"]').tab('show')
+}
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ }),

@@ -33,33 +33,59 @@
     <div class="card-header">
       <ul class="nav nav-tabs card-header-tabs" role="tablist">
         <li class="nav-item">
-          <a class="nav-link" href="#tests" role="tab" aria-controls="description" aria-selected="false">Test Results</a>
+          <a class="nav-link active" href="#tests" role="tab" aria-controls="description" aria-selected="true">Test Results</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="#content" role="tab" aria-controls="deals" aria-selected="false">Content</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link active"  href="#request" role="tab" aria-controls="history" aria-selected="true">Request Details</a>
+          <a class="nav-link" href="#seo" role="tab" aria-controls="deals" aria-selected="false">SEO</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#technical" role="tab" aria-controls="deals" aria-selected="false">Technical</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link"  href="#request" role="tab" aria-controls="history" aria-selected="false">Request Details</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="#links" role="tab" aria-controls="deals" aria-selected="false">Incoming &amp; Outgoing Links</a>
         </li>
+        
 
       </ul>
     </div>
     <div class="card-body">
-      
-      
        <div class="tab-content mt-3">
-        <div class="tab-pane " id="tests" role="tabpanel">
+
+
+
+        <div class="tab-pane active" id="tests" role="tabpanel">
           <ul class="list-unstyled">
             {% for result in object.test_results %}
             <li class="p-2 my-2 alert alert-{{result.bootstrap_class}}">
               <strong>{{result.test_title}}</strong> {{result.message}}
             </li>
             {% endfor %}
-
           </ul>
         </div>
+
+
+        <div class="tab-pane" id="content" role="tabpanel">
+          Content TODO
+        </div>
+
+        <div class="tab-pane" id="seo" role="tabpanel">
+          SEO TODO
+        </div>
+
+        <div class="tab-pane" id="technical" role="tabpanel">
+          technical TODO
+        </div>
          
-        <div class="tab-pane active" id="request" role="tabpanel" aria-labelledby="history-tab">  
+
+        <div class="tab-pane" id="request" role="tabpanel" aria-labelledby="history-tab">  
           {% if object.latest_request %}
           {% if object.latest_request.response %}
           <h4>Request Path</h4>
@@ -71,53 +97,75 @@
           </ul>
           {% endif %}
 
-          <div class="clearfix">
+          <div class="clearfix mt-4">
             <h4>Request Headers</h4>
-            <dl>
-            {% for key, value in object.latest_request.request_header_json.items %}
-              <dt>{{key}}</dt>
-              <dd>{{value}}</dd>
-            {% endfor %}
-            </dl>
+
+            <div class="border rounded bg-light clearfix">
+              <dl>
+              {% for key, value in object.latest_request.request_header_json.items %}
+                <dt>{{key}}</dt>
+                <dd>{{value}}</dd>
+              {% endfor %}
+              </dl>
+            </div>
           </div>
 
-          <div class="clearfix">
+          <div class="clearfix mt-4">
             <h4>Response Headers</h4>
-            {% if object.latest_request.response %}
-            <dl>
-            {% for key, value in object.latest_request.response.response_header_json.items %}
-              <dt>{{key}}</dt>
-              <dd>{{value}}</dd>
-            {% endfor %}
-            </dl>
-            {% else %}
-            <p>Page response hasn't been recorded</p>
-            {% endif %}
+
+            <div class="border rounded bg-light clearfix">
+
+              {% if object.latest_request.response %}
+              <dl>
+              {% for key, value in object.latest_request.response.response_header_json.items %}
+                <dt>{{key}}</dt>
+                <dd>{{value}}</dd>
+              {% endfor %}
+              </dl>
+              {% else %}
+              <p>Page response hasn't been recorded</p>
+              {% endif %}
+
+            </div>
           </div>
+
+          {% if object.latest_request.response.text_content %}
+          <h4 class="mt-4">Source</h4>
+          <div class="border rounded bg-light p-3">
+            <pre>{{object.latest_request.response.enumerated_source}}</pre>
+          </div>
+          {% endif %}
 
           {% else %}
           <p>Page hasn't been loaded yet</p>
           {% endif %}
-
         </div>
          
-        <div class="tab-pane" id="links" role="tabpanel" aria-labelledby="deals-tab">
 
+
+
+        <div class="tab-pane" id="links" role="tabpanel" aria-labelledby="deals-tab">
           <h4>Incoming links from within {{object.site_domain.site}}</h4>
           <ul class="list-unstyled">
             {% for link in object.incoming_links.all %}
             <li class="my-1 clearfix"><a href="{% url 'page-result-detail' link.site_domain.site.pk link.pk %}">{{link.url}}</a> <a class="float-right badge badge-info p-2" href="{{link.url}}" target="_blank">Visit</a></li>
+            {% empty %}
+            <li>No internal links to this page found yet.</li>
             {% endfor %}
           </ul>
-
           <h4>Outgoing links</h4>
           <ul class="list-unstyled">
             {% for link in object.outgoing_links.all %}
             <li class="my-1 clearfix"><a href="{% url 'page-result-detail' link.site_domain.site.pk link.pk %}">{{link.url}}</a> <a class="float-right badge badge-info p-2" href="{{link.url}}" target="_blank">Visit</a></li>
+            {% empty %}
+            <li>No outgoing links found on this page.</li>
             {% endfor %}
           </ul>
-
         </div>
+
+
+
+
       </div>
     </div>
   </div>

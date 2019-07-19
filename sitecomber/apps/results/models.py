@@ -59,6 +59,21 @@ class PageResponse(BaseMetaData, BaseResponse):
             return int(round(dt.total_seconds() * 1000))
         return None
 
+    @property
+    def enumerated_source(self):
+        if self.text_content:
+            try:
+                enumerated_source_list = self.text_content.split("\n")
+                counter = 0
+                source = u""
+                for line in enumerated_source_list:
+                    new_line = (u"%s: %s" % (counter, line))
+                    source += (u"%s\n" % (new_line))
+                    counter += 1
+                return source
+            except Exception as e:
+                return u"Error enumerating source: %s" % (e)
+
     @classmethod
     def parse_response(cls, request, redirected_from, response):
         r = PageResponse(
