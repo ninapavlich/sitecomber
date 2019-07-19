@@ -7026,6 +7026,9 @@ dl {
     margin-bottom: 1em;
     border-bottom: 1px solid transparent; }
 
+a.card-title {
+  text-decoration: none; }
+
 .status-code:before {
   content: '';
   display: inline-block;

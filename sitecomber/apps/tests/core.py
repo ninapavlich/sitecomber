@@ -18,8 +18,16 @@ class PageUpTest(BaseSiteTest):
         if page.latest_request and page.latest_request.response:
             status_code = page.latest_request.response.status_code
 
-            status = PageTestResult.STATUS_SUCCESS if status_code == 200 else PageTestResult.STATUS_ERROR
-            message = 'Okay' if status_code == 200 else 'Error loading %s - Returned code %s' % (page.url, status_code)
+            error_codes = [-1, 500, 404]
+            status = PageTestResult.STATUS_WARNING
+            if status_code == 200:
+                status = PageTestResult.STATUS_SUCCESS
+                message = 'Okay'
+            elif status_code in error_codes:
+                status = PageTestResult.STATUS_ERROR
+                message = 'Error loading %s returned error code %s' % (page.url, status_code)
+            else:
+                message = 'Warning loading %s returned unexpected code %s' % (page.url, status_code)
 
             try:
                 r, created = PageTestResult.objects.get_or_create(

@@ -109,7 +109,7 @@ class Site(BaseMetaData):
     @cached_property
     def pages_with_errors(self):
         # TODO -- optimize
-        return list(set([item.page for item in self.error_page_test_results]))
+        return list(set([item.page for item in self.error_page_test_results if item.page.is_internal]))
 
     def __str__(self):
         return self.title

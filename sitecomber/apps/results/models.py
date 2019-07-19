@@ -228,7 +228,7 @@ class PageResult(BaseMetaData, BaseURL):
         if result.response and result.response.text_content:
             parser = TitleParser()
             parser.feed(result.response.text_content)
-            self.title = parser.title
+            self.title = parser.title if parser.title else self.url
 
         self.last_load_time = timezone.now()
         self.save()
