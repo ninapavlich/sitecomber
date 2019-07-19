@@ -8,7 +8,7 @@
   <ol class="breadcrumb">
     <li class="breadcrumb-item"><a href="/">All Sites</a></li>
     <li class="breadcrumb-item"><a href="{% url 'site-detail' object.site_domain.site.pk %}">{{object.site_domain.site}}</a></li>
-    <li class="breadcrumb-item active" aria-current="page">Page Result</li>
+    <li class="breadcrumb-item active" aria-current="page">{{object.title}}</li>
   </ol>
 </nav>
 
@@ -37,13 +37,16 @@
         </li>
 
         <li class="nav-item">
-          <a class="nav-link" href="#content" role="tab" aria-controls="deals" aria-selected="false">Content</a>
+          <a class="nav-link" href="#article" role="tab" aria-controls="deals" aria-selected="false">Article</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="#seo" role="tab" aria-controls="deals" aria-selected="false">SEO</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="#technical" role="tab" aria-controls="deals" aria-selected="false">Technical</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#accessibility" role="tab" aria-controls="deals" aria-selected="false">Accessibility</a>
         </li>
 
         <li class="nav-item">
@@ -72,16 +75,39 @@
         </div>
 
 
-        <div class="tab-pane" id="content" role="tabpanel">
-          Content TODO
+        <div class="tab-pane" id="article" role="tabpanel">
+          Aricle TODO
+          <div>Article preview and time estimate based on data from test</div>
+          <div>List of mis-spelled words</div>
         </div>
 
         <div class="tab-pane" id="seo" role="tabpanel">
           SEO TODO
+          <ul>
+            <li>Display page meta tags</li>
+            <li>Social media share info</li>
+            <li>Duplicate content warning</li>
+            <li>Sitemap warning</li>
+          </ul>
+
         </div>
 
         <div class="tab-pane" id="technical" role="tabpanel">
-          technical TODO
+          Technical TODO
+          <ul>
+            <li>HTML Validation</li>
+            <li>Page speed test via Google API</li>
+            <li>Validate server security (certificate, known vulnerabilities)</li>
+          </ul>
+
+        </div>
+
+        <div class="tab-pane" id="accessibility" role="tabpanel">
+          Accessibility TODO
+          <ul>
+            <li>Image and video alt text</li>
+          </ul>
+
         </div>
          
 
@@ -147,7 +173,7 @@
         <div class="tab-pane" id="links" role="tabpanel" aria-labelledby="deals-tab">
           <h4>Incoming links from within {{object.site_domain.site}}</h4>
           <ul class="list-unstyled">
-            {% for link in object.incoming_links.all %}
+            {% for link in object.incoming_links_with_prefetch.all %}
             <li class="my-1 clearfix"><a href="{% url 'page-result-detail' link.site_domain.site.pk link.pk %}">{{link.url}} <span class="status-code status-code-{{link.latest_status_code}}" title="{{link.latest_status_code}}"></span></a> <a class="float-right badge badge-info p-2" href="{{link.url}}" target="_blank">Visit</a></li>
             {% empty %}
             <li>No internal links to this page found yet.</li>
@@ -155,7 +181,7 @@
           </ul>
           <h4>Outgoing links</h4>
           <ul class="list-unstyled">
-            {% for link in object.outgoing_links.all %}
+            {% for link in object.outgoing_links_with_prefetch.all %}
             <li class="my-1 clearfix"><a href="{% url 'page-result-detail' link.site_domain.site.pk link.pk %}">{{link.url}} <span class="status-code status-code-{{link.latest_status_code}}" title="{{link.latest_status_code}}"></span></a> <a class="float-right badge badge-info p-2" href="{{link.url}}" target="_blank">Visit</a></li>
             {% empty %}
             <li>No outgoing links found on this page.</li>

@@ -244,6 +244,14 @@ class PageResult(BaseMetaData, BaseURL):
         return 0
 
     @cached_property
+    def incoming_links_with_prefetch(self):
+        return self.incoming_links.all().prefetch_related('site_domain').prefetch_related('site_domain__site')
+
+    @cached_property
+    def outgoing_links_with_prefetch(self):
+        return self.outgoing_links.all().prefetch_related('site_domain').prefetch_related('site_domain__site')
+
+    @cached_property
     def response_list(self):
         output = []
         if self.latest_request:

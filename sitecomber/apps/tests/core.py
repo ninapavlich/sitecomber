@@ -18,12 +18,11 @@ class PageUpTest(BaseSiteTest):
         if page.latest_request and page.latest_request.response:
             status_code = page.latest_request.response.status_code
 
-            error_codes = [-1, 500, 404]
             status = PageTestResult.STATUS_WARNING
             if status_code == 200:
                 status = PageTestResult.STATUS_SUCCESS
                 message = 'Okay'
-            elif status_code in error_codes:
+            elif (status_code == -1) or (status_code >= 300 and status_code < 600):
                 status = PageTestResult.STATUS_ERROR
                 message = 'Error loading %s returned error code %s' % (page.url, status_code)
             else:

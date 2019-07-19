@@ -68,6 +68,7 @@ class Site(BaseMetaData):
 
     @cached_property
     def page_results(self):
+        # TODO -- optimize with prefetch
         return PageResult.objects.filter(site_domain__site=self)
 
     @cached_property
