@@ -1,2 +1,3 @@
 web: gunicorn sitecomber.wsgi
-worker: python site_comber_worker.py
+# To enable a continuous worker instead of using CROn to crawl the site:
+# worker: python site_comber_worker.py
