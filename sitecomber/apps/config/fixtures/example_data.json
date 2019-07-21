@@ -22,7 +22,7 @@
     "pk": 1,
     "fields": {
         "created": "2019-07-18T18:37:54.304Z",
-        "modified": "2019-07-18T22:54:13.528Z",
+        "modified": "2019-07-20T18:55:54.046Z",
         "owner": [
             "admin"
         ],
@@ -174,7 +174,7 @@
     "pk": 4,
     "fields": {
         "created": "2019-07-18T22:48:24.885Z",
-        "modified": "2019-07-18T22:54:13.532Z",
+        "modified": "2019-07-20T18:55:54.048Z",
         "site": 1,
         "test": "sitecomber_article_tests.tests.PlaceholderTextTest",
         "active": true,
@@ -198,10 +198,11 @@
     "pk": 6,
     "fields": {
         "created": "2019-07-18T22:48:24.889Z",
-        "modified": "2019-07-18T22:54:13.533Z",
+        "modified": "2019-07-20T18:55:54.049Z",
         "site": 1,
         "test": "sitecomber_article_tests.tests.SpellCheckTest",
         "active": true,
-        "settings": "{\n  \"known_words\": [\n    \"nyt\"\n  ]\n}"
+        "settings": "{\n  \"known_words\": [\n    \"nyt\",\n    \"nytparenting\",\n    \"hashtag\",\n    \"tinyvictories\",\n    \"\\u00a9\",\n    \"metoo\",\n    \"momstoo\",\n    \"blogs\",\n    \"bloggers\",\n    \"websites\",\n    \"inbox\",\n    \"meds\",\n    \"latte\",\n    \"sippy\",\n    \"gah\",\n    \"doula\",\n    \"bariatric\",\n    \"chemo\",\n    \"clomid\",\n    \"cesarean\",\n    \"previa\",\n    \"lactivists\"\n  ]\n}"
     }
-}]
+}
+]
