@@ -240,3 +240,9 @@ CKEDITOR_CONFIGS = {
 DEFAULT_USER_AGENT = env('DEFAULT_USER_AGENT', default='Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:68.0) Gecko/20100101 Firefox/68.0 Sitecomber')
 DEFAULT_MAX_TIMEOUT_SECONDS = int(env('DEFAULT_MAX_TIMEOUT_SECONDS', default=15))
 DEFAULT_MAINTAIN_PREVIOUS_RECORD_COUNT = int(env('DEFAULT_MAINTAIN_PREVIOUS_RECORD_COUNT', default=1))
+
+# Don't crawl a page any more frequently than this number of seconds:
+MIN_SECONDS_BETWEEN_INTERNAL_PAGE_CRAWL = int(env('MIN_SECONDS_BETWEEN_INTERNAL_PAGE_CRAWL', default=(60 * 60)))
+
+# To make sure we don't "over" crawl external pages, don't crawl an external page any more frequencly than this
+MIN_SECONDS_BETWEEN_EXTERNAL_PAGE_CRAWL = int(env('MIN_SECONDS_BETWEEN_EXTERNAL_PAGE_CRAWL', default=(60 * 60 * 24)))

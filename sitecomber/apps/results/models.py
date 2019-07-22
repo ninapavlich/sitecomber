@@ -213,6 +213,22 @@ class PageResult(BaseMetaData, BaseURL):
     is_root = models.BooleanField(default=False)
     is_internal = models.BooleanField(default=True)
 
+    def should_load(self):
+        do_load = False
+        if not self.last_load_time:
+            do_load = True
+        else:
+            time_since_last_load = timezone.now() - self.last_load_time
+            if self.is_internal:
+                logger.debug(u"Time since last load: %s min is %s " % (time_since_last_load.total_seconds(), settings.MIN_SECONDS_BETWEEN_INTERNAL_PAGE_CRAWL))
+                do_load = (time_since_last_load.total_seconds() > settings.MIN_SECONDS_BETWEEN_INTERNAL_PAGE_CRAWL)
+            else:
+                logger.debug(u"Time since last load: %s min is %s " % (time_since_last_load.total_seconds(), settings.MIN_SECONDS_BETWEEN_EXTERNAL_PAGE_CRAWL))
+                do_load = (time_since_last_load.total_seconds() > settings.MIN_SECONDS_BETWEEN_EXTERNAL_PAGE_CRAWL)
+
+        logger.debug(u"Should load %s? %s" % (self, do_load))
+        return do_load
+
     def load(self):
         logger.info(u"Loading %s" % (self))
 

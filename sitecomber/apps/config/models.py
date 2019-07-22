@@ -88,10 +88,10 @@ class Site(BaseMetaData):
                 last_child = child
                 if piece not in child:
                     child[piece] = {
-                        'path':piece,
-                        'page':None,
-                        'page_url':None,
-                        'children':{}
+                        'path': piece,
+                        'page': None,
+                        'page_url': None,
+                        'children': {}
                     }
                 child = child[piece]['children']
             if last_piece:
@@ -100,7 +100,6 @@ class Site(BaseMetaData):
 
         print(tree)
         return tree
-
 
     @cached_property
     def internal_page_results(self):
@@ -230,11 +229,16 @@ class SiteDomain(BaseMetaData, BaseURL):
 
             logger.info("Found %s pages within the %s site, going to load a max of %s" % (pages.count(), self, load_batch_size))
 
-            pages_to_load = pages[:load_batch_size]
-            for page in pages_to_load:
-                page.load()
-                for test in tests:
-                    test.page_parsed(page)
+            ctr = 0
+            for page in pages:
+                if ctr > load_batch_size:
+                    break
+
+                if page.should_load():
+                    ctr += 1
+                    page.load()
+                    for test in tests:
+                        test.page_parsed(page)
 
     def handle_link(self, url, source_page=None, is_internal=True):
 
