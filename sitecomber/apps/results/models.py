@@ -143,6 +143,9 @@ class PageRequest(BaseMetaData, BaseRequest):
     load_end_time = models.DateTimeField(blank=True, null=True)
     retain = models.BooleanField(default=False)
 
+    class Meta:
+        ordering = ['-created']
+
     def __str__(self):
         return u'%s at %s' % (self.request_url, self.load_start_time)
 
@@ -255,8 +258,14 @@ class PageResult(BaseMetaData, BaseURL):
 
     @cached_property
     def latest_status_code(self):
-        if self.latest_request and self.latest_request.response:
-            return self.latest_request.response.status_code
+        for request in self.pagerequest_set.all():
+            if request.response:
+                return request.response.status_code
+
+        # Less efficient:
+        # latest_request = self.pagerequest_set.select_related('response').order_by('-created').first()
+        # if latest_request and latest_request.response:
+        #     return self.latest_request.response.status_code
         return 0
 
     @cached_property
@@ -285,19 +294,27 @@ class PageResult(BaseMetaData, BaseURL):
 
     @cached_property
     def successful_test_results(self):
-        return self.test_results.filter(status=BaseTestResult.STATUS_SUCCESS)
+        # For some reason this is more db efficient than filtering
+        return [test for test in self.pagetestresult_set.all() if test.status == BaseTestResult.STATUS_SUCCESS]
+        # return self.pagetestresult_set.all().filter(status=BaseTestResult.STATUS_SUCCESS)
 
     @cached_property
     def info_test_results(self):
-        return self.test_results.filter(status=BaseTestResult.STATUS_INFO)
+        # For some reason this is more db efficient than filtering
+        return [test for test in self.pagetestresult_set.all() if test.status == BaseTestResult.STATUS_INFO]
+        # return self.pagetestresult_set.all().filter(status=BaseTestResult.STATUS_INFO)
 
     @cached_property
     def warning_test_results(self):
-        return self.test_results.filter(status=BaseTestResult.STATUS_WARNING)
+        # For some reason this is more db efficient than filtering
+        return [test for test in self.pagetestresult_set.all() if test.status == BaseTestResult.STATUS_WARNING]
+        # return self.pagetestresult_set.all().filter(status=BaseTestResult.STATUS_WARNING)
 
     @cached_property
     def error_test_results(self):
-        return self.test_results.filter(status=BaseTestResult.STATUS_ERROR)
+        # For some reason this is more db efficient than filtering
+        return [test for test in self.pagetestresult_set.all() if test.status == BaseTestResult.STATUS_ERROR]
+        # return self.pagetestresult_set.all().filter(status=BaseTestResult.STATUS_ERROR)
 
     def get_test_result_by_type(self, type):
         return self.test_results.filter(test=type).first()

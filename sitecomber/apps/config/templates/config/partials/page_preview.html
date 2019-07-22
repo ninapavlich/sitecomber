@@ -19,21 +19,27 @@
       <div class="p-2 flex-fill text-right">
         {% with errors=page_result.error_test_results %}
         {% if errors|length > 0 %}
-        <span
-          class="badge badge-danger p-1 ml-2"
-          title="{% for error in errors %}{{error.message}}{% if not forloop.last %}, {%endif %}{% endfor %}"
-          >{{errors|length}} error{% if errors|length > 1 %}s{% endif %}</span
-        >
+        <a href="{% url 'page-result-detail' object.pk page_result.pk %}" >
+          <span
+            class="badge badge-danger p-1 ml-2"
+            title="{% for error in errors %}{{error.message}}{% if not forloop.last %}, {%endif %}{% endfor %}"
+            >
+             {{errors|length}} error{% if errors|length > 1 %}s{% endif %}
+          </span>
+        </a>
         {% endif %}
         {% endwith %}
 
-        {% with errors=page_result.warning_test_results %}
-        {% if errors|length > 0 %}
-        <span
-          class="badge badge-warning p-1 ml-2"
-          title="{% for error in errors %}{{error.message}}{% if not forloop.last %}, {%endif %}{% endfor %}"
-          >{{errors|length}} warning{% if errors|length > 1 %}s{% endif %}</span
-        >
+        {% with warnings=page_result.warning_test_results %}
+        {% if warnings|length > 0 %}
+        <a href="{% url 'page-result-detail' object.pk page_result.pk %}" >
+          <span
+            class="badge badge-warning p-1 ml-2"
+            title="{% for warning in warnings %}{{warning.message}}{% if not forloop.last %}, {%endif %}{% endfor %}"
+            >
+             {{warnings|length}} warning{% if warnings|length > 1 %}s{% endif %}
+          </span>
+        </a>
         {% endif %}
         {% endwith %}
 

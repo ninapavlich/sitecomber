@@ -69,8 +69,9 @@ class Site(BaseMetaData):
 
     @cached_property
     def page_results(self):
+        # return self.sitedomain_set.first().pageresult_set.all().prefetch_related('pagerequest_set').prefetch_related('pagerequest_set__response')
         # TODO -- optimize with prefetch
-        return PageResult.objects.filter(site_domain__site=self)  # .prefetch_related('pagerequest_set').prefetch_related('pagerequest_set__response')
+        return PageResult.objects.filter(site_domain__site=self).prefetch_related('pagetestresult_set').prefetch_related('pagerequest_set').prefetch_related('pagerequest_set__response')
 
     @cached_property
     def page_results_hierarchy(self):
@@ -98,7 +99,6 @@ class Site(BaseMetaData):
                 last_child[last_piece]['page'] = result
                 last_child[last_piece]['page_url'] = result.url
 
-        print(tree)
         return tree
 
     @cached_property
