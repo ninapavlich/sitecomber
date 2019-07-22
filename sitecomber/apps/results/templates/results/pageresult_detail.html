@@ -1,5 +1,7 @@
 {% extends 'base.html' %} {% load results_tags %}
-{% block bodyclass %}{{block.super}} page-detail{% endblock %} {% block inner %}
+{% block bodyclass %}{{block.super}} page-detail{% endblock %} 
+
+{% block inner %}
 
 <nav aria-label="breadcrumb" class="my-4">
   <ol class="breadcrumb">
@@ -125,40 +127,46 @@
         </div>
 
         <div class="tab-pane" id="article" role="tabpanel">
-          {% get_test_result_by_type object
-          "sitecomber_article_tests.tests.ReaderViewTest" as reader_test %} {%
-          get_test_result_by_type object
-          "sitecomber_article_tests.tests.ArticleReadTimeInfo" as readtime_test
-          %} {% get_test_result_by_type object
-          "sitecomber_article_tests.tests.SpellCheckTest" as spell_check_test %}
-          {% get_test_result_by_type object
-          "sitecomber_article_tests.tests.PlaceholderTextTest" as
-          placeholder_text_test %} {% if reader_test.success %}
+          {% get_test_result_by_type object "sitecomber_article_tests.tests.ReaderViewTest" as reader_test %} 
+          {% get_test_result_by_type object "sitecomber_article_tests.tests.ArticleReadTimeInfo" as readtime_test
+          %} {% get_test_result_by_type object "sitecomber_article_tests.tests.SpellCheckTest" as spell_check_test %}
+          {% get_test_result_by_type object "sitecomber_article_tests.tests.PlaceholderTextTest" as placeholder_text_test %} 
+
+          {% if reader_test.success %}
           <h4 class="text-info">Article Detected:</h4>
           <article class="mb-4 p-4 bg-light rounded">
             <h1>{{reader_test.data_json.article.title}}</h1>
             {% if reader_test.status == 'success' %}
-            <small
-              ><strong>Read time:</strong>
-              {{readtime_test.data_json.read_time}}</small
-            >
-            {% endif %} {% if reader_test.data_json.article.publish_date %}
-            <h3>{{reader_test.data_json.article.publish_date}}</h3>
+              <small
+                ><strong>Read time:</strong>
+                {{readtime_test.data_json.read_time}}</small
+              >
+            {% endif %} 
+
+            {% if reader_test.data_json.article.publish_date %}
+              <h3>{{reader_test.data_json.article.publish_date}}</h3>
             {% else %}
-            <h3 class="text-danger">No publish date identified</h3>
-            {% endif %} {% if reader_test.data_json.article.authors %}
-            <h4>{{reader_test.data_json.article.authors}}</h4>
+              <h3 class="text-danger">No publish date identified</h3>
+            {% endif %} 
+
+            {% if reader_test.data_json.article.authors %}
+              <h4>{{reader_test.data_json.article.authors}}</h4>
             {% else %}
-            <h4 class="text-danger">No authors identified</h4>
-            {% endif %} {% if reader_test.data_json.article.top_image %}
-            <img
-              src="{{reader_test.data_json.article.top_image}}"
-              alt="Top image for {{reader_test.data_json.article.title}}"
-              class="my-4"
-            />
+              <h4 class="text-danger">No authors identified</h4>
+            {% endif %} 
+
+            {% if reader_test.data_json.article.top_image %}
+              <img
+                src="{{reader_test.data_json.article.top_image}}"
+                alt="Top image for {{reader_test.data_json.article.title}}"
+                class="my-4"
+              />
             {% else %}
-            <h4 class="text-danger">No top image identified</h4>
-            {% endif %} {% if reader_test.data_json.article.text %}
+              <h4 class="text-danger">No top image identified</h4>
+            {% endif %} 
+
+
+            {% if reader_test.data_json.article.text %}
             <main class="my-2">
               {{reader_test.data_json.article.text|linebreaks|highlight_spelling_errors:spell_check_test.data_json.misspelled_words}}
             </main>
@@ -167,29 +175,28 @@
             {% endif %}
           </article>
           {% else %}
-          <strong class="text-danger">{{reader_test.message|safe}}</strong> {%
-          endif %} {% if spell_check_test.success %}
+
+          <strong class="text-danger">{{reader_test.message|safe}}</strong> 
+          {% endif %} 
+
+          {% if spell_check_test.success %}
           <h4 class="text-info">No misspelled words found.</h4>
           {% else %}
           <h4 class="text-danger">
             Found {{spell_check_test.data_json.misspelled_words|length}}
-            misspellings: {% for word in
-            spell_check_test.data_json.misspelled_words %}{{word}}{% if not
-            forloop.last %}, {% endif %}{% endfor %}
+            misspellings: {% for word in spell_check_test.data_json.misspelled_words %}{{word}}{% if not forloop.last %}, {% endif %}{% endfor %}
           </h4>
           {% endif %} {% if placeholder_text_test.success %}
           <h4 class="text-info">
-            No placeholder text found. Words searched were {% for word in
-            placeholder_text_test.data_json.placeholder_words_searched
-            %}{{word}}{% if not forloop.last %}, {% endif %}{% endfor %}
+            No placeholder text found. Words searched were {% for word in placeholder_text_test.data_json.placeholder_words_searched %}{{word}}{% if not forloop.last %}, {% endif %}{% endfor %}
           </h4>
           {% else %}
           <h4 class="text-danger">
             Found
             {{placeholder_text_test.data_json.placeholder_words_found|length}}
-            placeholder words: {% for word in
-            placeholder_text_test.data_json.placeholder_words_found %}{{word}}{%
-            if not forloop.last %}, {% endif %}{% endfor %}
+            placeholder words: {% for word in placeholder_text_test.data_json.placeholder_words_found %}
+            {{word}}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
           </h4>
           {% endif %}
         </div>
@@ -225,59 +232,60 @@
           role="tabpanel"
           aria-labelledby="history-tab"
         >
-          {% if object.latest_request %} {% if object.latest_request.response %}
-          <h4>Request Path</h4>
-          <ul class="list-unstyled">
-            <li>
-              <strong>{{object.latest_request.method}}</strong> on
-              {{object.latest_request.load_start_time}}
-            </li>
-            {% for response in object.response_list %}
-            <li>
-              <strong>{{response.status_code}}</strong>
-              {{response.response_url}} [{{response.content_type}}{% if
-              response.content_length %} - {{response.content_length}}{% endif
-              %}] <em>{{response.time_elapsed_ms}}ms</em>
-            </li>
-            {% endfor %}
-          </ul>
-          {% endif %}
-          <div class="clearfix mt-4">
-            <h4>Request Headers</h4>
-            <div class="border rounded bg-light clearfix">
-              <dl>
-                {% for key, value in
-                object.latest_request.request_header_json.items %}
-                <dt>{{key}}</dt>
-                <dd>{{value}}</dd>
-                {% endfor %}
-              </dl>
+          {% if object.latest_request %} 
+
+            {% if object.latest_request.response %}
+            <h4>Request Path</h4>
+            <ul class="list-unstyled">
+              <li>
+                <strong>{{object.latest_request.method}}</strong> on
+                {{object.latest_request.load_start_time}}
+              </li>
+              {% for response in object.response_list %}
+              <li>
+                <strong>{{response.status_code}}</strong>
+                {{response.response_url}} [{{response.content_type}}{% if response.content_length %} - {{response.content_length}}{% endif %}] <em>{{response.time_elapsed_ms}}ms</em>
+              </li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+            <div class="clearfix mt-4">
+              <h4>Request Headers</h4>
+              <div class="border rounded bg-light clearfix">
+                <dl>
+                  {% for key, value in object.latest_request.request_header_json.items %}
+                  <dt>{{key}}</dt>
+                  <dd>{{value}}</dd>
+                  {% endfor %}
+                </dl>
+              </div>
             </div>
-          </div>
-          <div class="clearfix mt-4">
-            <h4>Response Headers</h4>
-            <div class="border rounded bg-light clearfix">
-              {% if object.latest_request.response %}
-              <dl>
-                {% for key, value in
-                object.latest_request.response.response_header_json.items %}
-                <dt>{{key}}</dt>
-                <dd>{{value}}</dd>
-                {% endfor %}
-              </dl>
-              {% else %}
-              <p>Page response hasn't been recorded</p>
-              {% endif %}
+            <div class="clearfix mt-4">
+              <h4>Response Headers</h4>
+              <div class="border rounded bg-light clearfix">
+                {% if object.latest_request.response %}
+                  <dl>
+                    {% for key, value in object.latest_request.response.response_header_json.items %}
+                    <dt>{{key}}</dt>
+                    <dd>{{value}}</dd>
+                    {% endfor %}
+                  </dl>
+                {% else %}
+                  <p>Page response hasn't been recorded</p>
+                {% endif %}
+              </div>
             </div>
-          </div>
-          {% if object.latest_request.response.text_content %}
-          <h4 class="mt-4">Source</h4>
-          <div class="border rounded bg-light p-3">
-            <pre>{{object.latest_request.response.enumerated_source}}</pre>
-          </div>
-          {% endif %} {% else %}
-          <p>Page hasn't been loaded yet</p>
-          {% endif %}
+              {% if object.latest_request.response.text_content %}
+              <h4 class="mt-4">Source</h4>
+              <div class="border rounded bg-light p-3">
+                <pre>{{object.latest_request.response.enumerated_source}}</pre>
+              </div>
+              {% endif %} 
+            {% else %}
+              <p>Page hasn't been loaded yet</p>
+        
+        {% endif %}
+        
         </div>
 
         <div
