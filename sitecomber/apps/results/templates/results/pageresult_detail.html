@@ -79,6 +79,10 @@
         <div class="tab-pane" id="article" role="tabpanel">
           {% get_test_result_by_type object "sitecomber_article_tests.tests.ReaderViewTest" as reader_test %}
           {% get_test_result_by_type object "sitecomber_article_tests.tests.ArticleReadTimeInfo" as readtime_test %}
+          {% get_test_result_by_type object "sitecomber_article_tests.tests.SpellCheckTest" as spell_check_test %}
+          {% get_test_result_by_type object "sitecomber_article_tests.tests.PlaceholderTextTest" as placeholder_text_test %}
+
+
           {% if reader_test.success %}
           <h4 class="text-info">Article Detected:</h4>
           <article class="mb-4 p-4 bg-light rounded">
@@ -106,7 +110,7 @@
             {% endif %}
 
             {% if reader_test.data_json.article.text %}
-            <main class="my-2">{{reader_test.data_json.article.text|linebreaks}}</main>
+            <main class="my-2">{{reader_test.data_json.article.text|linebreaks|highlight_spelling_errors:spell_check_test.data_json.misspelled_words}}</main>
             {% else %}
             <h4 class="text-danger">No article text identified</h4>
             {% endif %}
@@ -120,7 +124,7 @@
           <strong class="text-danger">{{reader_test.message|safe}}</strong>
           {% endif %}
 
-          {% get_test_result_by_type object "sitecomber_article_tests.tests.SpellCheckTest" as spell_check_test %}
+          
           {% if spell_check_test.success %}
           <h4 class="text-info">No misspelled words found.<h4>
           {% else %}
@@ -128,11 +132,11 @@
           {% endif %}
 
 
-          {% get_test_result_by_type object "sitecomber_article_tests.tests.PlaceholderTextTest" as placeholder_text_test %}
+          
           {% if placeholder_text_test.success %}
-          <h4 class="text-info">No placeholder text found -- words searched were {% for word in placeholder_text_test.data_json.placeholder_words_searched %}{{word}}{% if not forloop.last %}, {% endif %}{% endfor %}</h4>
+          <h4 class="text-info">No placeholder text found. Words searched were {% for word in placeholder_text_test.data_json.placeholder_words_searched %}{{word}}{% if not forloop.last %}, {% endif %}{% endfor %}</h4>
           {% else %}
-          <h4 class="text-danger">Found {{spell_check_test.data_json.misspelled_words|length}} misspellings: {{spell_check_test.data_json.misspelled_words}}</h4>
+          <h4 class="text-danger">Found {{placeholder_text_test.data_json.placeholder_words_found|length}} placeholder words: {% for word in placeholder_text_test.data_json.placeholder_words_found %}{{word}}{% if not forloop.last %}, {% endif %}{% endfor %}</h4>
           {% endif %}
           
         </div>
