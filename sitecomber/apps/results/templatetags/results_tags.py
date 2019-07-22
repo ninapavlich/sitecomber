@@ -1,3 +1,4 @@
+import re
 from django import template
 from django.template.defaultfilters import stringfilter
 from django.utils.safestring import mark_safe
@@ -14,6 +15,7 @@ def get_test_result_by_type(value, arg):
 @stringfilter
 def highlight_spelling_errors(value, misspellings, autoescape=True):
     for word in misspellings:
-        value = value.replace(word, "<span class='bg-danger text-light'>%s</span>" % word)
-        value = value.replace(word.capitalize(), "<span class='bg-danger text-light'>%s</span>" % word.capitalize())
+
+        pattern = re.compile(word, re.IGNORECASE)
+        value = pattern.sub("<span class='bg-danger text-light'>%s</span>" % word, value)
     return mark_safe(value)
