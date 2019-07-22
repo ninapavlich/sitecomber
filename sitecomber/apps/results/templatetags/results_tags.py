@@ -15,4 +15,5 @@ def get_test_result_by_type(value, arg):
 def highlight_spelling_errors(value, misspellings, autoescape=True):
     for word in misspellings:
         value = value.replace(word, "<span class='bg-danger text-light'>%s</span>" % word)
+        value = value.replace(word.capitalize(), "<span class='bg-danger text-light'>%s</span>" % word)
     return mark_safe(value)

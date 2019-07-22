@@ -37,6 +37,6 @@ class Command(BaseCommand):
         tests = site.tests
         pages = site.page_results
         for page in pages:
-            logger.info("- Running tests on %s" % (page))
+            logger.warn("- Running tests on %s" % (page))
             for test in tests:
                 test.page_parsed(page)
