@@ -29,13 +29,13 @@ class SiteDomainForm(AdminAutocompleteFormMixin):
 class SiteDomainInline(admin.TabularInline):
     model = SiteDomain
     form = SiteDomainForm
-    fields = ['title', 'url', 'should_crawl', 'alias_of', ]  # , 'authentication_type', 'authentication_data']
+    fields = ['title', 'url', 'should_crawl', 'alias_of', ]
     extra = 0
 
 
 class IgnoreURLInline(admin.TabularInline):
     model = IgnoreURL
-    fields = ['url', 'authentication_type', 'authentication_data']
+    fields = ['url']
     extra = 0
 
 
