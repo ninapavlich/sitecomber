@@ -1,4 +1,5 @@
 import logging
+import json
 
 from django.core.exceptions import MultipleObjectsReturned
 
@@ -33,7 +34,13 @@ class PageUpTest(BaseSiteTest):
                     page=page,
                     test=self.class_path
                 )
-                r.data = status_code  # TODO -- perhaps more structure info
+                data = {
+                    'status_code': status_code
+                }
+                try:
+                    r.data = json.dumps(data, sort_keys=True, indent=2)
+                except Exception as e:
+                    logger.error(u"Error dumping JSON data: %s: %s" % (data, e))
                 r.message = message
                 r.status = status
                 r.save()
@@ -58,7 +65,7 @@ class BrokenOutgoingLinkTest(BaseSiteTest):
 
         broken_link_count = len(broken_outgoing_links)
         status = PageTestResult.STATUS_SUCCESS if broken_link_count == 0 else PageTestResult.STATUS_ERROR
-        message = 'Okay' if broken_link_count == 0 else 'Found %s broken link(s) on %s' % (broken_link_count, page.url)
+        message = 'Okay' if broken_link_count == 0 else 'Found %s broken link(s): %s' % (broken_link_count, u", ".join(broken_outgoing_links))
 
         try:
             r, created = PageTestResult.objects.get_or_create(
@@ -66,6 +73,14 @@ class BrokenOutgoingLinkTest(BaseSiteTest):
                 test=self.class_path
             )
             r.data = broken_outgoing_links  # TODO -- perhaps more structure info
+            data = {
+                'broken_outgoing_links': broken_outgoing_links
+            }
+            try:
+                r.data = json.dumps(data, sort_keys=True, indent=2)
+            except Exception as e:
+                logger.error(u"Error dumping JSON data: %s: %s" % (data, e))
+
             r.message = message
             r.status = status
             r.save()
