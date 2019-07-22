@@ -109,7 +109,7 @@ To adjust how fast the worker crawls, adjust the WORKER_LOOP_DELAY_SECONDS value
 
 ```
     # Crawl page result with primary key = 1
-    crawl_page 1
+    python manage.py crawl_page 1
 ```
 
 #### Manually crawl a batch of URLs within a site:

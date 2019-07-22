@@ -22,12 +22,12 @@
       "value": "REPLACE_ME.herokuapp.com"
     },
     "STARTING_URL":{
-      "description": "Enter a fully qualified URL you would like to start crawling. This will be used for initial configuration. For Example: https://parenting.nytimes.com/",
+      "description": "Enter a fully qualified URL you would like to start crawling. This will be used for initial configuration. For Example: https://www.example.com/",
       "value": ""
     }
   },
   "scripts": {
-    "postdeploy": "python manage.py migrate && python manage.py loaddata sitecomber/apps/config/fixtures/initial_user_data.json"
+    "postdeploy": "python manage.py migrate && python manage.py loaddata sitecomber/apps/config/fixtures/initial_user_data.json && python manage.py init_site_config"
   }
 
 }
