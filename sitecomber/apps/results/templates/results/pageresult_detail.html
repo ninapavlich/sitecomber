@@ -128,8 +128,8 @@
 
         <div class="tab-pane" id="article" role="tabpanel">
           {% get_test_result_by_type object "sitecomber_article_tests.tests.ReaderViewTest" as reader_test %} 
-          {% get_test_result_by_type object "sitecomber_article_tests.tests.ArticleReadTimeInfo" as readtime_test
-          %} {% get_test_result_by_type object "sitecomber_article_tests.tests.SpellCheckTest" as spell_check_test %}
+          {% get_test_result_by_type object "sitecomber_article_tests.tests.ArticleReadTimeInfo" as readtime_test %}
+          {% get_test_result_by_type object "sitecomber_article_tests.tests.SpellCheckTest" as spell_check_test %}
           {% get_test_result_by_type object "sitecomber_article_tests.tests.PlaceholderTextTest" as placeholder_text_test %} 
 
           {% if reader_test.success %}
