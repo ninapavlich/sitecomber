@@ -80,11 +80,7 @@ To bootstrap the frontend for development:
 ```bash
     cd frontend
     npm install
-    npm install webpack -g
     npm run watch
-
-    # Create a build
-    npm run build
 ```
 
 You can see a local server running at:
