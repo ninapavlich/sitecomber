@@ -235,6 +235,8 @@ CKEDITOR_CONFIGS = {
     }
 }
 
+# Used for initialization script:
+STARTING_URL = env('STARTING_URL', default=None)
 
 # Sitecomber defaults
 DEFAULT_USER_AGENT = env('DEFAULT_USER_AGENT', default='Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:68.0) Gecko/20100101 Firefox/68.0 Sitecomber')

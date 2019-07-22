@@ -9,10 +9,6 @@
       "description": "A secret key for encryption used on this application.",
       "generator": "secret"
     },
-    "FIELD_ENCRYPTION_KEY": {
-      "description": "A secret key for field encryption used on this application. You can generate one using 'python manage.py generate_encryption_key'",
-      "generator": "secret"
-    },
     "ENVIRONMENT":{
       "description": "An environmental variable indicating which set of settings to use. Leave this as 'heroku'",
       "value": "heroku"
@@ -24,11 +20,14 @@
     "APP_HOST_NAME":{
       "description": "<App Name as entered above>.herokuapp.com. For Example: my-heroku-app-name.herokuapp.com",
       "value": "REPLACE_ME.herokuapp.com"
+    },
+    "STARTING_URL":{
+      "description": "Enter a fully qualified URL you would like to start crawling. This will be used for initial configuration. For Example: https://parenting.nytimes.com/",
+      "value": ""
     }
-
   },
   "scripts": {
-    "postdeploy": "python manage.py migrate"
+    "postdeploy": "python manage.py migrate && python manage.py loaddata sitecomber/apps/config/fixtures/initial_user_data.json"
   }
 
 }

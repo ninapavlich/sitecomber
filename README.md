@@ -25,14 +25,13 @@ When configuring the fields, be sure to take note of the App Name, as you will b
 
 After your application has deployed, run the following commands through the command line Heroku CLI and follow the prompts:
 
-    > heroku run python manage.py drf_create_token <replace-with-username> --app=<replace-with-app-name>
-    > heroku run python manage.py generate_encryption_key
-    > heroku run python manage.py migrate
-    > heroku run python manage.py loaddata sitecomber/apps/config/fixtures/example_data.json --app=<replace-with-app-name>
-    > heroku run python manage.py setpassword admin --app=<replace-with-app-name>
     > heroku ps:scale web=1 worker=1 --app=<replace-with-app-name>
 
-    You may now log in and configure your sites at https://<replace-with-app-name>.herokuapp.com/admin/config/site/
+Once deployed, you can configure the crawling settings by going here: https://<replace-with-app-name>.herokuapp.com/admin/
+
+The default admin username is 'admin' and the default admin password is 'sitecomber'. You can update the password by going here: https://<replace-with-app-name>.herokuapp.com/admin/auth/user/1/password/
+
+Note that if you are parsing a large site, you will probably need to upgrade your database instance in the Heroku admin panel. The free database allows for up to 10000 rows.
 
 ## Local Development Quickstart
 
@@ -46,13 +45,12 @@ After your application has deployed, run the following commands through the comm
 Run the following commands in your terminal:
 
 ```bash
-	git clone git@bitbucket.org:ninapavlich/sitecomber.git
-    cd sitecomber
+  git clone git@bitbucket.org:ninapavlich/sitecomber.git
+  cd sitecomber
 ```
 
 Copy the contents of env.example into a file called .env at the root of the
-project directory. Update the SECRET_KEY value with some other random string,
-update FIELD_ENCRYPTION_KEY with a value generated from 'python manage.py generate_encryption_key'
+project directory. Update the SECRET_KEY value with some other random string.'
 
 Then run the following commands:
 
@@ -60,7 +58,6 @@ Then run the following commands:
     virtualenv venv -p python3
     source venv/bin/activate
     pip install -r requirements.txt
-    # Copy env.example and update SECRET_KEY with large random string
     python download_nltk_libs.py
     python manage.py migrate
     python manage.py loaddata sitecomber/apps/config/fixtures/example_data.json
