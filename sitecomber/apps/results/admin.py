@@ -142,7 +142,10 @@ class PageTestResultInline(admin.TabularInline):
     model = PageTestResult
     extra = 0
     max_num = 0
-    fields = readonly_fields = ['test', 'status', 'message', 'data', 'modified']
+    fields = readonly_fields = ['test', 'status', 'message', 'modified', 'view_test']
+
+    def view_test(self, obj):
+        return format_html(u'<a href="%s">View Test Data ></a>' % (obj.get_edit_url()))
 
 
 @admin.register(PageTestResult)
@@ -206,7 +209,7 @@ class PageResultAdmin(admin.ModelAdmin):
     def view_incoming_links(self, obj):
         template = Template("""<table>
         {% for link in links %}
-        <td><td>{{forloop.counter}}. <a href="{{link.get_edit_url}}">{{link.url}}</td><td><a href="{{link.url}}" target="_blank">Visit ></a></td></tr>
+        <td><td>{{forloop.counter}}. <a href="{{link.get_edit_url}}">{{link.url|truncatechars:80}}</td><td><a href="{{link.url}}" target="_blank">Visit ></a></td></tr>
         {% endfor %}
         </table>""")
         context = Context({"links": obj.incoming_links.all()})
@@ -216,7 +219,7 @@ class PageResultAdmin(admin.ModelAdmin):
     def view_outgoing_links(self, obj):
         template = Template("""<table>
         {% for link in links %}
-        <td><td>{{forloop.counter}}. <a href="{{link.get_edit_url}}">{{link.url}}</td><td><a href="{{link.url}}" target="_blank">Visit ></a></td></tr>
+        <td><td>{{forloop.counter}}. <a href="{{link.get_edit_url}}">{{link.url|truncatechars:80}}</td><td><a href="{{link.url}}" target="_blank">Visit ></a></td></tr>
         {% endfor %}
         </table>""")
         context = Context({"links": obj.outgoing_links.all()})

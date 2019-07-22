@@ -1,7 +1,7 @@
 [
 {
     "model": "auth.user",
-    "pk": 1,
+    "pk": 2,
     "fields": {
         "password": "pbkdf2_sha256$150000$Uf3wsFfwbb4u$znJkD8nxpoMp13Ec2UNxH9J2ZSfUuV0ujcgtZtaCwkk=",
         "last_login": "2019-07-18T19:00:31.817Z",

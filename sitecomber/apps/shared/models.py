@@ -194,6 +194,31 @@ class BaseTestResult(models.Model):
     )
     status = models.CharField(max_length=16, choices=STATUSES, default=STATUS_INFO)
 
+    @cached_property
+    def data_json(self):
+        if self.data:
+            try:
+                return json.loads(self.data)
+            except ValueError:
+                logger.error(u"Error parsing data JSON: %s" % (self.data))
+        return {}
+
+    @cached_property
+    def success(self):
+        return self.status == BaseTestResult.STATUS_SUCCESS
+
+    @cached_property
+    def error(self):
+        return self.status == BaseTestResult.STATUS_ERROR
+
+    @cached_property
+    def warning(self):
+        return self.status == BaseTestResult.STATUS_WARNING
+
+    @cached_property
+    def info(self):
+        return self.status == BaseTestResult.STATUS_INFO
+
     @property
     def test_title(self):
         return (self.test.split('.')[-1])

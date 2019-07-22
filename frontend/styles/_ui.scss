@@ -4,6 +4,12 @@
 .breadcrumb-item + .breadcrumb-item::before{
   content:"|";
 }
+article{
+  img{
+    max-width: 100%;
+  }
+}
+
 dl{
   display: block;
   padding: 1em;

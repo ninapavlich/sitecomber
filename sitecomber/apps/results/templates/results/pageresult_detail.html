@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load results_tags %}
 
 {% block bodyclass %}{{block.super}} page-detail{% endblock %}
 
@@ -68,7 +69,7 @@
           <ul class="list-unstyled">
             {% for result in object.test_results %}
             <li class="p-2 my-2 alert alert-{{result.bootstrap_class}}">
-              <strong>{{result.test_title}}</strong> {{result.message}}
+              <strong data-id="{{result.test}}">{{result.test_title}}</strong> {{result.message|safe}}
             </li>
             {% endfor %}
           </ul>
@@ -76,9 +77,64 @@
 
 
         <div class="tab-pane" id="article" role="tabpanel">
-          Aricle TODO
-          <div>Article preview and time estimate based on data from test</div>
-          <div>List of mis-spelled words</div>
+          {% get_test_result_by_type object "sitecomber_article_tests.tests.ReaderViewTest" as reader_test %}
+          {% get_test_result_by_type object "sitecomber_article_tests.tests.ArticleReadTimeInfo" as readtime_test %}
+          {% if reader_test.success %}
+          <h4 class="text-info">Article Detected:</h4>
+          <article class="mb-4 p-4 bg-light rounded">
+            <h1>{{reader_test.data_json.article.title}}</h1>
+            {% if reader_test.status == 'success' %}
+            <small><strong>Read time:</strong> {{readtime_test.data_json.read_time}}</small>
+            {% endif %}
+
+            {% if reader_test.data_json.article.publish_date %}
+            <h3>{{reader_test.data_json.article.publish_date}}</h3>
+            {% else %}
+            <h3 class="text-danger">No publish date identified</h3>
+            {% endif %}
+            
+            {% if reader_test.data_json.article.authors %}
+            <h4>{{reader_test.data_json.article.authors}}</h4>
+            {% else %}
+            <h4 class="text-danger">No authors identified</h4>
+            {% endif %}
+
+            {% if reader_test.data_json.article.top_image %}
+            <img src="{{reader_test.data_json.article.top_image}}" alt="Top image for {{reader_test.data_json.article.title}}" class="my-4"/>
+            {% else %}
+            <h4 class="text-danger">No top image identified</h4>
+            {% endif %}
+
+            {% if reader_test.data_json.article.text %}
+            <main class="my-2">{{reader_test.data_json.article.text|linebreaks}}</main>
+            {% else %}
+            <h4 class="text-danger">No article text identified</h4>
+            {% endif %}
+
+            
+            
+            
+
+          </article>
+          {% else %}
+          <strong class="text-danger">{{reader_test.message|safe}}</strong>
+          {% endif %}
+
+          {% get_test_result_by_type object "sitecomber_article_tests.tests.SpellCheckTest" as spell_check_test %}
+          {% if spell_check_test.success %}
+          <h4 class="text-info">No misspelled words found.<h4>
+          {% else %}
+          <h4 class="text-danger">Found {{spell_check_test.data_json.misspelled_words|length}} misspellings: {% for word in spell_check_test.data_json.misspelled_words %}{{word}}{% if not forloop.last %}, {% endif %}{% endfor %}</h4>
+          {% endif %}
+
+
+          {% get_test_result_by_type object "sitecomber_article_tests.tests.PlaceholderTextTest" as placeholder_text_test %}
+          {% if placeholder_text_test.success %}
+          <h4 class="text-info">No placeholder text found -- words searched were {% for word in placeholder_text_test.data_json.placeholder_words_searched %}{{word}}{% if not forloop.last %}, {% endif %}{% endfor %}</h4>
+          {% else %}
+          <h4 class="text-danger">Found {{spell_check_test.data_json.misspelled_words|length}} misspellings: {{spell_check_test.data_json.misspelled_words}}</h4>
+          {% endif %}
+          
         </div>
 
         <div class="tab-pane" id="seo" role="tabpanel">

@@ -55,15 +55,17 @@
 
                 {% with errors=page_result.error_test_results %}
                 {% if errors|length > 0 %}
-                <span class="badge badge-danger p-1" title="{% for error in errors %}{{error.message}}{% if not forloop.last %}, {%endif %}{% endfor %}">{{errors|length}} error{% if errors|length > 1 %}s{% endif %}</span>
+                <span class="badge badge-danger p-1 ml-2" title="{% for error in errors %}{{error.message}}{% if not forloop.last %}, {%endif %}{% endfor %}">{{errors|length}} error{% if errors|length > 1 %}s{% endif %}</span>
                 {% endif %}
                 {% endwith %}
 
                 {% with errors=page_result.warning_test_results %}
                 {% if errors|length > 0 %}
-                <span class="badge badge-warning p-1" title="{% for error in errors %}{{error.message}}{% if not forloop.last %}, {%endif %}{% endfor %}">{{errors|length}} warning{% if errors|length > 1 %}s{% endif %}</span>
+                <span class="badge badge-warning p-1 ml-2" title="{% for error in errors %}{{error.message}}{% if not forloop.last %}, {%endif %}{% endfor %}">{{errors|length}} warning{% if errors|length > 1 %}s{% endif %}</span>
                 {% endif %}
                 {% endwith %}
+
+                <a href="{{object.url}}" target="_blank" class="float-right badge badge-secondary p-1 ml-2">Visit</a>
 
               </div>
             </div>

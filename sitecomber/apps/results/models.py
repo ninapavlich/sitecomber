@@ -283,6 +283,9 @@ class PageResult(BaseMetaData, BaseURL):
     def error_test_results(self):
         return self.test_results.filter(status=BaseTestResult.STATUS_ERROR)
 
+    def get_test_result_by_type(self, type):
+        return self.test_results.filter(test=type).first()
+
     def save(self, *args, **kwargs):
 
         if not self.title:
