@@ -5,7 +5,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils.functional import cached_property
 
-from encrypted_model_fields.fields import EncryptedCharField
+# from encrypted_model_fields.fields import EncryptedCharField
 
 from .utils import get_test_choices
 
@@ -29,28 +29,28 @@ class BaseMetaData(models.Model):
         abstract = True
 
 
-class BaseAuthenticationCredentials(models.Model):
-    # TODO
+# class BaseAuthenticationCredentials(models.Model):
+#     # TODO
+#
+#     AUTH_NONE = 'none'
+#     AUTH_BASIC = 'basic_auth'
+#     AUTHENTICATION_TYPES = (
+#         (AUTH_NONE, 'None'),
+#         (AUTH_BASIC, 'Basic Auth'),
+#     )
+#     authentication_type = models.CharField(max_length=16, choices=AUTHENTICATION_TYPES,
+#                                            default=AUTH_NONE)
+#
+#     authentication_data = EncryptedCharField(max_length=10000, null=True, blank=True)
+#
+#     def __str__(self):
+#         return u'%s %s' % (self.pk, self.authentication_type)
+#
+#     class Meta:
+#         abstract = True
 
-    AUTH_NONE = 'none'
-    AUTH_BASIC = 'basic_auth'
-    AUTHENTICATION_TYPES = (
-        (AUTH_NONE, 'None'),
-        (AUTH_BASIC, 'Basic Auth'),
-    )
-    authentication_type = models.CharField(max_length=16, choices=AUTHENTICATION_TYPES,
-                                           default=AUTH_NONE)
 
-    authentication_data = EncryptedCharField(max_length=10000, null=True, blank=True)
-
-    def __str__(self):
-        return u'%s %s' % (self.pk, self.authentication_type)
-
-    class Meta:
-        abstract = True
-
-
-class BaseURL(BaseAuthenticationCredentials):
+class BaseURL(models.Model):
 
     title = models.CharField(max_length=255, blank=True, null=True)
     url = models.URLField(max_length=2000)

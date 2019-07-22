@@ -1,6 +1,7 @@
 import logging
 import importlib
 import json
+from urllib.parse import urlparse
 
 from django.db import models
 from django.db.models import F
@@ -70,6 +71,36 @@ class Site(BaseMetaData):
     def page_results(self):
         # TODO -- optimize with prefetch
         return PageResult.objects.filter(site_domain__site=self)  # .prefetch_related('pagerequest_set').prefetch_related('pagerequest_set__response')
+
+    @cached_property
+    def page_results_hierarchy(self):
+        results = self.internal_page_results
+        tree = {}
+        for result in results:
+            result_url_parsed = urlparse(result.url)
+            result_url_parsed_split = [path for path in result_url_parsed.path.split('/') if path]
+
+            child = tree
+            last_piece = None
+            last_child = None
+            for piece in result_url_parsed_split:
+                last_piece = piece
+                last_child = child
+                if piece not in child:
+                    child[piece] = {
+                        'path':piece,
+                        'page':None,
+                        'page_url':None,
+                        'children':{}
+                    }
+                child = child[piece]['children']
+            if last_piece:
+                last_child[last_piece]['page'] = result
+                last_child[last_piece]['page_url'] = result.url
+
+        print(tree)
+        return tree
+
 
     @cached_property
     def internal_page_results(self):

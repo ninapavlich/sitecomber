@@ -91,7 +91,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'django_filters',
-    'encrypted_model_fields',
 
     # Application components
     'sitecomber.apps.shared',

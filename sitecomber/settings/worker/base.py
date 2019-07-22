@@ -9,7 +9,7 @@ WORKER_DATABASE_REFRESH_FREQUENCY = 60 * 5
 
 PID_FILE = env("WORKER_PID_FILE", default=os.path.join(BASE_DIR, '%s.pid' % (WORKER_ID)))
 LOG_FILE = env("WORKER_LOG_FILE", default=os.path.join(BASE_DIR, 'logs/%s.log' % (WORKER_ID)))
-
+WORKER_LOOP_DELAY_SECONDS = int(env('WORKER_LOOP_DELAY_SECONDS', default=1))
 
 # LOGGING
 # -----------------------------------------------------------------------------

@@ -19,7 +19,7 @@ dl{
     float: left;
     clear: left;
     width: 25%;
-    
+
     text-align: right;
     font-weight: bold;
     padding-right: 0.5em;
@@ -38,7 +38,7 @@ a.card-title{
 }
 
 .status-code{
-    
+
   &:before{
     content: '';
     display: inline-block;
@@ -60,7 +60,7 @@ a.card-title{
   &.status-code-500:before{
     background-color: $red;
   }
-  
+
 }
 .site-detail{
 
@@ -69,4 +69,81 @@ a.card-title{
 
 
 
+}
+#links{
+
+  .path{
+    display:none;
+  }
+  &.sitemap{
+    &.zoomed-out{
+      & > ul{
+        transform: scale(0.15);
+      }
+    }
+    .path{
+      display:block;
+    }
+    overflow: scroll;
+    & > ul{
+
+      transform-origin: top left;
+
+      display:flex;
+      border-top:1px solid $secondary;
+
+      & > li{
+        flex: 0 0 auto;
+      }
+    }
+
+    &> ul > li > .child{
+
+    }
+    .child{
+
+    }
+    .url, .page-title{
+      display:none;
+    }
+    .path{
+      display:block;
+      font-size:0.8rem;
+      max-width: 200px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .children{
+      border-left:1px solid $secondary;
+      left:1em;
+
+      .child{
+        padding: 0.5em 0 0.5em 0.5em;
+        display: block;
+        border-bottom: 1px solid $secondary;
+        &:last-child{
+          border-bottom: 0px !important;
+        }
+
+        article{
+          display: inline-block;
+          float: right;
+          padding:0 !important;
+          background-color:transparent !important;
+          border-color: transparent;
+          .card-body{
+            padding:0 !important;
+            .flex-fill{
+              display:none;
+              padding:0 !important;
+              .badge{
+                margin-top:0 !important;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }

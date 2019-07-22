@@ -36,7 +36,7 @@ class Worker:
     heartbeat_url_valid = None
     database_restart_time = time.time()
     loop_timer = Event()
-    loop_duration = 1
+    loop_delay = 1
 
     sites = None
 
@@ -46,6 +46,7 @@ class Worker:
         self.stderr = stderr
         self.pidfile = pidfile
         logger.info("%s :: %s" % (settings.WORKER_NAME, self.pidfile))
+        self.loop_delay = settings.WORKER_LOOP_DELAY_SECONDS
 
         signal.signal(signal.SIGINT, self.sigint)
         signal.signal(signal.SIGTERM, self.sigterm)
@@ -103,9 +104,9 @@ class Worker:
                 # new DB connection
                 self.reset_database_connection()
 
-            logger.debug("%s :: waiting to loop for %s seconds" %
-                         (settings.WORKER_NAME, self.loop_duration))
-            self.loop_timer.wait(self.loop_duration)
+            logger.info("%s :: waiting to loop for %s seconds" %
+                         (settings.WORKER_NAME, self.loop_delay))
+            self.loop_timer.wait(self.loop_delay)
 
     def on_start(self):
         self.sites = Site.objects.filter(active=True)

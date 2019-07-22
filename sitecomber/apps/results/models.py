@@ -1,10 +1,10 @@
 import logging
+
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.text import Truncator
-
 
 from sitecomber.apps.shared.models import BaseMetaData, BaseURL, BaseRequest, BaseResponse, BaseTestResult
 from sitecomber.apps.shared.utils import LinkParser, TitleParser, load_url

@@ -1,7 +1,8 @@
 # SiteComber
+
 This tool crawls an entire domain (or set of domains) to create a living snapshot of a website. A worker script is constantly crawling and re-crawing to provide the most up-to-date snapshot.
 
-With this snapshot you are able to see problems that may arise from content entry or underlying code problems. For example, you can use this tool to identify problems like broken links, spelling errors, slow load times, or SEO issues. 
+With this snapshot you are able to see problems that may arise from content entry or underlying code problems. For example, you can use this tool to identify problems like broken links, spelling errors, slow load times, or SEO issues.
 
 A whole suite of tests are available out of the box, but you can also write your own custom tests to fit your own needs. Some examples: You could use natural language processing to make sure your language doesn't exceed a certain reading level. Or you could hook into the Google Analytics API to correlate search performance to load times. Or you could use Selenium to generate snapshots at different window sizes.
 
@@ -14,18 +15,18 @@ A whole suite of tests are available out of the box, but you can also write your
 ## Heroku One-Click Deployment Quickstart
 
 ### Pre-reqs for deploying this project to Heroku:
- * Create a free [Heroku account](https://signup.heroku.com/) 
- * Install the [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli)
+
+- Create a free [Heroku account](https://signup.heroku.com/)
+- Install the [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli)
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/ninapavlich/sitecomber/blob/master)
 
-When configuring the fields, be sure to take note of the App Name, as you will be using this in the next steps. 
+When configuring the fields, be sure to take note of the App Name, as you will be using this in the next steps.
 
 After your application has deployed, run the following commands through the command line Heroku CLI and follow the prompts:
 
     > heroku run python manage.py drf_create_token <replace-with-username> --app=<replace-with-app-name>
     > heroku run python manage.py generate_encryption_key
-    > heroku config:set FIELD_ENCRYPTION_KEY='<replace-with-value-from-previous-command>'
     > heroku run python manage.py migrate
     > heroku run python manage.py loaddata sitecomber/apps/config/fixtures/example_data.json --app=<replace-with-app-name>
     > heroku run python manage.py setpassword admin --app=<replace-with-app-name>
@@ -37,9 +38,10 @@ After your application has deployed, run the following commands through the comm
 
 ### Pre-Requisites:
 
-* Python 3
-* PIP
-* Virtualenv
+- Python 3
+- PIP
+- Virtualenv
+- Postgres (To use a different database backend, you can comment 'psycopg2' out in the requirements.txt)
 
 Run the following commands in your terminal:
 
@@ -48,8 +50,8 @@ Run the following commands in your terminal:
     cd sitecomber
 ```
 
-Copy the contents of env.example into a file called .env at the root of the 
-project directory. Update the SECRET_KEY value with some other random string, 
+Copy the contents of env.example into a file called .env at the root of the
+project directory. Update the SECRET_KEY value with some other random string,
 update FIELD_ENCRYPTION_KEY with a value generated from 'python manage.py generate_encryption_key'
 
 Then run the following commands:
@@ -58,6 +60,8 @@ Then run the following commands:
     virtualenv venv -p python3
     source venv/bin/activate
     pip install -r requirements.txt
+    # Copy env.example and update SECRET_KEY with large random string
+    python download_nltk_libs.py
     python manage.py migrate
     python manage.py loaddata sitecomber/apps/config/fixtures/example_data.json
     python manage.py setpassword admin
@@ -65,7 +69,7 @@ Then run the following commands:
     python manage.py runserver
 ```
 
-With the local server running, you may browse the admin CMS at: 
+With the local server running, you may browse the admin CMS at:
 
 http://localhost:8000/admin/
 
@@ -79,9 +83,13 @@ To bootstrap the frontend for development:
     npm install webpack -g
     npm run watch
 
-    # Create a development build
+    # Create a build
     npm run build
 ```
+
+You can see a local server running at:
+
+http://localhost:8000/
 
 ## SiteComber Worker
 
@@ -93,27 +101,33 @@ To run the worker locally, follow the "Local Development Quickstart" instruction
     python site_comber_worker.py
 ```
 
+To adjust how fast the worker crawls, adjust the WORKER_LOOP_DELAY_SECONDS value in the .env
+
 ## Development Tools
 
 #### Manually re-run tests after a configuration change:
-``` 
+
+```
     # Re-run tests on site with primary key = 1
     python manage.py rerun_tests 1
 ```
 
 #### Manually crawl a single page result:
+
 ```
     # Crawl page result with primary key = 1
     crawl_page 1
 ```
 
 #### Manually crawl a batch of URLs within a site:
+
 ```
     # Crawl 5 URLs on the Site with primary key = 1
-    python manage.py crawl_site 1 5  
+    python manage.py crawl_site 1 5
 ```
 
 #### Update Example Data Fixture
+
 ```
     python manage.py dumpdata auth.user config --natural-foreign --indent=4 > sitecomber/apps/config/fixtures/example_data.json
 ```
