@@ -270,11 +270,11 @@ class PageResult(BaseMetaData, BaseURL):
 
     @cached_property
     def incoming_links_with_prefetch(self):
-        return self.incoming_links.all().prefetch_related('site_domain').prefetch_related('site_domain__site')
+        return self.incoming_links.all().prefetch_related('site_domain').prefetch_related('site_domain__site').prefetch_related('pagetestresult_set').prefetch_related('pagerequest_set').prefetch_related('pagerequest_set__response')
 
     @cached_property
     def outgoing_links_with_prefetch(self):
-        return self.outgoing_links.all().prefetch_related('site_domain').prefetch_related('site_domain__site')
+        return self.outgoing_links.all().prefetch_related('site_domain').prefetch_related('site_domain__site').prefetch_related('pagetestresult_set').prefetch_related('pagerequest_set').prefetch_related('pagerequest_set__response')
 
     @cached_property
     def response_list(self):
@@ -316,8 +316,12 @@ class PageResult(BaseMetaData, BaseURL):
         return [test for test in self.pagetestresult_set.all() if test.status == BaseTestResult.STATUS_ERROR]
         # return self.pagetestresult_set.all().filter(status=BaseTestResult.STATUS_ERROR)
 
-    def get_test_result_by_type(self, type):
-        return self.test_results.filter(test=type).first()
+    def get_test_result_by_type(self, test_type):
+        # For some reason this is more db efficient than filtering
+        for test in self.pagetestresult_set.all():
+            if test.test == test_type:
+                return test
+        # return self.pagetestresult_set.all().filter(test=test_type).first()
 
     def save(self, *args, **kwargs):
 
