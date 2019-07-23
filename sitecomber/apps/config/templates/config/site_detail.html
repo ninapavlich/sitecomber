@@ -18,11 +18,15 @@
   <aside>
     <ul class="list-unstyled">
       {% if object.has_fully_crawled_site %}
-      <li>
-        Found <strong>{{object.internal_page_results|length}}</strong> internal
-        pages, with
-        <strong>{{object.external_page_results|length}}</strong> outgoing links.
-      </li>
+        {% if object.internal_page_results|length == 0 %}
+        <li>Crawling has not yet started.</li>
+        {% else %}
+        <li>
+          Found <strong>{{object.internal_page_results|length}}</strong> internal
+          pages, with
+          <strong>{{object.external_page_results|length}}</strong> outgoing links.
+        </li>
+        {% endif %}
       {% else %}
       <li>
         (So far) Found
@@ -33,11 +37,13 @@
       </li>
       {% endif %}
 
+      {% if object.pages_with_errors|length > 0 %}
       <li>
         <a href="{% url 'site-test-results' object.pk %}"  class="text-danger">
-          <strong>{{object.pages_with_errors|length}}</strong> pages with errors.
+          <strong>{{object.pages_with_errors|length}}</strong> pages with errors...
         </a>
       </li>
+      {% endif %}
     </ul>
     <!-- <ul class="list-unstyled clearfix">
       <li class="float-right">

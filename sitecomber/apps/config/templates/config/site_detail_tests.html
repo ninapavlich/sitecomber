@@ -48,10 +48,8 @@
           <ul class="list-unstyled">
             {% for result in object.page_test_results %}
             {% if result.test == test_setting.test and result.status == 'error'%}
-            <li class="p-2 my-2 alert alert-{{result.bootstrap_class}}">
-              <p class="my-0"><strong>{{result.page}}</strong></p>
-              <p class="my-0"><small>{{result.page.url}}</small></p>
-              <p class="my-0">{{result.message|safe}}</p>
+            <li class="p-2 my-2">
+              {% include 'config/partials/test_preview.html' %}
             </li>
             {% endif %}
             {% endfor %}
@@ -61,10 +59,8 @@
           <ul class="list-unstyled">
             {% for result in object.page_test_results %}
             {% if result.test == test_setting.test and result.status == 'warning'%}
-            <li class="p-2 my-2 alert alert-{{result.bootstrap_class}}">
-              <p class="my-0"><strong>{{result.page}}</strong></p>
-              <p class="my-0"><small>{{result.page.url}}</small></p>
-              <p class="my-0">{{result.message|safe}}</p>
+            <li class="p-2 my-2">
+              {% include 'config/partials/test_preview.html' %}
             </li>
             {% endif %}
             {% endfor %}
@@ -74,10 +70,8 @@
           <ul class="list-unstyled">
             {% for result in object.page_test_results %}
             {% if result.test == test_setting.test and result.status == 'success'%}
-            <li class="p-2 my-2 alert alert-{{result.bootstrap_class}}">
-              <p class="my-0"><strong>{{result.page}}</strong></p>
-              <p class="my-0"><small>{{result.page.url}}</small></p>
-              <p class="my-0">{{result.message|safe}}</p>
+            <li class="p-2 my-2">
+              {% include 'config/partials/test_preview.html' %}
             </li>
             {% endif %}
             {% endfor %}
@@ -87,10 +81,8 @@
           <ul class="list-unstyled">
             {% for result in object.page_test_results %}
             {% if result.test == test_setting.test and result.status == 'info'%}
-            <li class="p-2 my-2 alert alert-{{result.bootstrap_class}}">
-              <p class="my-0"><strong>{{result.page}}</strong></p>
-              <p class="my-0"><small>{{result.page.url}}</small></p>
-              <p class="my-0">{{result.message|safe}}</p>
+            <li class="p-2 my-2">
+              {% include 'config/partials/test_preview.html' %}
             </li>
             {% endif %}
             {% endfor %}
