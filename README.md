@@ -124,3 +124,72 @@ To adjust how fast the worker crawls, adjust the WORKER_LOOP_DELAY_SECONDS value
 ```
     python manage.py dumpdata auth.user config --natural-foreign --indent=4 > sitecomber/apps/config/fixtures/example_data.json
 ```
+
+## Create a Custom Test
+
+1. Create the Test
+
+```python
+    # example_test.py 
+    
+    from sitecomber.apps.shared.interfaces import BaseSiteTest
+
+    class ExamplePageTest(BaseSiteTest):
+
+        def on_sitemap_parsed(self, sitemap_item):
+            """
+            sitemap_item is an instance of an AbstractIndexSitemap,
+            see https://ultimate-sitemap-parser.readthedocs.io/en/latest/usp.objects.html#module-usp.objects.sitemap
+            for source
+            """
+            print(u"Parsed sitemap %s"%(sitemap_item.url))
+            
+          
+        def on_page_parsed(self, page):
+            from sitecomber.apps.results.models import PageTestResult
+
+            if page.latest_request and page.latest_request.response:
+
+                status_code = page.latest_request.response.status_code
+                status = PageTestResult.STATUS_SUCCESS if status_code == 200 else PageTestResult.STATUS_ERROR
+                message = '%s status code: %s' % (page.url, status_code)
+
+                r, created = PageTestResult.objects.get_or_create(
+                    page=page,
+                    test=self.class_path
+                )
+                r.data = status_code
+                r.message = message
+                r.status = status
+                r.save()
+            
+```
+
+2. Save Test File
+
+Either place this in the sitecomber source code, in sitecomber/apps/tests/example_test.py or save this in an external repository and make it an installable application with PyPi. 
+
+See [sitecomber-article-tests](https://github.com/ninapavlich/sitecomber-article-tests) to see an example set of custom installable tests.
+
+3. Restart the Server
+
+When the server restarts, it will re-register any classes that are subclasses of sitecomber.apps.shared.interfaces.BaseSiteTest
+
+You can verify that your new test was found by running:
+```
+  python manage.py list_available_tests
+```
+
+4. Add Test to Site
+
+Go into the site admin at /admin/config/site/, select your site, scroll down to the "Site test settings" section and add a row for this new test.
+
+5. Re-run Tests
+
+In order to re-apply the new tests to your existing site, run the following command, passing in the primary key of your site:
+
+```
+  # Re-run tests on site with primary key = 1
+  python manage.py rerun_tests 1
+```
+
