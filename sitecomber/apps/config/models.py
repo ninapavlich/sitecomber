@@ -323,6 +323,11 @@ class SiteTestSetting(BaseMetaData):
 
         return class_(self.site, settings_json)
 
+    @property
+    def test_name(self):
+        module_name, class_name = self.test.rsplit('.', 1)
+        return class_name
+
     def save(self, *args, **kwargs):
 
         # Validate settings JSON

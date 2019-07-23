@@ -34,11 +34,12 @@
       {% endif %}
 
       <li>
-        <strong class="text-danger">{{object.pages_with_errors|length}}</strong>
-        pages with errors.
+        <a href="{% url 'site-test-results' object.pk %}"  class="text-danger">
+          <strong>{{object.pages_with_errors|length}}</strong> pages with errors.
+        </a>
       </li>
     </ul>
-    <ul class="list-unstyled clearfix">
+    <!-- <ul class="list-unstyled clearfix">
       <li class="float-right">
         <a
           href="#"
@@ -60,7 +61,7 @@
           >List</a
         >
       </li>
-    </ul>
+    </ul> -->
   </aside>
 
   <div class="" id="links">
