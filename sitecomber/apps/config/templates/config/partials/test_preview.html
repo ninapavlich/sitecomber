@@ -1,4 +1,4 @@
-<div class="alert alert-{{result.bootstrap_class}}">
+<div class="mb-0 alert alert-{{result.bootstrap_class}}">
   <p class="my-0"><strong><a href="{% url 'page-result-detail' object.pk result.page.pk %}" class="text-dark">{{result.page}}</a></strong></p>
   <p class="my-0"><small><a href="{{result.page.url}}" target="_blank" class="text-dark">{{result.page.url}}</a></small></p>
   <p class="my-0">{{result.message|safe}}</p>
