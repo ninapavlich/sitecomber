@@ -60,8 +60,10 @@ class BrokenOutgoingLinkTest(BaseSiteTest):
 
         broken_outgoing_links = []
         for outgoing_link in page.outgoing_links.all():
-            if outgoing_link.latest_request and outgoing_link.latest_request.response and outgoing_link.latest_request.response.status_code != 200:
-                broken_outgoing_links.append(outgoing_link.url)
+            if outgoing_link.latest_request and outgoing_link.latest_request.response:
+                status_code = outgoing_link.latest_request.response.status_code
+                if (status_code == -1) or (status_code >= 300 and status_code < 600):
+                    broken_outgoing_links.append(outgoing_link.url)
 
         broken_link_count = len(broken_outgoing_links)
         status = PageTestResult.STATUS_SUCCESS if broken_link_count == 0 else PageTestResult.STATUS_ERROR

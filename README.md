@@ -31,7 +31,7 @@ After your application has deployed, run the following commands through the comm
 
 Once deployed, you can configure the crawling settings by going here: https://<replace-with-app-name>.herokuapp.com/admin/
 
-The default admin username is 'admin' and the default admin password is 'sitecomber'. You can update the password by going here: https://<replace-with-app-name>.herokuapp.com/admin/auth/user/1/password/
+The default admin username is 'admin' and the default admin password is 'sitecomber'. MAKE SURE to update the password by going here: https://<replace-with-app-name>.herokuapp.com/admin/auth/user/1/password/
 
 Note that if you are parsing a large site, you will probably need to upgrade your database instance in the Heroku admin panel. The free database allows for up to 10000 rows.
 
