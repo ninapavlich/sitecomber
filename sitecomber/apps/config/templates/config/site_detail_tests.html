@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load results_tags %}
 {% block bodyclass %}{{block.super}} site-detail{% endblock %}
 
 {% block inner %}
@@ -15,7 +16,9 @@
 </nav>
 
 <article class="main">
-  <h1>Test Results for {{object}}</h1>
+  <div class="my-4">
+    <h1>Test Results for {{object}}</h1>
+  </div>
   
   
 
@@ -24,6 +27,11 @@
       <ul class="nav nav-tabs card-header-tabs" role="tablist">
         
         {% for test_setting in object.sitetestsetting_set.all %}
+
+
+        {% filter_page_test_results object.page_test_results test_setting.test 'error' as errors %}
+        {% filter_page_test_results object.page_test_results test_setting.test 'warning' as warnings %}
+
         <li class="nav-item">
           <a
             class="nav-link {% if forloop.first %}active{% endif %}"
@@ -31,8 +39,24 @@
             role="tab"
             aria-controls="description"
             aria-selected="true"
-            >{{test_setting.test_name}}</a
-          >
+            title="Test {{test_setting.test_name}} has {{errors|length}} error(s) and {{warnings|length}} warning(s)"
+            >
+            <small>
+              {{test_setting.test_name}}
+              
+              {% if errors|length > 0 %}
+              <span class="badge badge-danger p-1 ml-1" >
+                {{errors|length}}
+              </span>
+              {% endif %}
+              {% if warnings|length > 0 %}
+              <span class="badge badge-warning p-1 ml-1" >
+                {{warnings|length}}
+              </span>
+              {% endif %}
+            </small>
+
+          </a>
         </li>
         {% endfor %}
         
@@ -42,51 +66,57 @@
       <div class="tab-content mt-3">
         {% for test_setting in object.sitetestsetting_set.all %}
 
+
+        {% filter_page_test_results object.page_test_results test_setting.test 'error' as errors %}
+        {% filter_page_test_results object.page_test_results test_setting.test 'warning' as warnings %}
+        {% filter_page_test_results object.page_test_results test_setting.test 'info' as infos %}
+        {% filter_page_test_results object.page_test_results test_setting.test 'success' as successes %}
+
         <div class="tab-pane {% if forloop.first %}active{% endif %}" id="{{test_setting.test_name}}" role="tabpanel">
           
-          <h4>Errors</h4>
-          <ul class="list-unstyled">
-            {% for result in object.page_test_results %}
-            {% if result.test == test_setting.test and result.status == 'error'%}
-            <li class="p-2 my-2">
-              {% include 'config/partials/test_preview.html' %}
-            </li>
-            {% endif %}
-            {% endfor %}
-          </ul>
+          <div class="mb-4">
+            <h2>{{test_setting.test_name}}</h2>
+            <div class="text-muted">{{test_setting.class_instance.description|safe}}</div>
+          </div>
 
-          <h4>Warnings</h4>
-          <ul class="list-unstyled">
-            {% for result in object.page_test_results %}
-            {% if result.test == test_setting.test and result.status == 'warning'%}
-            <li class="p-2 my-2">
-              {% include 'config/partials/test_preview.html' %}
-            </li>
-            {% endif %}
-            {% endfor %}
-          </ul>
+          {% if errors|length == 0 and warnings|length == 0 and infos|length == 0 and successes|length > 0 %}
+          <p>It looks like everything is working correctly and there's nothing to see here.</p>
+          {% endif %}
 
-          <h4>Success</h4>
+          {% if errors|length > 0 %}
+          <h4 class="text-danger">{{errors|length}} Error{% if errors|length > 1 %}s{% endif %}</h4>
           <ul class="list-unstyled">
-            {% for result in object.page_test_results %}
-            {% if result.test == test_setting.test and result.status == 'success'%}
-            <li class="p-2 my-2">
+            {% for result in errors %}
+            <li class=" my-3">
               {% include 'config/partials/test_preview.html' %}
             </li>
-            {% endif %}
             {% endfor %}
           </ul>
+          {% endif %}
 
-          <h4>Info</h4>
+          {% if warnings|length > 0 %}
+          <h4 class="text-warning">{{warnings|length}} Warning{% if warnings|length > 1 %}s{% endif %}</h4>
           <ul class="list-unstyled">
-            {% for result in object.page_test_results %}
-            {% if result.test == test_setting.test and result.status == 'info'%}
-            <li class="p-2 my-2">
+            {% for result in warnings %}
+            <li class=" my-3">
               {% include 'config/partials/test_preview.html' %}
             </li>
-            {% endif %}
             {% endfor %}
           </ul>
+          {% endif %}
+
+          {% if infos|length > 0 %}
+          <h4 class="text-info">{{infos|length}} Result{% if infos|length > 1 %}s{% endif %}</h4>
+          <ul class="list-unstyled">
+            {% for result in infos %}
+            <li class="my-3">
+              {% include 'config/partials/test_preview.html' %}
+            </li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+
+          
         </div>
         {% endfor %}
 

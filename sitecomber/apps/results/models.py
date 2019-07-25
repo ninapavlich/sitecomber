@@ -1,4 +1,6 @@
+import os
 import logging
+from urllib.parse import urlparse
 
 from django.conf import settings
 from django.db import models
@@ -73,6 +75,26 @@ class PageResponse(BaseMetaData, BaseResponse):
                 return source
             except Exception as e:
                 return u"Error enumerating source: %s" % (e)
+
+    @property
+    def archive_filename(self):
+        parsed = urlparse(self.response_url)
+        path = parsed.path[1:]
+        if path == "":
+            path = "index"
+        return '%s.%s' % (path, self.archive_filetype)
+
+    @property
+    def archive_filetype(self):
+        if not self.content_type:
+            return 'txt'
+
+        try:
+            return self.content_type.split(";")[0].split("/")[1].split("+")[0]
+        except Exception as e:
+            logger.error(u"Error parsing content type from %s: %s" % (self.content_type, e))
+
+        return 'txt'
 
     @classmethod
     def parse_response(cls, request, redirected_from, response):
@@ -255,6 +277,13 @@ class PageResult(BaseMetaData, BaseURL):
     @cached_property
     def latest_request(self):
         return self.pagerequest_set.select_related('response').order_by('-created').first()
+
+    @cached_property
+    def latest_response(self):
+        for request in self.pagerequest_set.all():
+            if request.response:
+                return request.response
+        return None
 
     @cached_property
     def latest_status_code(self):

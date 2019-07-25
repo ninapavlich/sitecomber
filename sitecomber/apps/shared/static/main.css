@@ -1,3 +1,4 @@
+@charset "UTF-8";
 /* OVERRIDE VARIABLES */
 :root {
   --blue: #00adba;
@@ -7060,6 +7061,9 @@ a.card-title {
 #links .path {
   display: none; }
 
+#links .card {
+  background-color: #6c757d4f !important; }
+
 #links.sitemap {
   overflow: scroll; }
   #links.sitemap.zoomed-out > ul {
@@ -7069,27 +7073,54 @@ a.card-title {
   #links.sitemap > ul {
     transform-origin: top left;
     display: flex;
-    border-top: 1px solid #6c757d; }
+    /*border-top:1px solid $secondary;*/ }
     #links.sitemap > ul > li {
       flex: 0 0 auto; }
+  #links.sitemap > ul > li > .child > .path {
+    background-color: #6c757d4f;
+    padding: 0.5em 1em;
+    width: 264px; }
+  #links.sitemap > ul > li > .child:before {
+    content: "" !important; }
   #links.sitemap .url, #links.sitemap .page-title {
     display: none; }
   #links.sitemap .path {
-    display: block;
-    font-size: 0.8rem;
-    max-width: 200px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis; }
+    width: 200px;
+    overflow: hidden; }
+    #links.sitemap .path .truncate {
+      display: block;
+      font-size: 0.8rem;
+      width: 180px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis; }
+    #links.sitemap .path .badge {
+      position: absolute;
+      right: 0.5em;
+      /*top: 0;*/ }
   #links.sitemap .children {
-    border-left: 1px solid #6c757d;
-    left: 1em; }
+    /*border-left:1px solid $secondary;*/
+    left: 1em;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em; }
+    #links.sitemap .children li {
+      position: relative; }
+    #links.sitemap .children li:first-child .child {
+      padding-top: 0; }
+    #links.sitemap .children li:last-child .child {
+      padding-bottom: 0; }
     #links.sitemap .children .child {
-      padding: 0.5em 0 0.5em 0.5em;
+      padding: 0.5em 0 0.5em 2em;
       display: block;
       border-bottom: 1px solid #6c757d; }
       #links.sitemap .children .child:last-child {
         border-bottom: 0px !important; }
+      #links.sitemap .children .child:before {
+        content: "↵";
+        position: absolute;
+        left: 0;
+        transform: scale(-1, 1);
+        color: #6c757d; }
       #links.sitemap .children .child article {
         display: inline-block;
         float: right;

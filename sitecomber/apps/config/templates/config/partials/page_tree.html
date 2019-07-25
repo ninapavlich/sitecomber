@@ -1,11 +1,29 @@
 <div class="child">
 
-
   {% if child.page %}
-  <strong class="path"><a href="{% url 'page-result-detail' object.pk child.page.pk %}" title="{{child.page.title}}">/{{child.path}}/</a></strong>
+  <strong class="path">
+    
+    <a
+      href="{{child.page_url}}"
+      target="_blank"
+      title="Visit in new tab"
+      class="badge badge-secondary p-1 ml-2"
+      >&nearr;</a>
+    <a href="{% url 'page-result-detail' object.pk child.page.pk %}" title="{{child.page.title}}"><span class="truncate">/{{child.path}}/</span></a> 
+  </strong>
   {% include 'config/partials/page_preview.html' with page_result=child.page %}
   {% else %}
-  <strong class="path text-warning">/{{child.path}}/ [missing]</strong>
+  <strong class="path text-warning">
+    
+    <a
+      href="{{child.full_path}}"
+      target="_blank"
+      title="Visit in new tab"
+      class="badge badge-secondary p-1 ml-2"
+      >&nearr;</a>
+    <a href="{{child.full_path}}" class="text-warning" target="_blank"><span class="truncate">/{{child.path}}/ [missing]</span></a>
+
+  </strong>
   {% endif %}
 
   <ul class="list-unstyled children">

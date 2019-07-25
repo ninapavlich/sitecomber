@@ -10,7 +10,11 @@ logger = logging.getLogger('django')
 
 class PageUpTest(BaseSiteTest):
     """
-    Is failing when a page is broken
+    This test checks the status code of each page. If the status code is 200,
+    then the page is working. If the status code is a valid error code from
+    300-600, or there is an HTTP error when loading the page, then it is
+    failing. If we receive some other non-standard error code, then there will
+    be a warning.
     """
 
     def on_page_parsed(self, page):
@@ -49,6 +53,13 @@ class PageUpTest(BaseSiteTest):
 
 
 class BrokenOutgoingLinkTest(BaseSiteTest):
+    """
+    This test checks if there are any broken links on a given page. If a link
+    on the page returns a status code 200, then it is considered working. If a
+    link returns a valid error code from 300-600, or there is an HTTP error
+    when loading the link, then it is considered broken. If a page returns some
+    other non-standard error, then it will display a warning.
+    """
 
     def on_page_parsed(self, page):
 

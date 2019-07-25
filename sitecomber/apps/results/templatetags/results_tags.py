@@ -17,5 +17,21 @@ def highlight_spelling_errors(value, misspellings, autoescape=True):
     for word in misspellings:
 
         pattern = re.compile(word, re.IGNORECASE)
-        value = pattern.sub("<span class='bg-danger text-light'>%s</span>" % word, value)
+        value = pattern.sub(r"<span class='bg-danger text-light'>\g<0></span>", value)
+
     return mark_safe(value)
+
+
+@register.simple_tag
+def get_test_results_for_test(site, test, status=None):
+    return site.get_test_results_for_test(test, status)
+
+
+@register.simple_tag
+def filter_page_test_results(page_test_results, test, status):
+
+    output = [result for result in page_test_results if (result.test == test and result.status == status)]
+
+    print("There are %s %s.%s results from %s" % (len(output), test, status, len(page_test_results)))
+
+    return output

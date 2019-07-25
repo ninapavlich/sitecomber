@@ -6,14 +6,14 @@
           class="card-title"
           href="{% url 'page-result-detail' object.pk page_result.pk %}"
         >
-          <h1 class="page-title h5 text-light m-0">
+          <h1 class="page-title h5 text-light mb-1">
             {{page_result.title}}
             <span
               class="status-code status-code-{{page_result.latest_status_code}}"
               title="{{page_result.latest_status_code}}"
             ></span>
           </h1>
-          <h2 class="url h6 text-white-50 m-0">{{page_result.url}}</h2>
+          <small class="url h6 text-white-50 m-0">{{page_result.url}}</small>
         </a>
       </div>
       <div class="p-2 flex-fill text-right">
@@ -44,12 +44,11 @@
         {% endwith %}
 
         <a
-          href="{{object.url}}"
+          href="{{page_result.url}}"
           target="_blank"
           title="Visit in new tab"
-          class="float-right badge badge-info p-1 ml-2 mt-1"
-          >Visit</a
-        >
+          class="float-right badge badge-secondary p-1 ml-2 mt-1"
+          >Visit &nearr;</a>
       </div>
     </div>
   </div>

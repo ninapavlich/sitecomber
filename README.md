@@ -25,15 +25,16 @@ A whole suite of tests are available out of the box, but you can also write your
 
 When configuring the fields, be sure to take note of the App Name, as you will be using this in the next steps.
 
-After your application has deployed, run the following commands through the command line Heroku CLI and follow the prompts:
-
-    > heroku ps:scale web=1 worker=1 --app=<replace-with-app-name>
 
 Once deployed, you can configure the crawling settings by going here: https://<replace-with-app-name>.herokuapp.com/admin/
 
 The default admin username is 'admin' and the default admin password is 'sitecomber'. MAKE SURE to update the password by going here: https://<replace-with-app-name>.herokuapp.com/admin/auth/user/1/password/
 
 Note that if you are parsing a large site, you will probably need to upgrade your database instance in the Heroku admin panel. The free database allows for up to 10000 rows.
+
+After your application has deployed and you have made any configuration settings, run the following commands through the command line Heroku CLI and follow the prompts:
+
+    > heroku ps:scale web=1 worker=1 --app=<replace-with-app-name>
 
 ## Local Development Quickstart
 

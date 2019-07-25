@@ -75,6 +75,9 @@ a.card-title{
   .path{
     display:none;
   }
+  .card{
+    background-color: #6c757d4f !important;
+  }
   &.sitemap{
     &.zoomed-out{
       & > ul{
@@ -90,15 +93,23 @@ a.card-title{
       transform-origin: top left;
 
       display:flex;
-      border-top:1px solid $secondary;
+      /*border-top:1px solid $secondary;*/
 
       & > li{
         flex: 0 0 auto;
       }
     }
 
-    &> ul > li > .child{
-
+    & > ul > li > .child{
+      
+      & > .path{
+        background-color: #6c757d4f; 
+        padding: 0.5em 1em; 
+        width: 264px;
+      }
+      &:before{
+        content:"" !important;
+      }
     }
     .child{
 
@@ -107,23 +118,56 @@ a.card-title{
       display:none;
     }
     .path{
-      display:block;
-      font-size:0.8rem;
-      max-width: 200px;
-      white-space: nowrap;
+      width: 200px;
       overflow: hidden;
-      text-overflow: ellipsis;
+
+      .truncate{
+        display:block;
+        font-size:0.8rem;
+        width: 180px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .badge{
+        position: absolute;
+        right: 0.5em;
+        /*top: 0;*/
+      }
     }
     .children{
-      border-left:1px solid $secondary;
+      /*border-left:1px solid $secondary;*/
       left:1em;
+      margin-top: 0.5em;
+      margin-bottom: 0.5em;
+
+      li{
+        position:relative;
+      }
+      li:first-child{
+        .child{
+          padding-top:0;
+        }
+      }
+      li:last-child{
+        .child{
+          padding-bottom:0;
+        }
+      }
 
       .child{
-        padding: 0.5em 0 0.5em 0.5em;
+        padding: 0.5em 0 0.5em 2em;
         display: block;
         border-bottom: 1px solid $secondary;
         &:last-child{
           border-bottom: 0px !important;
+        }
+        &:before{
+          content:"↵";
+          position: absolute;;
+          left:0;
+          transform: scale(-1, 1);
+          color:$secondary;
         }
 
         article{

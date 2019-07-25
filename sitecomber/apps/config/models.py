@@ -84,14 +84,17 @@ class Site(BaseMetaData):
             child = tree
             last_piece = None
             last_child = None
+            running_path = get_domain(result.url)
             for piece in result_url_parsed_split:
                 last_piece = piece
                 last_child = child
+                running_path = '%s/%s' % (running_path, piece)
                 if piece not in child:
                     child[piece] = {
                         'path': piece,
                         'page': None,
                         'page_url': None,
+                        'full_path': running_path,
                         'children': {}
                     }
                 child = child[piece]['children']
@@ -136,6 +139,14 @@ class Site(BaseMetaData):
     @cached_property
     def error_page_test_results(self):
         return self.page_test_results.filter(status=BaseTestResult.STATUS_ERROR)
+
+    def get_test_results_for_test(self, test, status=None):
+        results = self.page_test_results.filter(test=test)
+
+        if status:
+            results = results.filter(status=status)
+
+        return results
 
     @cached_property
     def pages_with_errors(self):
@@ -309,9 +320,6 @@ class SiteTestSetting(BaseMetaData):
     def class_instance(self):
         if not self.test:
             return None
-        module_name, class_name = self.test.rsplit('.', 1)
-        module = importlib.import_module(module_name)
-        class_ = getattr(module, class_name)
 
         if self.settings:
             try:
@@ -321,7 +329,17 @@ class SiteTestSetting(BaseMetaData):
         else:
             settings_json = {}
 
+        class_ = self.class_model
         return class_(self.site, settings_json)
+
+    @property
+    def class_model(self):
+        if not self.test:
+            return None
+        module_name, class_name = self.test.rsplit('.', 1)
+        module = importlib.import_module(module_name)
+        class_ = getattr(module, class_name)
+        return class_
 
     @property
     def test_name(self):

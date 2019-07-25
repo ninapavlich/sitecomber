@@ -12,7 +12,7 @@
 <article class="main">
   <h1>{{object}}</h1>
   <h2 class="text-secondary h5">
-    {% for url in object.domains %}{{url}}{% if not forloop.last %}, {% endif %}{% endfor %}
+    {% for url in object.domains %}<a href="{{url}}" target="_blank" class="text-secondary">{{url}}</a>{% if not forloop.last %}, {% endif %}{% endfor %}
   </h2>
 
   <aside>
@@ -37,22 +37,28 @@
       </li>
       {% endif %}
 
-      {% if object.pages_with_errors|length > 0 %}
-      <li>
-        <a href="{% url 'site-test-results' object.pk %}"  class="text-danger">
-          <strong>{{object.pages_with_errors|length}}</strong> pages with errors...
-        </a>
+      <li class="clearfix">
+          
+          {% if object.pages_with_errors|length > 0 %}  
+            <p class="float-left text-danger"><strong>{{object.pages_with_errors|length}}</strong> pages with errors</p>
+          {% endif %}
+
+          <a href="{% url 'site-test-results' object.pk %}"  class="text-danger float-right">
+            <span class="badge badge-info p-1 ml-2" >
+              Site Test Results
+            </span>
+          </a>
       </li>
-      {% endif %}
+      
     </ul>
-    <!-- <ul class="list-unstyled clearfix">
-      <li class="float-right">
+    <ul class="list-unstyled clearfix">
+      <!-- <li class="float-right">
         <a
           href="#"
           class="viewlink overview float-right badge badge-secondary p-1 ml-2 mt-1"
           >Overview</a
         >
-      </li>
+      </li> -->
       <li class="float-right">
         <a
           href="#"
@@ -67,7 +73,10 @@
           >List</a
         >
       </li>
-    </ul> -->
+      <li class="float-right">
+        <small class="text-muted">View pages as:</small>
+      </li>
+    </ul>
   </aside>
 
   <div class="" id="links">

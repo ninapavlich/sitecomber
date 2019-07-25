@@ -1,4 +1,5 @@
-{% extends 'base.html' %} {% load results_tags %}
+{% extends 'base.html' %} 
+{% load results_tags %}
 {% block bodyclass %}{{block.super}} page-detail{% endblock %} 
 
 {% block inner %}
@@ -48,7 +49,7 @@
             role="tab"
             aria-controls="description"
             aria-selected="true"
-            >Test Results</a
+            >Results Overview</a
           >
         </li>
         <li class="nav-item">
@@ -115,14 +116,24 @@
     </div>
     <div class="card-body">
       <div class="tab-content mt-3">
-        <div class="tab-pane active" id="tests" role="tabpanel">
-          <ul class="list-unstyled">
+        <div class="tab-pane active px-3" id="tests" role="tabpanel">
+
+          <h4>Page Test Results</h4>
+          <ul class="list-unstyled row p-2">
+
+
             {% for result in object.test_results %}
-            <li class="p-2 my-2 alert alert-{{result.bootstrap_class}}">
-              <strong data-id="{{result.test}}">{{result.test_title}}</strong>
-              {{result.message|safe}}
+            <li class="col-lg-4 col-md-6 my-0 alert alert-{{result.bootstrap_class}}">
+
+              <div  class="p-2 ">
+                <a href="{% url 'site-test-results' object.site_domain.site.pk %}#{{result.test_title}}" class="text-{{result.bootstrap_class}}" text="View site-wide report for {{result.test_title}}"><h6>{{result.test_title}}</h6></a>
+            
+                {{result.message|safe}}
+              </div>
             </li>
             {% endfor %}
+
+
           </ul>
         </div>
 
@@ -179,14 +190,28 @@
           <strong class="text-danger">{{reader_test.message|safe}}</strong> 
           {% endif %} 
 
+          <hr />
           {% if spell_check_test.success %}
           <h4 class="text-info">No misspelled words found.</h4>
           {% else %}
           <h4 class="text-danger">
             Found {{spell_check_test.data_json.misspelled_words|length}}
-            misspellings: {% for word in spell_check_test.data_json.misspelled_words %}{{word}}{% if not forloop.last %}, {% endif %}{% endfor %}
+            unrecognized words: {% for word in spell_check_test.data_json.misspelled_words %}{{word}}{% if not forloop.last %}, {% endif %}{% endfor %}
           </h4>
-          {% endif %} {% if placeholder_text_test.success %}
+          <p class="text-muted"><small>It may be that this word is simply not in our dictionary. To add this word to the custom dictionary <a href="/admin/config/site/{{object.site_domain.site.pk}}/change/">click here</a> and scroll down to the "SpellCheckTest" section. Custom words should be entered as a JSON list, in this format:
+<pre class="text-muted">
+  {
+    "known_words": [
+      "swole",
+      "cheesemonger",
+      "gadzooks",
+    ]
+  }
+</pre></small></p>
+          {% endif %} 
+
+          <hr />
+          {% if placeholder_text_test.success %}
           <h4 class="text-info">
             No placeholder text found. Words searched were {% for word in placeholder_text_test.data_json.placeholder_words_searched %}{{word}}{% if not forloop.last %}, {% endif %}{% endfor %}
           </h4>
@@ -199,6 +224,8 @@
             {% endfor %}
           </h4>
           {% endif %}
+
+
         </div>
 
         <div class="tab-pane" id="seo" role="tabpanel">

@@ -1,5 +1,5 @@
 <div class="mb-0 alert alert-{{result.bootstrap_class}}">
-  <p class="my-0"><strong><a href="{% url 'page-result-detail' object.pk result.page.pk %}" class="text-dark">{{result.page}}</a></strong></p>
-  <p class="my-0"><small><a href="{{result.page.url}}" target="_blank" class="text-dark">{{result.page.url}}</a></small></p>
+  <p class="my-0"><strong><a href="{% url 'page-result-detail' object.pk result.page.pk %}" class="text-dark" title="View info for this page">{{result.page}}</a></strong></p>
+  <p class="my-0"><small><a href="{{result.page.url}}" target="_blank" class="text-dark" title="View link in new tab">{{result.page.url}} &nearr;</a></small></p>
   <p class="my-0">{{result.message|safe}}</p>
 </div>
