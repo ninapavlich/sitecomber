@@ -27,7 +27,7 @@
 
       {% if object.latest_request and object.latest_request.response %}
       <span class="text-muted"
-        >Last crawled on {{object.latest_request.load_start_time}}</span
+        >Last crawled on {{object.latest_request.load_start_time}} {{object.latest_request.load_start_time|date:'e'}}</span
       >
       {% else %}
       <span class="text-muted">Page has not yet been crawled</span> {% endif %}

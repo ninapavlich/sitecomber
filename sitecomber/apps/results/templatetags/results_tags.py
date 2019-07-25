@@ -1,9 +1,13 @@
 import re
+import logging
+
 from django import template
 from django.template.defaultfilters import stringfilter
 from django.utils.safestring import mark_safe
 
 register = template.Library()
+
+logger = logging.getLogger('django')
 
 
 @register.simple_tag
@@ -16,8 +20,11 @@ def get_test_result_by_type(value, arg):
 def highlight_spelling_errors(value, misspellings, autoescape=True):
     for word in misspellings:
 
-        pattern = re.compile(word, re.IGNORECASE)
-        value = pattern.sub(r"<span class='bg-danger text-light'>\g<0></span>", value)
+        try:
+            pattern = re.compile(word, re.IGNORECASE)
+            value = pattern.sub(r"<span class='bg-danger text-light'>\g<0></span>", value)
+        except Exception as e:
+            logger.error("Error highlighting misspellings: %s" % (e))
 
     return mark_safe(value)
 

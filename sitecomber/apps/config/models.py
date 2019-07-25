@@ -206,17 +206,18 @@ class SiteDomain(BaseMetaData, BaseURL):
         sitemap_ctr = 0
         page_ctr = 0
         tree = sitemap_tree_for_homepage(self.url)
-        for sitemap in tree.sub_sitemaps:
-            sitemap_ctr += 1
-            sitemap_item = self.handle_link(sitemap.url)
-            sitemap_item.is_sitemap = True
-            sitemap_item.save()
-            for sitemap_item_url in sitemap.all_pages():
-                self.handle_link(sitemap_item_url.url, sitemap_item)
-                page_ctr += 1
+        if hasattr(tree, 'sub_sitemaps'):
+            for sitemap in tree.sub_sitemaps:
+                sitemap_ctr += 1
+                sitemap_item = self.handle_link(sitemap.url)
+                sitemap_item.is_sitemap = True
+                sitemap_item.save()
+                for sitemap_item_url in sitemap.all_pages():
+                    self.handle_link(sitemap_item_url.url, sitemap_item)
+                    page_ctr += 1
 
-            for test in tests:
-                test.sitemap_parsed(sitemap_item)
+                for test in tests:
+                    test.sitemap_parsed(sitemap_item)
 
         logger.info("Found %s pages in %s sitemap(s)" % (page_ctr, sitemap_ctr))
 
