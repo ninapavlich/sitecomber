@@ -36,6 +36,10 @@ After your application has deployed and you have made any configuration settings
 
     > heroku ps:scale web=1 worker=1 --app=<replace-with-app-name>
 
+NOTE: There is currently a memory leak in the worker, so instead of using the worker, set the Heroku Scheduler to run the following CRON every 10 minutes:
+
+    python manage.py crawl_site -1 100
+
 ## Local Development Quickstart
 
 ### Pre-Requisites:

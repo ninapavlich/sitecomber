@@ -1,4 +1,5 @@
 import logging
+import time
 
 from django.core.management.base import BaseCommand
 from django.core.exceptions import ObjectDoesNotExist
@@ -29,6 +30,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
+        start = time.time()
         site_pk = int(options['site_pk'][0])
         load_batch_size = int(options['load_batch_size'][0])
 
@@ -48,3 +50,5 @@ class Command(BaseCommand):
 
             site.parse_sitemap()
             site.crawl(load_batch_size)
+
+        logger.warn("Crawling took %s seconds" % (time.time() - start))
