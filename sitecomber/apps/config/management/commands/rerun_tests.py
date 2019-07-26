@@ -35,8 +35,8 @@ class Command(BaseCommand):
             return
 
         SiteTestResult.objects.filter(site=site).delete()
-        SiteDomainTestResult.object.filter(site_domain__site=site).delete()
-        PageTestResult.objects.filter(site_domain__site=site).delete()
+        SiteDomainTestResult.objects.filter(site_domain__site=site).delete()
+        PageTestResult.objects.filter(page__site_domain__site=site).delete()
 
         site.parse_sitemap()
         tests = site.tests
