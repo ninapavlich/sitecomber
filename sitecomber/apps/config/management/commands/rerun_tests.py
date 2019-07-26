@@ -4,6 +4,7 @@ from django.core.management.base import BaseCommand
 from django.core.exceptions import ObjectDoesNotExist
 
 from sitecomber.apps.config.models import Site
+from sitecomber.apps.results.models import SiteTestResult, SiteDomainTestResult, PageTestResult
 
 logger = logging.getLogger('django')
 
@@ -32,6 +33,10 @@ class Command(BaseCommand):
         except ObjectDoesNotExist:
             logger.error(u"Could not find site with primary key = %s" % (site_pk))
             return
+
+        SiteTestResult.objects.filter(site=site).delete()
+        SiteDomainTestResult.object.filter(site_domain__site=site).delete()
+        PageTestResult.objects.filter(site_domain__site=site).delete()
 
         site.parse_sitemap()
         tests = site.tests
