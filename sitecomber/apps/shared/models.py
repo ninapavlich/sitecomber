@@ -71,8 +71,8 @@ class BasePath(models.Model):
     def __str__(self):
         return self.path
 
-    def test(self, test_path):
-        return fnmatch(test_path, self.path)
+    def test(self, test_url):
+        return fnmatch(test_url, self.path)
 
     class Meta:
         abstract = True
