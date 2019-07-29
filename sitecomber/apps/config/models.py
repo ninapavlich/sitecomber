@@ -4,7 +4,6 @@ import json
 from urllib.parse import urlparse
 
 from django.db import models
-from django.db.models import F
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import MultipleObjectsReturned
@@ -58,9 +57,12 @@ class Site(BaseMetaData):
             domain.parse_sitemap(tests)
 
     def crawl(self, load_batch_size):
+        log_memory("before crawl")
         tests = self.tests
+        log_memory("after tests")
         for domain in self.sitedomain_set.filter(should_crawl=True):
             domain.crawl(tests, load_batch_size)
+        log_memory("after crawl")
 
     @cached_property
     def tests(self):
@@ -210,7 +212,7 @@ class SiteDomain(BaseMetaData, BaseURL):
             log_memory('---- b. After loading root page')
             for test in tests:
                 test.page_parsed(root_page)
-                log_memory('-------- c. After running test %s' % (test))
+                # log_memory('-------- c. After running test %s' % (test))
         except MultipleObjectsReturned as e:
             logger.error("MultipleObjectsReturned when creating root page for site %s with url %s: %s" % (self, self.url, e))
 
@@ -234,7 +236,7 @@ class SiteDomain(BaseMetaData, BaseURL):
                     test.sitemap_parsed(sitemap_item)
 
         log_memory('---- e. After getting sitemap tree')
-        logger.info("Found %s pages in %s sitemap(s)" % (page_ctr, sitemap_ctr))
+        logger.debug("Found %s pages in %s sitemap(s)" % (page_ctr, sitemap_ctr))
 
     def crawl(self, tests, load_batch_size):
 
@@ -267,12 +269,12 @@ class SiteDomain(BaseMetaData, BaseURL):
             ctr = 0
             for page in pages:
                 ctr += 1
-                log_memory("---- Before loading page %s" % (ctr))
+                # log_memory("---- Before loading page %s" % (ctr))
                 page.load(user_agent, max_timeout)
-                log_memory("---- After loading page %s" % (ctr))
+                # log_memory("---- After loading page %s" % (ctr))
                 for test in tests:
                     test.page_parsed(page)
-                    log_memory("------ After applying test %s to page %s" % (test, ctr))
+                    # log_memory("------ After applying test %s to page %s" % (test, ctr))
                 page.render_synoposes()
 
         log_memory("-- After domain crawl for %s" % (self))

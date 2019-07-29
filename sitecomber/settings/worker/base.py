@@ -30,4 +30,4 @@ if DEBUG:
     if 'file' in LOGGING['handlers']:
         LOGGING['handlers']['file']['level'] = 'INFO'
 
-LOAD_BATCH_SIZE = int(env('LOAD_BATCH_SIZE', default=10))
+LOAD_BATCH_SIZE = int(env('LOAD_BATCH_SIZE', default=100))

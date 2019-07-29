@@ -105,7 +105,7 @@ class Worker:
                 self.reset_database_connection()
 
             logger.info("%s :: waiting to loop for %s seconds" %
-                         (settings.WORKER_NAME, self.loop_delay))
+                        (settings.WORKER_NAME, self.loop_delay))
             self.loop_timer.wait(self.loop_delay)
 
     def on_start(self):

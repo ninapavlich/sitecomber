@@ -247,24 +247,26 @@ class PageResult(BaseMetaData, BaseURL):
     @classmethod
     def get_batch_to_load(cls, site_domain, rook_pk, load_batch_size):
 
-        # This version is very memory intensive if a queryset is very large:
+        output = []
+        ctr = 0
+
+        # # This version is very memory intensive if a queryset is very large:
         # pages = cls.objects\
-        #     .filter(site_domain=self)\
-        #     .exclude(pk=root_page.pk)\
+        #     .filter(site_domain=site_domain)\
+        #     .exclude(pk=rook_pk)\
         #     .order_by(F('last_load_start_time').desc(nulls_last=True)).reverse()
 
         # ctr = 0
         # for page in pages:
-        #     log_memory("---- Before loading page %s" % (ctr))
         #     if ctr > load_batch_size:
         #         break
         #     if page.should_load():
         #         output.append(page)
         #         ctr += 1
+        # return output
 
         # This version handles pagination to load as little as possible:
-        output = []
-        ctr = 0
+
         batch_increment = 0
         page_size = 100
 
