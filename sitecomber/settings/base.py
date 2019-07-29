@@ -88,8 +88,8 @@ INSTALLED_APPS = [
     'django_ace',
     'django_list_wrestler',
 
-    'rest_framework',
-    'rest_framework.authtoken',
+    # 'rest_framework',
+    # 'rest_framework.authtoken',
     'django_filters',
 
     # Application components

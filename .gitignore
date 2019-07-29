@@ -123,3 +123,4 @@ data.json
 *.pid
 
 node_modules/
+*.zip

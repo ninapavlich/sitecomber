@@ -8,11 +8,12 @@ from django.db.models import F
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import MultipleObjectsReturned
+from django.urls import reverse
 from django.utils.functional import cached_property
 
 from usp.tree import sitemap_tree_for_homepage
 
-from sitecomber.apps.shared.models import BaseMetaData, BaseURL, BaseTestResult
+from sitecomber.apps.shared.models import BaseMetaData, BaseURL, BaseTestResult, BasePath
 from sitecomber.apps.shared.utils import get_domain, get_test_choices
 from sitecomber.apps.results.models import PageResult, PageTestResult
 
@@ -35,6 +36,12 @@ class Site(BaseMetaData):
     override_user_agent = models.TextField(blank=True, null=True)
     override_max_timeout_seconds = models.IntegerField(blank=True, null=True)
 
+    max_page_results = models.IntegerField(blank=True, null=True,
+                                           help_text="Limit the total number of pages crawled on a given site.")
+
+    def get_absolute_url(self):
+        return reverse('site-detail', args=[str(self.pk)])
+
     def get_user_agent(self):
         if self.override_user_agent:
             return self.override_user_agent
@@ -51,6 +58,7 @@ class Site(BaseMetaData):
             domain.parse_sitemap(tests)
 
     def crawl(self, load_batch_size):
+
         tests = self.tests
         for domain in self.sitedomain_set.filter(should_crawl=True):
             domain.crawl(tests, load_batch_size)
@@ -209,7 +217,7 @@ class SiteDomain(BaseMetaData, BaseURL):
         if hasattr(tree, 'sub_sitemaps'):
             for sitemap in tree.sub_sitemaps:
                 sitemap_ctr += 1
-                sitemap_item = self.handle_link(sitemap.url)
+                sitemap_item = self.handle_link(sitemap.url, None, True, True)
                 sitemap_item.is_sitemap = True
                 sitemap_item.save()
                 for sitemap_item_url in sitemap.all_pages():
@@ -223,6 +231,7 @@ class SiteDomain(BaseMetaData, BaseURL):
 
     def crawl(self, tests, load_batch_size):
 
+        # First add the root page
         try:
             root_page, created = PageResult.objects.get_or_create(
                 site_domain=self,
@@ -232,8 +241,12 @@ class SiteDomain(BaseMetaData, BaseURL):
         except MultipleObjectsReturned as e:
             logger.error("MultipleObjectsReturned when creating root page for site %s with url %s: %s" % (self, self.url, e))
 
-        if self.site.recursive:
+        # Now also add seed pages
+        for seed_url in self.site.includeseed_set.all():
+            if self.url in seed_url.url:
+                self.handle_link(seed_url.url, None, True, True)
 
+        if self.site.recursive:
             pages = PageResult.objects\
                 .filter(site_domain=self)\
                 .exclude(pk=root_page.pk)\
@@ -252,7 +265,20 @@ class SiteDomain(BaseMetaData, BaseURL):
                     for test in tests:
                         test.page_parsed(page)
 
-    def handle_link(self, url, source_page=None, is_internal=True):
+    def handle_link(self, url, source_page=None, is_internal=True, force_create=False):
+
+        if not force_create:
+
+            reached_page_result_max_for_site = PageResult.objects.filter(site_domain__site=self.site).count() >= self.site.max_page_results
+            if reached_page_result_max_for_site:
+                logger.debug("Cannot create any new page results for site %s. Max of %s has been hit." % (self.site, self.site.max_page_results))
+                return None
+
+            ignore_paths = self.site.ignoreresult_set.all()
+            for ignore_path in ignore_paths:
+                if ignore_path.test(url):
+                    logger.debug("Ignoring url %s based on ignore path %s" % (url, ignore_path))
+                    return None
 
         try:
             link_page, created = PageResult.objects.get_or_create(
@@ -267,6 +293,7 @@ class SiteDomain(BaseMetaData, BaseURL):
 
         except MultipleObjectsReturned as e:
             logger.error("MultipleObjectsReturned when creating page result for site %s with url %s: %s" % (self, self.url, e))
+            return None
 
     @staticmethod
     def autocomplete_search_fields():
@@ -281,7 +308,18 @@ class SiteDomain(BaseMetaData, BaseURL):
         return str(item)
 
 
-class IgnoreURL(BaseMetaData, BaseURL):
+class IncludeSeed(BaseMetaData, BaseURL):
+    """
+    If a URL is not available through the homepage or sitemap, include this seed URL
+    """
+    site = models.ForeignKey(
+        Site,
+        null=False,
+        on_delete=models.CASCADE
+    )
+
+
+class IgnoreResult(BaseMetaData, BasePath):
 
     site = models.ForeignKey(
         Site,

@@ -1,5 +1,6 @@
 import logging
 import json
+from fnmatch import fnmatch
 
 from django.db import models
 from django.urls import reverse
@@ -57,6 +58,21 @@ class BaseURL(models.Model):
 
     def __str__(self):
         return self.url
+
+    class Meta:
+        abstract = True
+
+
+class BasePath(models.Model):
+
+    title = models.CharField(max_length=255, blank=True, null=True)
+    path = models.CharField(max_length=2000, help_text='Match either a fully qualified URL or paths using Unix shell-style wildcards, e.g. */files/*.txt')
+
+    def __str__(self):
+        return self.path
+
+    def test(self, test_path):
+        return fnmatch(test_path, self.path)
 
     class Meta:
         abstract = True

@@ -7,7 +7,8 @@ from django_ace import AceWidget
 from sitecomber.apps.shared.forms import AdminAutocompleteFormMixin
 # from sitecomber.apps.shared.admin import AdminModelSelect2
 
-from .models import Site, SiteDomain, IgnoreURL, IgnoreQueryParam, SiteTestSetting
+from .models import Site, SiteDomain, IncludeSeed, IgnoreResult, \
+    IgnoreQueryParam, SiteTestSetting
 
 
 class SiteDomainForm(AdminAutocompleteFormMixin):
@@ -33,9 +34,15 @@ class SiteDomainInline(admin.TabularInline):
     extra = 0
 
 
-class IgnoreURLInline(admin.TabularInline):
-    model = IgnoreURL
+class IncludeSeedInline(admin.TabularInline):
+    model = IncludeSeed
     fields = ['url']
+    extra = 0
+
+
+class IgnoreResultInline(admin.TabularInline):
+    model = IgnoreResult
+    fields = ['path']
     extra = 0
 
 
@@ -94,7 +101,8 @@ class SiteAdmin(admin.ModelAdmin):
                 'active',
                 'recursive',
                 'override_user_agent',
-                'override_max_timeout_seconds'
+                'override_max_timeout_seconds',
+                'max_page_results'
             )
         }),
         ('Metadata', {
@@ -105,5 +113,5 @@ class SiteAdmin(admin.ModelAdmin):
         }),
     )
 
-    inlines = [SiteDomainInline, IgnoreURLInline, IgnoreQueryParamInline, SiteTestSettingInline]
+    inlines = [SiteDomainInline, IncludeSeedInline, IgnoreResultInline, IgnoreQueryParamInline, SiteTestSettingInline]
     custom_list_order_by = 'title'

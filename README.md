@@ -30,7 +30,7 @@ Once deployed, you can configure the crawling settings by going here: https://<r
 
 The default admin username is 'admin' and the default admin password is 'sitecomber'. MAKE SURE to update the password by going here: https://<replace-with-app-name>.herokuapp.com/admin/auth/user/1/password/
 
-Note that if you are parsing a large site, you will probably need to upgrade your database instance in the Heroku admin panel. The free database allows for up to 10000 rows.
+Note that if you are parsing a large site, you will probably need to upgrade your database instance in the Heroku admin panel. The free database allows for up to 10000 rows. If you would like to stay on the free database but only crawl a subset of the URLs, you can adjust either the "Max page results" setting in the site configuration, which will cap the total number of pages crawled; or you can ignore entire directories using pattern matching in the "Ignore Results" section of the site configuration.
 
 After your application has deployed and you have made any configuration settings, run the following commands through the command line Heroku CLI and follow the prompts:
 
