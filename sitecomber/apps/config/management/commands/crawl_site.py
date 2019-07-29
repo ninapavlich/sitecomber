@@ -58,8 +58,8 @@ class Command(BaseCommand):
             log_memory('2. Before parsing')
             site.parse_sitemap()
             log_memory('3. After parsing / Before crawling')
-            # site.crawl(load_batch_size)
-            # log_memory('4. After crawling')
+            site.crawl(load_batch_size)
+            log_memory('4. After crawling')
 
         logger.info("Crawling took %s seconds" % (time.time() - start))
 

@@ -37,8 +37,8 @@ def standardize_url(url, ignored_query_params):
 
 def log_memory(message):
     # if settings.DEBUG:
-    logger.info('-------------------------')
-    logger.info('%s %s' % (humanbytes(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss), message))
+    logger.warn('-------------------------')
+    logger.warn('%s %s' % (humanbytes(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss), message))
 
 
 def humanbytes(bytes):
