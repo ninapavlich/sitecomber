@@ -327,10 +327,10 @@
             <li class="my-1 clearfix">
               <a
                 href="{% url 'page-result-detail' link.site_domain.site.pk link.pk %}"
-                title="{{link.latest_status_code}}"
+                title="{{link.last_status_code}}"
                 >{{link.url}}
                 <span
-                  class="status-code status-code-{{link.latest_status_code}}"
+                  class="status-code status-code-{{link.last_status_code}}"
                   
                 ></span
               ></a>
@@ -351,10 +351,10 @@
             <li class="my-1 clearfix">
               <a
                 href="{% url 'page-result-detail' link.site_domain.site.pk link.pk %}"
-                title="{{link.latest_status_code}}"
+                title="{{link.last_status_code}}"
                 >{{link.url}}
                 <span
-                  class="status-code status-code-{{link.latest_status_code}}"
+                  class="status-code status-code-{{link.last_status_code}}"
                 ></span
               ></a>
               <a

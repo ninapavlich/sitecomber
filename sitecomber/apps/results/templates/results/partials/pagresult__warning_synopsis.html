@@ -1,0 +1,12 @@
+{% with warnings=object.warning_test_results %}
+{% if warnings|length > 0 %}
+<a 
+  href="{% url 'page-result-detail' object.site_domain.site.pk object.pk %}" 
+  title="{% for warning in warnings %}{{warning.message}}{% if not forloop.last %}, {%endif %}{% endfor %}"
+>
+  <span class="badge badge-warning p-1 ml-2" >
+     {{warnings|length}} warning{% if warnings|length > 1 %}s{% endif %}
+  </span>
+</a>
+{% endif %}
+{% endwith %}

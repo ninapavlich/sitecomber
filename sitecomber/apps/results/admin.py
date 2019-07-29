@@ -167,14 +167,18 @@ class PageTestResultAdmin(admin.ModelAdmin):
 @admin.register(PageResult)
 class PageResultAdmin(admin.ModelAdmin):
 
-    list_display_links = ['title', 'view_url', 'last_load_time']
-    list_display = ['site_domain', 'title', 'view_url', 'last_load_time', 'visit_url']
-    list_filter = ['site_domain__site', 'site_domain', 'is_sitemap', 'is_root', 'is_internal']
+    list_display_links = ['view_title', 'view_url', 'last_load_start_time', 'last_time_elapsed_ms', 'last_status_code']
+    list_display = ['site_domain', 'view_title', 'view_url', 'last_load_start_time', 'last_time_elapsed_ms', 'last_status_code', 'visit_url']
+    list_filter = ['site_domain__site', 'site_domain', 'is_sitemap', 'is_root',
+                   'is_internal', 'last_status_code', 'last_content_type']
     readonly_fields = ['site_domain', 'url', 'view_url', 'created', 'modified',
-                       'title', 'last_load_time', 'view_site_settings',
+                       'title', 'last_load_start_time', 'last_load_end_time', 'last_time_elapsed_ms',
+                       'last_status_code', 'last_content_type',
+                       'last_content_length', 'view_site_settings',
                        'incoming_links', 'outgoing_links',
                        'view_incoming_links', 'view_outgoing_links',
-                       'is_sitemap', 'is_root', 'is_internal']
+                       'is_sitemap', 'is_root', 'is_internal', 'view_title',
+                       'error_synopsis', 'warning_synoposis', ]
     change_form_template = 'admin/pageresult_change_form.html'
     # filter_horizontal = ['incoming_links', 'outgoing_links']
     search_fields = ['url']
@@ -189,6 +193,10 @@ class PageResultAdmin(admin.ModelAdmin):
                 'is_sitemap',
                 'is_root',
                 'is_internal',
+                ('last_load_start_time', 'last_load_end_time', 'last_time_elapsed_ms'),
+                ('last_status_code', 'last_content_type', 'last_content_length'),
+                'error_synopsis',
+                'warning_synoposis',
                 'view_incoming_links',
                 'view_outgoing_links',
             )
@@ -202,6 +210,9 @@ class PageResultAdmin(admin.ModelAdmin):
 
     inlines = [PageRequestInline, PageTestResultInline]
     custom_list_order_by = 'title'
+
+    def view_title(self, obj):
+        return Truncator(obj.title).chars(80)
 
     def view_url(self, obj):
         return Truncator(obj.url).chars(80)

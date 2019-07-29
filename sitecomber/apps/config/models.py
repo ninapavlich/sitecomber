@@ -14,7 +14,7 @@ from django.utils.functional import cached_property
 from usp.tree import sitemap_tree_for_homepage
 
 from sitecomber.apps.shared.models import BaseMetaData, BaseURL, BaseTestResult, BasePath
-from sitecomber.apps.shared.utils import get_domain, get_test_choices
+from sitecomber.apps.shared.utils import get_domain, get_test_choices, log_memory
 from sitecomber.apps.results.models import PageResult, PageTestResult
 
 
@@ -58,7 +58,6 @@ class Site(BaseMetaData):
             domain.parse_sitemap(tests)
 
     def crawl(self, load_batch_size):
-
         tests = self.tests
         for domain in self.sitedomain_set.filter(should_crawl=True):
             domain.crawl(tests, load_batch_size)
@@ -77,9 +76,7 @@ class Site(BaseMetaData):
 
     @cached_property
     def page_results(self):
-        # return self.sitedomain_set.first().pageresult_set.all().prefetch_related('pagerequest_set').prefetch_related('pagerequest_set__response')
-        # TODO -- optimize with prefetch
-        return PageResult.objects.filter(site_domain__site=self).prefetch_related('pagetestresult_set').prefetch_related('pagerequest_set').prefetch_related('pagerequest_set__response')
+        return PageResult.objects.filter(site_domain__site=self)
 
     @cached_property
     def page_results_hierarchy(self):
@@ -122,7 +119,7 @@ class Site(BaseMetaData):
 
     @cached_property
     def uncrawled_page_results(self):
-        return self.page_results.filter(last_load_time=None)
+        return self.page_results.filter(last_load_start_time=None)
 
     @cached_property
     def has_fully_crawled_site(self):
@@ -198,6 +195,10 @@ class SiteDomain(BaseMetaData, BaseURL):
         super(SiteDomain, self).save(*args, **kwargs)
 
     def parse_sitemap(self, tests):
+        log_memory('---- a. Before creating root page')
+
+        user_agent = self.site.get_user_agent()
+        max_timeout = self.site.get_max_timeout_seconds()
 
         try:
             root_page, created = PageResult.objects.get_or_create(
@@ -205,21 +206,26 @@ class SiteDomain(BaseMetaData, BaseURL):
                 url=self.url,
                 defaults={'is_root': True}
             )
-            root_page.load()
+            root_page.load(user_agent, max_timeout)
+            log_memory('---- b. After loading root page')
             for test in tests:
                 test.page_parsed(root_page)
+                log_memory('-------- c. After running test %s' % (test))
         except MultipleObjectsReturned as e:
             logger.error("MultipleObjectsReturned when creating root page for site %s with url %s: %s" % (self, self.url, e))
 
         sitemap_ctr = 0
         page_ctr = 0
+        log_memory('---- d. Before getting sitemap tree')
         tree = sitemap_tree_for_homepage(self.url)
         if hasattr(tree, 'sub_sitemaps'):
             for sitemap in tree.sub_sitemaps:
                 sitemap_ctr += 1
+
                 sitemap_item = self.handle_link(sitemap.url, None, True, True)
                 sitemap_item.is_sitemap = True
                 sitemap_item.save()
+
                 for sitemap_item_url in sitemap.all_pages():
                     self.handle_link(sitemap_item_url.url, sitemap_item)
                     page_ctr += 1
@@ -227,9 +233,15 @@ class SiteDomain(BaseMetaData, BaseURL):
                 for test in tests:
                     test.sitemap_parsed(sitemap_item)
 
+        log_memory('---- e. After getting sitemap tree')
         logger.info("Found %s pages in %s sitemap(s)" % (page_ctr, sitemap_ctr))
 
     def crawl(self, tests, load_batch_size):
+
+        log_memory("-- Starting domain crawl for %s" % (self))
+
+        user_agent = self.site.get_user_agent()
+        max_timeout = self.site.get_max_timeout_seconds()
 
         # First add the root page
         try:
@@ -247,29 +259,29 @@ class SiteDomain(BaseMetaData, BaseURL):
                 self.handle_link(seed_url.url, None, True, True)
 
         if self.site.recursive:
-            pages = PageResult.objects\
-                .filter(site_domain=self)\
-                .exclude(pk=root_page.pk)\
-                .order_by(F('last_load_time').desc(nulls_last=True)).reverse()
+            pages = PageResult.get_batch_to_load(self, root_page.pk, load_batch_size)
 
-            logger.info("Found %s pages within the %s site, going to load a max of %s" % (pages.count(), self, load_batch_size))
+            logger.info("Found %s pages within the %s site, going to load a max of %s" % (len(pages), self, load_batch_size))
+            log_memory("---- After retrieving pages")
 
             ctr = 0
             for page in pages:
-                if ctr > load_batch_size:
-                    break
+                ctr += 1
+                log_memory("---- Before loading page %s" % (ctr))
+                page.load(user_agent, max_timeout)
+                log_memory("---- After loading page %s" % (ctr))
+                for test in tests:
+                    test.page_parsed(page)
+                    log_memory("------ After applying test %s to page %s" % (test, ctr))
+                page.render_synoposes()
 
-                if page.should_load():
-                    ctr += 1
-                    page.load()
-                    for test in tests:
-                        test.page_parsed(page)
+        log_memory("-- After domain crawl for %s" % (self))
 
     def handle_link(self, url, source_page=None, is_internal=True, force_create=False):
 
         if not force_create:
 
-            reached_page_result_max_for_site = PageResult.objects.filter(site_domain__site=self.site).count() >= self.site.max_page_results
+            reached_page_result_max_for_site = False if not self.site.max_page_results else PageResult.objects.filter(site_domain__site=self.site).count() >= self.site.max_page_results
             if reached_page_result_max_for_site:
                 logger.debug("Cannot create any new page results for site %s. Max of %s has been hit." % (self.site, self.site.max_page_results))
                 return None

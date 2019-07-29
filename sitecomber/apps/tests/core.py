@@ -20,8 +20,8 @@ class PageUpTest(BaseSiteTest):
     def on_page_parsed(self, page):
         from sitecomber.apps.results.models import PageTestResult
 
-        if page.latest_request and page.latest_request.response:
-            status_code = page.latest_request.response.status_code
+        if page.last_status_code:
+            status_code = page.last_status_code
 
             status = PageTestResult.STATUS_WARNING
             if status_code == 200:
@@ -62,7 +62,7 @@ class BrokenOutgoingLinkTest(BaseSiteTest):
     """
 
     def on_page_parsed(self, page):
-
+        return
         # Only apply to internal pages
         if not page.is_internal:
             return
@@ -71,9 +71,8 @@ class BrokenOutgoingLinkTest(BaseSiteTest):
 
         broken_outgoing_links = []
         for outgoing_link in page.outgoing_links.all():
-            if outgoing_link.latest_request and outgoing_link.latest_request.response:
-                status_code = outgoing_link.latest_request.response.status_code
-                if (status_code == -1) or (status_code >= 300 and status_code < 600):
+            if outgoing_link.last_status_code:
+                if (outgoing_link.last_status_code == -1) or (outgoing_link.last_status_code >= 300 and outgoing_link.last_status_code < 600):
                     broken_outgoing_links.append(outgoing_link.url)
 
         broken_link_count = len(broken_outgoing_links)

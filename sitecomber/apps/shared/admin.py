@@ -69,7 +69,7 @@ class AdminAutocomplete(autocomplete.Select2QuerySetView):
                 else:
                     autocomplete_fields = ['pk']
 
-            print(autocomplete_fields)
+            # print(autocomplete_fields)
 
             for autocomplete_field_query in autocomplete_fields:
                 kwargs = {autocomplete_field_query: self.q}

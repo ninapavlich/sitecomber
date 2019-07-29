@@ -39,6 +39,6 @@ def filter_page_test_results(page_test_results, test, status):
 
     output = [result for result in page_test_results if (result.test == test and result.status == status)]
 
-    print("There are %s %s.%s results from %s" % (len(output), test, status, len(page_test_results)))
+    # print("There are %s %s.%s results from %s" % (len(output), test, status, len(page_test_results)))
 
     return output

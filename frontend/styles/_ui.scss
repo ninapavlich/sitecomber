@@ -50,6 +50,7 @@ a.card-title{
     background-color: $yellow;
   }
 
+  &.status-code-None:before,
   &.status-code-0:before{
     background-color: $gray-300;
   }

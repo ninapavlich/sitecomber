@@ -1,0 +1,12 @@
+{% with errors=object.error_test_results %}
+{% if errors|length > 0 %}
+<a 
+  href="{% url 'page-result-detail' object.site_domain.site.pk object.pk %}" 
+  title="{% for error in errors %}{{error.message}}{% if not forloop.last %}, {%endif %}{% endfor %}"
+>
+  <span class="badge badge-danger p-1 ml-2" >
+     {{errors|length}} error{% if errors|length > 1 %}s{% endif %}
+  </span>
+</a>
+{% endif %}
+{% endwith %}

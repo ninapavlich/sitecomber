@@ -1,33 +1,20 @@
-import os
 import logging
 from urllib.parse import urlparse
 
 from django.conf import settings
 from django.db import models
+from django.db.models import F
+from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.text import Truncator
 
+
 from sitecomber.apps.shared.models import BaseMetaData, BaseURL, BaseRequest, BaseResponse, BaseTestResult
 from sitecomber.apps.shared.utils import LinkParser, TitleParser, load_url
 
+
 logger = logging.getLogger('django')
-
-
-# class RequestHeader(BaseHeader):
-#     parent = models.ForeignKey(
-#         'results.PageRequest',
-#         null=False,
-#         on_delete=models.CASCADE
-#     )
-
-
-# class ResponseHeader(BaseHeader):
-#     parent = models.ForeignKey(
-#         'results.PageResponse',
-#         null=False,
-#         on_delete=models.CASCADE
-#     )
 
 
 class PageResponse(BaseMetaData, BaseResponse):
@@ -171,12 +158,12 @@ class PageRequest(BaseMetaData, BaseRequest):
     def __str__(self):
         return u'%s at %s' % (self.request_url, self.load_start_time)
 
-    def load(self):
+    def load(self, user_agent, max_timeout):
         self.load_start_time = timezone.now()
         self.method = BaseRequest.METHOD_GET if self.page_result.is_internal else BaseRequest.METHOD_HEAD
         self.request_url = self.page_result.url
 
-        request_headers = {'user-agent': self.page_result.site_domain.site.get_user_agent()}
+        request_headers = {'user-agent': user_agent}
         self.request_headers = self.prepare_header_dict_for_db(request_headers)
         self.save()
 
@@ -185,7 +172,7 @@ class PageRequest(BaseMetaData, BaseRequest):
             self.method,
             self.page_result.url,
             request_headers,
-            self.page_result.site_domain.site.get_max_timeout_seconds()
+            max_timeout
         )
         if error_message or response.status_code != 200 and self.method == BaseRequest.METHOD_HEAD:
             logger.warn("HEAD Request was unsuccessful on %s, falling back to normal GET request." % (self.page_result.url))
@@ -195,7 +182,7 @@ class PageRequest(BaseMetaData, BaseRequest):
                 self.method,
                 self.page_result.url,
                 request_headers,
-                self.page_result.site_domain.site.get_max_timeout_seconds()
+                max_timeout
             )
 
         self.load_end_time = timezone.now()
@@ -230,7 +217,19 @@ class PageResult(BaseMetaData, BaseURL):
         'config.SiteDomain',
         on_delete=models.CASCADE
     )
-    last_load_time = models.DateTimeField(blank=True, null=True)
+    last_load_start_time = models.DateTimeField(blank=True, null=True)
+    last_load_end_time = models.DateTimeField(blank=True, null=True)
+    last_status_code = models.IntegerField(blank=True, null=True)
+    last_content_type = models.CharField(max_length=255, blank=True, null=True)
+    last_content_length = models.IntegerField(blank=True, null=True)
+    last_text_content = models.TextField(blank=True, null=True)
+
+    error_synopsis = models.TextField(blank=True, null=True)
+    warning_synoposis = models.TextField(blank=True, null=True)
+
+    load_start_time = models.DateTimeField(blank=True, null=True)
+    load_end_time = models.DateTimeField(blank=True, null=True)
+
     incoming_links = models.ManyToManyField('self', symmetrical=False, related_name="page_incoming_links",)
     outgoing_links = models.ManyToManyField('self', symmetrical=False, related_name="page_outgoing_links",)
 
@@ -238,12 +237,62 @@ class PageResult(BaseMetaData, BaseURL):
     is_root = models.BooleanField(default=False)
     is_internal = models.BooleanField(default=True)
 
+    @classmethod
+    def _raw_get_batch_to_load(cls, site_domain, rook_pk, start_index, end_index):
+        return cls.objects\
+            .filter(site_domain=site_domain)\
+            .exclude(pk=rook_pk)\
+            .order_by(F('last_load_start_time').desc(nulls_last=True)).reverse()[start_index:end_index]
+
+    @classmethod
+    def get_batch_to_load(cls, site_domain, rook_pk, load_batch_size):
+
+        # This version is very memory intensive if a queryset is very large:
+        # pages = cls.objects\
+        #     .filter(site_domain=self)\
+        #     .exclude(pk=root_page.pk)\
+        #     .order_by(F('last_load_start_time').desc(nulls_last=True)).reverse()
+
+        # ctr = 0
+        # for page in pages:
+        #     log_memory("---- Before loading page %s" % (ctr))
+        #     if ctr > load_batch_size:
+        #         break
+        #     if page.should_load():
+        #         output.append(page)
+        #         ctr += 1
+
+        # This version handles pagination to load as little as possible:
+        output = []
+        ctr = 0
+        batch_increment = 0
+        page_size = 100
+
+        while ctr < load_batch_size:
+            next_batch = cls._raw_get_batch_to_load(site_domain, rook_pk, batch_increment, batch_increment + page_size)
+
+            for page in next_batch:
+
+                if ctr >= load_batch_size:
+                    break
+                if page.should_load():
+                    output.append(page)
+                    ctr += 1
+
+            # If we dont have any more items in the list, then we are done here.
+            if len(next_batch) < load_batch_size:
+                ctr = load_batch_size
+            else:
+                batch_increment += page_size
+
+        return output
+
     def should_load(self):
         do_load = False
-        if not self.last_load_time:
+        if not self.last_load_start_time:
             do_load = True
         else:
-            time_since_last_load = timezone.now() - self.last_load_time
+            time_since_last_load = timezone.now() - self.last_load_start_time
             if self.is_internal:
                 logger.debug(u"Time since last load: %s min is %s " % (time_since_last_load.total_seconds(), settings.MIN_SECONDS_BETWEEN_INTERNAL_PAGE_CRAWL))
                 do_load = (time_since_last_load.total_seconds() > settings.MIN_SECONDS_BETWEEN_INTERNAL_PAGE_CRAWL)
@@ -254,7 +303,7 @@ class PageResult(BaseMetaData, BaseURL):
         logger.debug(u"Should load %s? %s" % (self, do_load))
         return do_load
 
-    def load(self):
+    def load(self, user_agent, max_timeout):
         logger.info(u"Loading %s" % (self))
 
         # First clean old records
@@ -264,15 +313,39 @@ class PageResult(BaseMetaData, BaseURL):
 
         result = PageRequest(page_result=self)
         result.save()
-        result.load()
+        result.load(user_agent, max_timeout)
 
-        if result.response and result.response.text_content:
-            parser = TitleParser()
-            parser.feed(result.response.text_content)
-            self.title = parser.title if parser.title else self.url
+        if result.response:
+            if result.response.text_content:
+                parser = TitleParser()
+                parser.feed(result.response.text_content)
+                self.title = parser.title if parser.title else self.url
+                self.last_text_content = result.response.text_content
 
-        self.last_load_time = timezone.now()
+            self.last_load_start_time = result.response.load_start_time
+            self.last_load_end_time = result.response.load_end_time
+            self.last_status_code = result.response.status_code
+            self.last_content_type = result.response.content_type
+            self.last_content_length = result.response.content_length
+        else:
+            self.last_load_start_time = self.last_load_end_time = timezone.now()
+            self.last_status_code = None
+            self.last_content_type = None
+            self.last_content_length = None
+
         self.save()
+
+    def render_synoposes(self):
+        self.error_synopsis = render_to_string('results/partials/pagresult__error_synopsis.html', {'object': self})
+        self.warning_synoposis = render_to_string('results/partials/pagresult__warning_synopsis.html', {'object': self})
+        self.save()
+
+    @property
+    def last_time_elapsed_ms(self):
+        if self.last_load_end_time and self.last_load_start_time:
+            dt = self.last_load_end_time - self.last_load_start_time
+            return int(round(dt.total_seconds() * 1000))
+        return None
 
     @cached_property
     def latest_request(self):
@@ -284,18 +357,6 @@ class PageResult(BaseMetaData, BaseURL):
             if request.response:
                 return request.response
         return None
-
-    @cached_property
-    def latest_status_code(self):
-        for request in self.pagerequest_set.all():
-            if request.response:
-                return request.response.status_code
-
-        # Less efficient:
-        # latest_request = self.pagerequest_set.select_related('response').order_by('-created').first()
-        # if latest_request and latest_request.response:
-        #     return self.latest_request.response.status_code
-        return 0
 
     @cached_property
     def incoming_links_with_prefetch(self):

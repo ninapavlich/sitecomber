@@ -7049,7 +7049,7 @@ a.card-title {
   border-radius: 0.25em;
   background-color: #ffc107; }
 
-.status-code.status-code-0:before {
+.status-code.status-code-None:before, .status-code.status-code-0:before {
   background-color: #dee2e6; }
 
 .status-code.status-code-200:before {
