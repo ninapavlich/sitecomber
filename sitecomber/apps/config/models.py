@@ -66,7 +66,7 @@ class Site(BaseMetaData):
 
     @cached_property
     def tests(self):
-        return [item.class_instance for item in self.sitetestsetting_set.all()]
+        return [item.class_instance for item in self.sitetestsetting_set.filter(active=True)]
 
     @cached_property
     def domains(self):
