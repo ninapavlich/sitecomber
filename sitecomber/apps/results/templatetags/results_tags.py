@@ -21,7 +21,7 @@ def highlight_spelling_errors(value, misspellings, autoescape=True):
     for word in misspellings:
 
         try:
-            pattern = re.compile(word, re.IGNORECASE)
+            pattern = re.compile(r'(\b%s\b)' % (word), re.IGNORECASE)
             value = pattern.sub(r"<span class='bg-danger text-light'>\g<0></span>", value)
         except Exception as e:
             logger.error("Error highlighting misspellings: %s" % (e))
