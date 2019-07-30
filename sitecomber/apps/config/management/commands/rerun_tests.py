@@ -45,3 +45,4 @@ class Command(BaseCommand):
             print("- Running tests on %s" % (page))
             for test in tests:
                 test.page_parsed(page)
+            page.render_synoposes()
