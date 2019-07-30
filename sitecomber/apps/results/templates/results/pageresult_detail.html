@@ -143,27 +143,29 @@
           {% get_test_result_by_type object "sitecomber_article_tests.tests.SpellCheckTest" as spell_check_test %}
           {% get_test_result_by_type object "sitecomber_article_tests.tests.PlaceholderTextTest" as placeholder_text_test %} 
 
-          {% if reader_test.success %}
+
+
+          {% if reader_test.data_json.article %}
           <h4 class="text-info">Article Detected:</h4>
           <article class="mb-4 p-4 bg-light rounded">
             <h1>{{reader_test.data_json.article.title}}</h1>
-            {% if reader_test.status == 'success' %}
-              <small
-                ><strong>Read time:</strong>
-                {{readtime_test.data_json.read_time}}</small
-              >
+            {% if readtime_test.data_json.read_time %}
+              <small>
+                <strong>Read time:</strong>
+                {{readtime_test.data_json.read_time}}
+              </small>
             {% endif %} 
 
             {% if reader_test.data_json.article.publish_date %}
-              <h3>{{reader_test.data_json.article.publish_date}}</h3>
+              <h3 class="h5">{{reader_test.data_json.article.publish_date}}</h3>
             {% else %}
-              <h3 class="text-danger">No publish date identified</h3>
+              <h3 class="text-danger h5">No publish date identified</h3>
             {% endif %} 
 
             {% if reader_test.data_json.article.authors %}
-              <h4>{{reader_test.data_json.article.authors}}</h4>
+              <h4 class=" h6">{{reader_test.data_json.article.authors}}</h4>
             {% else %}
-              <h4 class="text-danger">No authors identified</h4>
+              <h4 class="text-danger h6">No authors identified</h4>
             {% endif %} 
 
             {% if reader_test.data_json.article.top_image %}
