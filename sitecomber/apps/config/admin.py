@@ -89,7 +89,9 @@ class SiteAdmin(admin.ModelAdmin):
     form = SiteForm
     change_form_template = 'admin/site_change_form.html'
 
-    list_display_links = list_display = ['owner', 'title', 'created', 'active']
+    list_display = ['title', 'owner', 'created', 'active']
+    list_display_links = ['title']
+    list_editable = ['active']
     list_filter = ['owner', 'active']
     readonly_fields = ['created', 'modified']
 

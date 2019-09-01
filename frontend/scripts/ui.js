@@ -26,3 +26,6 @@ $('.viewlink.list').on('click', function (e) {
   $('#links').removeClass('sitemap').removeClass('zoomed-out');
   $(".viewlink.list").addClass('badge-info').removeClass('badge-secondary');
 })
+
+
+$("#sitemap").sitemap(); 
