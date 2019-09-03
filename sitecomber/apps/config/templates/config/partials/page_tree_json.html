@@ -1,0 +1,11 @@
+  {
+    "url": "{{child.page_url}}",
+    "title": "{{child.page.title|escapejs}}",
+    "path": "{{child.path}}",
+    "full_path": "{{child.full_path}}",
+    "children": [
+    {% for key, sub_child in child.children.items %}
+    {% include 'config/partials/page_tree_json.html' with child=sub_child %}{% if not forloop.last %},{% endif %}
+    {% endfor %}
+    ]
+  }

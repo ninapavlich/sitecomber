@@ -16,10 +16,6 @@
         this.element = element;
 
         this.options = $.extend( {}, defaults, options) ;
-
-
-        console.log("NEW SITEMAP VISUALIZER!")
-
         
 
         this.windows = {};
@@ -30,6 +26,8 @@
     Sitemap.prototype = {
 
         init: function() {
+
+            return;
             
             this.canvas = document.createElement('canvas');
             this.canvas.id = "SitemapCanvas";
@@ -51,11 +49,20 @@
 
             this.render()
         },
+
+        
        
         render: function() {
-            //Update view
+            this.renderPositionDots();
+            this.renderLines();
+        },
 
-          
+
+        renderPositionDots: function() {
+
+        },
+        renderLines: function() {
+
         },
 
         addListeners: function() {
