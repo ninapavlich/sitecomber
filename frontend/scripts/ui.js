@@ -28,4 +28,11 @@ $('.viewlink.list').on('click', function (e) {
 })
 
 
-$("#sitemap").sitemap(); 
+
+
+$( document ).ready(function() {
+  console.log( "ready!" );
+  console.log('sitemap_data');
+  console.log(window['sitemap_data'])
+  $("#sitemap").sitemap(window['sitemap_data']); 
+});

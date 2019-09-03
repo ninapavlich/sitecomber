@@ -1,6 +1,20 @@
 {% extends 'base.html' %}
 {% block bodyclass %}{{block.super}} site-detail{% endblock %}
 
+
+{% block js %}
+{{block.super}}
+<script>
+  var sitemap_data = [
+  {% for key, item in object.page_results_hierarchy.items %}
+  {% include 'config/partials/page_tree_json.html' with child=item %}{% if not forloop.last %},{% endif %}
+  {% endfor %}
+  ]
+</script>
+{% endblock %}
+
+
+
 {% block inner %}
 <nav aria-label="breadcrumb" class="my-4">
   <ol class="breadcrumb">
