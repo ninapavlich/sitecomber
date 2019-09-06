@@ -157,8 +157,16 @@ class Site(BaseMetaData):
 
     @cached_property
     def pages_with_errors(self):
-        # TODO -- optimize
-        return list(set([item.page for item in self.error_page_test_results if item.page.is_internal]))
+
+        # Optimized version
+        return list(set([page for page in PageTestResult.objects.filter(
+            page__site_domain__site=self,
+            page__is_internal=True,
+            status=BaseTestResult.STATUS_ERROR
+        ).only('page')]))
+
+        # 2.5s SLOWER VERSION
+        # return list(set([item.page for item in self.error_page_test_results if item.page.is_internal]))
 
     def __str__(self):
         return self.title
