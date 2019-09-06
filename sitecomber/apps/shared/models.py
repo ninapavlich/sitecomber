@@ -190,11 +190,20 @@ class BaseResponse(BaseHeaders):
         abstract = True
 
 
+class TruncatingCharField(models.CharField):
+
+    def get_prep_value(self, value):
+        value = super(TruncatingCharField, self).get_prep_value(value)
+        if value:
+            return value[:self.max_length]
+        return value
+
+
 class BaseTestResult(models.Model):
 
     test = models.CharField(max_length=255, choices=get_test_choices())
     data = models.TextField(blank=True, null=True)
-    message = models.TextField(blank=True, null=True)
+    message = TruncatingCharField(blank=True, null=True, max_length=2000)
 
     STATUS_NONE = 'none'
     STATUS_INFO = 'info'
