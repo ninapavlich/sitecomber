@@ -113,15 +113,15 @@ class Site(BaseMetaData):
 
     @cached_property
     def internal_page_results(self):
-        return self.page_results.filter(is_internal=True)
+        return self.page_results.filter(is_internal=True).defer('last_text_content')
 
     @cached_property
     def external_page_results(self):
-        return self.page_results.filter(is_internal=False)
+        return self.page_results.filter(is_internal=False).defer('last_text_content')
 
     @cached_property
     def uncrawled_page_results(self):
-        return self.page_results.filter(last_load_start_time=None)
+        return self.page_results.filter(last_load_start_time=None).defer('last_text_content')
 
     @cached_property
     def has_fully_crawled_site(self):
