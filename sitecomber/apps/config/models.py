@@ -78,7 +78,7 @@ class Site(BaseMetaData):
 
     @cached_property
     def page_results(self):
-        return PageResult.objects.filter(site_domain__site=self)
+        return PageResult.objects.filter(site_domain__site=self).defer('last_text_content')
 
     @cached_property
     def page_results_hierarchy(self):
@@ -113,15 +113,15 @@ class Site(BaseMetaData):
 
     @cached_property
     def internal_page_results(self):
-        return self.page_results.filter(is_internal=True).defer('last_text_content')
+        return self.page_results.filter(is_internal=True)
 
     @cached_property
     def external_page_results(self):
-        return self.page_results.filter(is_internal=False).defer('last_text_content')
+        return self.page_results.filter(is_internal=False)
 
     @cached_property
     def uncrawled_page_results(self):
-        return self.page_results.filter(last_load_start_time=None).defer('last_text_content')
+        return self.page_results.filter(last_load_start_time=None)
 
     @cached_property
     def has_fully_crawled_site(self):
@@ -129,7 +129,7 @@ class Site(BaseMetaData):
 
     @cached_property
     def page_test_results(self):
-        return PageTestResult.objects.filter(page__site_domain__site=self).select_related('page')
+        return PageTestResult.objects.filter(page__site_domain__site=self).select_related('page').defer('data', 'page__last_text_content')
 
     @cached_property
     def successful_page_test_results(self):
