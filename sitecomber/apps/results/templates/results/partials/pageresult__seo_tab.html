@@ -42,7 +42,6 @@
   <strong>Facebook Preview</strong>
   <div class="facebook-preview my-4  mx-auto">
     <figure>
-      {% if social_test.data_json.property__ogtype == 'article' %}
       <img src="{{social_test.data_json.property__ogimage}}" />
       <figcaption>
         <h6>{{social_test.data_json.property__ogtitle}}</h6>
@@ -50,9 +49,6 @@
         <small>{{object.site_domain.url}}</small>
       </figcaption>
     </figure>
-    {% else %}
-    <h6>TODO -- implement preview for og:type <strong>{{social_test.data_json.property__ogtype}}</strong></h6>
-    {% endif %}
   </div>
   <a href="https://developers.facebook.com/tools/debug/">Facebook Sharing Debugger</a>
 </div>
@@ -62,7 +58,7 @@
   <div class="twitter-preview my-4  mx-auto">
     <figure>
 
-      {% if social_test.data_json.name__twittercard == 'summary_large_image' %}
+
       {% if not social_test.data_json.name__twitterimagesrc %}
       <div class="image-container" >
         <img src="{{social_test.data_json.property__ogimage}}" />
@@ -82,9 +78,7 @@
       </small>
       </figcaption>
     </figure>
-    {% else %}
-    <h6>TODO -- implement preview for og:type <strong>{{social_test.data_json.property__ogtype}}</strong></h6>
-    {% endif %}
+
   </div>
   <a href="https://cards-dev.twitter.com/validator">Twitter Card Validator</a>
 </div>
