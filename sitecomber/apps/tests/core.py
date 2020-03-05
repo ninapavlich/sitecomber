@@ -62,7 +62,6 @@ class BrokenOutgoingLinkTest(BaseSiteTest):
     """
 
     def on_page_parsed(self, page):
-        return
         # Only apply to internal pages
         if not page.is_internal:
             return
