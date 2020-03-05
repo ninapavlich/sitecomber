@@ -1,6 +1,6 @@
   {
     "url": "{{child.page_url}}",
-    "title": "{{child.page.title|escapejs}}",
+    "name": "/{{child.path}}/ {% if child.page %}{{child.page.title|escapejs}}{% else %}[missing]{% endif %}",
     "path": "{{child.path}}",
     "full_path": "{{child.full_path}}",
     "children": [

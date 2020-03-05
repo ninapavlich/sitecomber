@@ -17,6 +17,9 @@ module.exports = {
     filename: 'main.js',
     path: path.resolve(__dirname, '../sitecomber/apps/shared/static')
   },
+  optimization: {
+        minimize: false
+    },
   module: {
         rules: [
 

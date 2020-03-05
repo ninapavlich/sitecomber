@@ -168,10 +168,10 @@ class PageTestResultAdmin(admin.ModelAdmin):
 class PageResultAdmin(admin.ModelAdmin):
 
     list_display_links = ['view_title', 'view_url', 'last_load_start_time', 'last_time_elapsed_ms', 'last_status_code']
-    list_display = ['site_domain', 'view_title', 'view_url', 'last_load_start_time', 'last_time_elapsed_ms', 'last_status_code', 'visit_url']
+    list_display = ['view_site_domain_title', 'url_root', 'view_title', 'view_url', 'last_load_start_time', 'last_time_elapsed_ms', 'last_status_code', 'visit_url']
     list_filter = ['site_domain__site', 'site_domain', 'is_sitemap', 'is_root',
-                   'is_internal', 'last_status_code', 'last_content_type']
-    readonly_fields = ['site_domain', 'url', 'view_url', 'created', 'modified',
+                   'is_internal', 'last_status_code', 'last_content_type', 'url_root',]
+    readonly_fields = ['site_domain', 'view_site_domain_title', 'url', 'url_root','view_url', 'created', 'modified',
                        'title', 'last_load_start_time', 'last_load_end_time', 'last_time_elapsed_ms',
                        'last_status_code', 'last_content_type',
                        'last_content_length', 'view_site_settings',
@@ -190,6 +190,7 @@ class PageResultAdmin(admin.ModelAdmin):
                 'site_domain',
                 'title',
                 'url',
+                'url_root',
                 'is_sitemap',
                 'is_root',
                 'is_internal',
@@ -210,6 +211,9 @@ class PageResultAdmin(admin.ModelAdmin):
 
     inlines = [PageRequestInline, PageTestResultInline]
     custom_list_order_by = 'title'
+
+    def view_site_domain_title(self, obj):
+        return obj.site_domain.title
 
     def view_title(self, obj):
         return Truncator(obj.title).chars(80)

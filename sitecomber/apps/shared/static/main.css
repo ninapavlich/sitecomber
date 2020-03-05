@@ -6985,11 +6985,11 @@ body {
   margin-bottom: 0; }
 
 .nav-masthead .nav-link {
-  padding: .25rem 0;
+  padding: 0.25rem 0;
   font-weight: 700;
   color: rgba(255, 255, 255, 0.5);
   background-color: transparent;
-  border-bottom: .25rem solid transparent; }
+  border-bottom: 0.25rem solid transparent; }
 
 .nav-masthead .nav-link:hover,
 .nav-masthead .nav-link:focus {

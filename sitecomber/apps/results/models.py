@@ -233,6 +233,7 @@ class PageResult(BaseMetaData, BaseURL):
     incoming_links = models.ManyToManyField('self', symmetrical=False, related_name="page_incoming_links",)
     outgoing_links = models.ManyToManyField('self', symmetrical=False, related_name="page_outgoing_links",)
 
+    url_root = models.TextField(blank=True, null=True)
     is_sitemap = models.BooleanField(default=False)
     is_root = models.BooleanField(default=False)
     is_internal = models.BooleanField(default=True)
@@ -419,6 +420,9 @@ class PageResult(BaseMetaData, BaseURL):
 
         if not self.title:
             self.title = self.url
+
+        if not self.url_root:
+            self.url_root = '{uri.scheme}://{uri.netloc}'.format(uri=urlparse(self.url))
 
         super(PageResult, self).save(*args, **kwargs)
 

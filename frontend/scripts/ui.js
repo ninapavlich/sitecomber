@@ -31,8 +31,5 @@ $('.viewlink.list').on('click', function (e) {
 
 
 $( document ).ready(function() {
-  console.log( "ready!" );
-  console.log('sitemap_data');
-  console.log(window['sitemap_data'])
-  $("#sitemap").sitemap(window['sitemap_data']); 
+  $("#sitemap").sitemap({'data':window['sitemap_data']}); 
 });

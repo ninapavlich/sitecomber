@@ -68,7 +68,7 @@ Then run the following commands:
     python download_nltk_libs.py
     python manage.py migrate
     python manage.py loaddata sitecomber/apps/config/fixtures/example_data.json
-    python manage.py setpassword admin
+    python manage.py changepassword admin
     # Follow interactive commands to reset admin password
     python manage.py runserver
 ```
@@ -77,7 +77,7 @@ With the local server running, you may browse the admin CMS at:
 
 http://localhost:8000/admin/
 
-Log in with the credentials you provided when you ran the 'createsuperuser' command.
+Log in with the credentials you provided when you ran the 'changepassword' command.
 
 To bootstrap the frontend for development:
 
@@ -137,8 +137,8 @@ To adjust how fast the worker crawls, adjust the WORKER_LOOP_DELAY_SECONDS value
 1. Create the Test
 
 ```python
-    # example_test.py 
-    
+    # example_test.py
+
     from sitecomber.apps.shared.interfaces import BaseSiteTest
 
     class ExamplePageTest(BaseSiteTest):
@@ -150,8 +150,8 @@ To adjust how fast the worker crawls, adjust the WORKER_LOOP_DELAY_SECONDS value
             for source
             """
             print(u"Parsed sitemap %s"%(sitemap_item.url))
-            
-          
+
+
         def on_page_parsed(self, page):
             from sitecomber.apps.results.models import PageTestResult
 
@@ -169,12 +169,12 @@ To adjust how fast the worker crawls, adjust the WORKER_LOOP_DELAY_SECONDS value
                 r.message = message
                 r.status = status
                 r.save()
-            
+
 ```
 
 2. Save Test File
 
-Either place this in the sitecomber source code, in sitecomber/apps/tests/example_test.py or save this in an external repository and make it an installable application with PyPi. 
+Either place this in the sitecomber source code, in sitecomber/apps/tests/example_test.py or save this in an external repository and make it an installable application with PyPi.
 
 See [sitecomber-article-tests](https://github.com/ninapavlich/sitecomber-article-tests) to see an example set of custom installable tests.
 
@@ -199,4 +199,3 @@ In order to re-apply the new tests to your existing site, run the following comm
   # Re-run tests on site with primary key = 1
   python manage.py rerun_tests 1
 ```
-
