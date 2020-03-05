@@ -24,7 +24,7 @@
   {% endif %}
 
   {% if reader_test.data_json.article.authors %}
-    <h4 class=" h6">{{reader_test.data_json.article.authors}}</h4>
+    <h4 class=" h6">{% for author in reader_test.data_json.article.authors %}{{author}}{% if not forloop.last %}, {% endif %}{% endfor %}</h4>
   {% else %}
     <h4 class="text-danger h6">No authors identified</h4>
   {% endif %}
