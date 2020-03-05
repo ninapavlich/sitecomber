@@ -211,8 +211,9 @@ class PageRequest(BaseMetaData, BaseRequest):
 
 
 class PageResult(BaseMetaData, BaseURL):
+    TITLE_MAX_LENGTH = 1000
 
-    title = models.CharField(max_length=1000, blank=True, null=True)
+    title = models.CharField(max_length=TITLE_MAX_LENGTH, blank=True, null=True)
     site_domain = models.ForeignKey(
         'config.SiteDomain',
         on_delete=models.CASCADE
@@ -420,6 +421,8 @@ class PageResult(BaseMetaData, BaseURL):
 
         if not self.title:
             self.title = self.url
+
+        self.title = self.title[:PageResult.TITLE_MAX_LENGTH]
 
         if not self.url_root:
             self.url_root = '{uri.scheme}://{uri.netloc}'.format(uri=urlparse(self.url))
