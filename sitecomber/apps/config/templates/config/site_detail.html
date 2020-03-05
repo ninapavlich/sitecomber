@@ -1,22 +1,6 @@
 {% extends 'base.html' %}
 {% block bodyclass %}{{block.super}} site-detail{% endblock %}
-{% block js %}
-{{block.super}}
-<script>
-  var sitemap_data =
-  {
-      "name": "{{object}}",
-      "url": "{{object.url}}",
-      "path": "/",
-      "full_path": "{{object.url}}",
-      "children": [
-    {% for key, item in object.page_results_hierarchy.items %}
-    {% include 'config/partials/page_tree_json.html' with child=item %}{% if not forloop.last %},{% endif %}
-    {% endfor %}
-    ]
-  }
-</script>
-{% endblock %}
+
 
 {% block inner %}
 <nav aria-label="breadcrumb" class="my-4">
@@ -85,7 +69,6 @@
       {% endif %}
     </ul>
 
-    <div id="sitemap"></div>
 
     {% if object.internal_page_results|length > 0 %}
     <ul class="list-unstyled clearfix">
