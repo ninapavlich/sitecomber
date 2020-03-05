@@ -32,6 +32,9 @@ dl{
     margin-bottom: 1em;
     border-bottom: 1px solid transparent;
   }
+  & > *:nth-child(2n+1) {
+    clear: both;
+  }
 }
 a.card-title{
   text-decoration: none;
@@ -102,10 +105,10 @@ a.card-title{
     }
 
     & > ul > li > .child{
-      
+
       & > .path{
-        background-color: #6c757d4f; 
-        padding: 0.5em 1em; 
+        background-color: #6c757d4f;
+        padding: 0.5em 1em;
         width: 264px;
       }
       &:before{

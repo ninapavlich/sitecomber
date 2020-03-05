@@ -243,7 +243,7 @@ class PageResult(BaseMetaData, BaseURL):
         return cls.objects\
             .filter(site_domain=site_domain)\
             .exclude(pk=rook_pk)\
-            .order_by(F('last_load_start_time').desc(nulls_last=True)).reverse()[start_index:end_index]
+            .order_by(F('last_load_start_time').desc(nulls_last=True)).reverse().order_by('is_internal')[start_index:end_index]
 
     @classmethod
     def get_batch_to_load(cls, site_domain, rook_pk, load_batch_size):
@@ -283,7 +283,7 @@ class PageResult(BaseMetaData, BaseURL):
                     ctr += 1
 
             # If we dont have any more items in the list, then we are done here.
-            if len(next_batch) < load_batch_size:
+            if len(next_batch) < page_size:
                 ctr = load_batch_size
             else:
                 batch_increment += page_size

@@ -1,0 +1,77 @@
+#seo{
+
+  .facebook-preview{
+    max-width:600px;
+    border:1px solid #ccc;
+    figure{
+      margin:0;
+    }
+    figcaption{
+      margin:0.5rem;
+    }
+    h6{
+      font-size: 1.5rem;
+      font-family: serif;
+      margin:0 0 0.5rem 0;
+    }
+    p{
+      margin:0 0 0.5rem 0;
+    }
+    small{
+      margin:0;
+      color:#999;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+  }
+  .twitter-preview{
+    max-width:510px;
+    border:1px solid #ccc;
+    border-radius: 10px;
+    overflow: hidden;
+
+    .image-container{
+      overflow: hidden;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: 50% 50%;
+      position: relative;
+
+      span{
+        position: absolute;
+        bottom:0;
+        opacity: 0.8;
+        right:0;
+        left:0;
+        text-align:center;
+      }
+    }
+
+    figure{
+      margin:0;
+    }
+    figcaption{
+      margin:1rem;
+    }
+
+    h6{
+      font-size: 15px;
+      color: rgb(20, 23, 26);
+      margin:0 0 0.5rem 0;
+    }
+    p{
+      margin:0 0 0.25rem 0;
+      color:rgb(101, 119, 134);
+      font-size: 15px;
+    }
+    small{
+      margin:0;
+      color:rgb(101, 119, 134);
+      font-size: 15px;
+      svg{
+        height: 15px;
+        fill: rgb(101, 119, 134);
+      }
+    }
+  }
+}

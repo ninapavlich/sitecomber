@@ -19,7 +19,7 @@ class PageResponseAdmin(admin.ModelAdmin):
                 ('load_start_time', 'load_end_time',),
                 ('content_type', 'content_length'),
                 'response_headers',
-                'view_text'
+                'preview_response_text'
             )
         }),
 
@@ -30,17 +30,21 @@ class PageResponseAdmin(admin.ModelAdmin):
                        'status_code',
                        'load_start_time', 'load_end_time',
                        'content_type', 'content_length', 'response_headers',
-                       'view_text', 'view_url', 'request_method']
+                       'preview_response_text', 'view_url', 'request_method']
 
     list_display = list_display_links = ['view_url', 'request_method', 'status_code']
     list_filter = ['request__method', 'status_code', 'content_type']
     search_fields = ['response_url']
+    change_form_template = 'admin/pageresponse_change_form.html'
 
     def view_url(self, obj):
         return Truncator(obj.response_url).chars(80)
 
-    def view_text(self, obj):
-        return Truncator(obj.text_content).chars(1000)
+    def preview_response_text(self, obj):
+        if self.showFull:
+            return obj.text_content
+        else:
+            return Truncator(obj.text_content).chars(1000)
 
     def request_method(self, obj):
         if obj.request:
@@ -53,6 +57,9 @@ class PageResponseAdmin(admin.ModelAdmin):
         if self.reqdirected_from:
             return format_html(u'<a href="%s">View %s</a>' % (obj.redirected_from.get_edit_url(), obj.redirected_from))
 
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        self.showFull = ("full" in request.GET)
+        return super().change_view(request, object_id, form_url, extra_context)
 
 class PageResponseInline(admin.TabularInline):
     model = PageResponse

@@ -7035,6 +7035,8 @@ dl {
     padding-left: 0.5em;
     margin-bottom: 1em;
     border-bottom: 1px solid transparent; }
+  dl > *:nth-child(2n+1) {
+    clear: both; }
 
 a.card-title {
   text-decoration: none; }
@@ -7134,3 +7136,63 @@ a.card-title {
             padding: 0 !important; }
             #links.sitemap .children .child article .card-body .flex-fill .badge {
               margin-top: 0 !important; }
+
+#article article {
+  max-width: 600px; }
+
+#seo .facebook-preview {
+  max-width: 600px;
+  border: 1px solid #ccc; }
+  #seo .facebook-preview figure {
+    margin: 0; }
+  #seo .facebook-preview figcaption {
+    margin: 0.5rem; }
+  #seo .facebook-preview h6 {
+    font-size: 1.5rem;
+    font-family: serif;
+    margin: 0 0 0.5rem 0; }
+  #seo .facebook-preview p {
+    margin: 0 0 0.5rem 0; }
+  #seo .facebook-preview small {
+    margin: 0;
+    color: #999;
+    font-weight: 600;
+    text-transform: uppercase; }
+
+#seo .twitter-preview {
+  max-width: 510px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  overflow: hidden; }
+  #seo .twitter-preview .image-container {
+    overflow: hidden;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    position: relative; }
+    #seo .twitter-preview .image-container span {
+      position: absolute;
+      bottom: 0;
+      opacity: 0.8;
+      right: 0;
+      left: 0;
+      text-align: center; }
+  #seo .twitter-preview figure {
+    margin: 0; }
+  #seo .twitter-preview figcaption {
+    margin: 1rem; }
+  #seo .twitter-preview h6 {
+    font-size: 15px;
+    color: #14171a;
+    margin: 0 0 0.5rem 0; }
+  #seo .twitter-preview p {
+    margin: 0 0 0.25rem 0;
+    color: #657786;
+    font-size: 15px; }
+  #seo .twitter-preview small {
+    margin: 0;
+    color: #657786;
+    font-size: 15px; }
+    #seo .twitter-preview small svg {
+      height: 15px;
+      fill: #657786; }
