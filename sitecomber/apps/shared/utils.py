@@ -139,9 +139,12 @@ class TitleParser(HTMLParser):
         HTMLParser.__init__(self)
         self.match = False
         self.title = ''
+        self.inHead = False
 
     def handle_starttag(self, tag, attributes):
-        self.match = True if tag == 'title' else False
+        if tag == 'head':
+            self.inHead = True
+        self.match = True if (self.inHead and tag == 'title') else False
 
     def handle_data(self, data):
         if self.match:
