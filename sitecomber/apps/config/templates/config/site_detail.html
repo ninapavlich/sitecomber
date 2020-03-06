@@ -101,7 +101,21 @@
   </aside>
 
   <div class="" id="links">
+
+    {% if object.root_page_result %}
+    {% include 'config/partials/page_preview.html' with page_result=object.root_page_result %}
+    {% endif %}
+
     <ul class="list-unstyled children">
+      <li class="clearfix">
+
+
+
+
+
+
+
+      </li>
       {% for key, item in object.page_results_hierarchy.items %}
       <li class="clearfix">
         {% include 'config/partials/page_tree.html' with child=item %}

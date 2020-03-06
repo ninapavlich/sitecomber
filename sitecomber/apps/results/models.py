@@ -424,6 +424,9 @@ class PageResult(BaseMetaData, BaseURL):
 
         self.title = self.title[:PageResult.TITLE_MAX_LENGTH]
 
+        if self.url == self.site_domain.url:
+            self.is_root = True
+
         if not self.url_root:
             self.url_root = '{uri.scheme}://{uri.netloc}'.format(uri=urlparse(self.url))
 

@@ -112,6 +112,10 @@ class Site(BaseMetaData):
         return tree
 
     @cached_property
+    def root_page_result(self):
+        return self.page_results.filter(is_root=True).first()
+
+    @cached_property
     def internal_page_results(self):
         return self.page_results.filter(is_internal=True)
 
