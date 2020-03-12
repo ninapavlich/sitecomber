@@ -29076,6 +29076,16 @@ $( document ).ready(function() {
 
 /*!
  * nina@ninalp.com
+ *
+ *  TODO List:
+ * - Add lines between connections
+ * - Add ability to visualize links VS hierarchy
+ * - Fix linking so you can click on a link without clicking on the node
+ * - Fix upside down text in ring 2
+ * - Add error indicators
+ * - Have H1 link to page detail
+ * - Add the ability to deep link to a selection to assist with preserving state
+ *
  */
 
 // Example Usage
