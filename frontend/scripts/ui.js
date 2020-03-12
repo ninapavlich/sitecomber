@@ -31,5 +31,5 @@ $('.viewlink.list').on('click', function (e) {
 
 
 $( document ).ready(function() {
-  
+  $(".interactive-sitemap").sitemap({'data':window['sitemap_data']}); 	
 });

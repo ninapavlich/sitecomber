@@ -1,8 +1,9 @@
   {
-    "url": "{{child.page_url}}",
-    "name": "/{{child.path}}/ {% if child.page %}{{child.page.title|escapejs}}{% else %}[missing]{% endif %}",
+    "url": {% if child.page_url %}"{{child.page_url}}"{% else %}null{% endif %},
+    "title": {% if child.page %}"{{child.page.title|escapejs}}"{% else %}null{% endif %},
     "path": "{{child.path}}",
     "full_path": "{{child.full_path}}",
+    "full_url": "{{child.full_url}}",
     "children": [
     {% for key, sub_child in child.children.items %}
     {% include 'config/partials/page_tree_json.html' with child=sub_child %}{% if not forloop.last %},{% endif %}

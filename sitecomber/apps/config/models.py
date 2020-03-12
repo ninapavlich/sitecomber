@@ -91,16 +91,19 @@ class Site(BaseMetaData):
             child = tree
             last_piece = None
             last_child = None
-            running_path = get_domain(result.url)
+            running_url = get_domain(result.url)
+            running_path = ''
             for piece in result_url_parsed_split:
                 last_piece = piece
                 last_child = child
+                running_url = '%s/%s' % (running_url, piece)
                 running_path = '%s/%s' % (running_path, piece)
                 if piece not in child:
                     child[piece] = {
                         'path': piece,
                         'page': None,
                         'page_url': None,
+                        'full_url': running_url,
                         'full_path': running_path,
                         'children': {}
                     }
