@@ -4,6 +4,17 @@
     "path": "{{child.path}}",
     "full_path": "{{child.full_path}}",
     "full_url": "{{child.full_url}}",
+    "info_url":{% if child.page %}"{% url 'page-result-detail' object.pk child.page.pk %}"{% else %}null{% endif %},
+
+    {% with errors=child.page.error_test_results %}
+    {% if errors|length > 0 %}
+    "errors":[{% for error in errors %}"{{error.message}}"{% if not forloop.last %}, {%endif %}{% endfor %}],
+    {% else %}
+    "errors":[],
+    {% endif %}
+    {% endwith %}
+
+
     "children": [
     {% for key, sub_child in child.children.items %}
     {% include 'config/partials/page_tree_json.html' with child=sub_child %}{% if not forloop.last %},{% endif %}

@@ -4,7 +4,9 @@
   height: 80vh;
   overflow: hidden;
 
-  margin-left: calc(-1em - ((100vw - 75em) * 0.5));
+  @media (min-width: 73em) {
+    margin-left: calc(-1em - ((100vw - 75em) * 0.5));
+  }
 
   &:after {
     box-shadow: inset 0px 0px 20px 40px $gray-800;
@@ -19,34 +21,61 @@
   .node {
     position: absolute;
 
-    &:before {
-      content: "";
-      display: inline-block;
-      width: 1em;
-      height: 1em;
-      border-radius: 0.5em;
+    .ring{
       cursor: pointer;
+      position: absolute;
+      left:-0.5em;
+      top:-0.5em;
+      z-index: 900;
+
+      &:before {
+        content: "";
+        display: inline-block;
+        width: 1em;
+        height: 1em;
+        border-radius: 0.5em;
+
+      }
     }
 
-    &.site:before {
-      width: 2em;
-      height: 2em;
-      border-radius: 1em;
-      background-color: $blue;
+    &.site{
+
+      .ring{
+        left: -1em;
+        top: -1em;
+
+        &:before {
+          width: 2em;
+          height: 2em;
+          border-radius: 1em;
+          background-color: $blue;
+        }
+      }
+      .flag-rotated h1{
+        margin: 0 3em;
+      }
     }
-    &.page:before {
+
+    &.page .ring:before {
       background-color: $gray-200;
     }
-    &.page.leaf:before {
+    &.page.leaf .ring:before {
       border: 0.125em solid $gray-200;
       background-color: transparent;
     }
-    &.path:before {
+    &.path .ring:before {
       background-color: $gray-600;
     }
-    &.path.leaf:before {
+    &.path.leaf .ring:before {
       border: 0.125em solid $gray-600;
       background-color: transparent;
+    }
+
+    &.errors{
+      .ring:before {
+        background-color: $red !important;
+        border-color: $red !important;
+      }
     }
 
     .flag-rotated{
@@ -54,8 +83,8 @@
       position: absolute;
       transform: rotate(-45deg);
       transform-origin: 0 0;
-      left: 0.5em;
-      top: 0.5em;
+      cursor: pointer;
+      z-index: 900;
 
       h1 {
         font-size: 0.75rem;
@@ -69,6 +98,7 @@
 
       padding: 0.5em 1em;
       position: absolute;
+      z-index: 800;
 
       font-size: 0.75rem;
       line-height: normal;
@@ -99,7 +129,7 @@
         content: "";
         position: absolute;
         background-color: $blue;
-        height: calc(100% + 3em);
+        height: calc(100% + 2em);
         width: 1px;
       }
 
@@ -118,18 +148,18 @@
       }
 
       &.flag-up-right {
-        transform: translate(0px, -3em);
+        transform: translate(0px, -1em);
         transform-origin: left bottom;
         border-radius: 0 0.5em 0.5em 0;
         left: 50%;
-        bottom: 1rem;
+        bottom: 0.5em;
         &:before {
           left: 0;
           top: 0;
         }
       }
       &.flag-up-left {
-        transform: translate(0px, -3em);
+        transform: translate(0px, -1em);
         transform-origin: left bottom;
         border-radius: 0.5em 0 0 0.5em 0.5em;
         right: 50%;
@@ -140,7 +170,7 @@
         }
       }
       &.flag-down-right {
-        transform: translate(0px, 3em);
+        transform: translate(0px, 1em);
         transform-origin: left bottom;
         border-radius: 0 0.5em 0.5em 0;
         left: 50%;
@@ -151,7 +181,7 @@
         }
       }
       &.flag-down-left {
-        transform: translate(0px, 3em);
+        transform: translate(0px, 1em);
         transform-origin: left bottom;
         border-radius: 0.5em 0 0 0.5em 0.5em;
         right: 50%;
@@ -162,25 +192,23 @@
         }
       }
     }
-    &:hover {
-      z-index: 1000;
 
-      &:before {
+    &.layer-0 {
+      .ring:before{
         background-color: $blue !important;
         border-color: $blue !important;
       }
-      .flag {
-        display:block;
-        &:after {
-          display: block;
+      &.errors{
+        .ring:before {
+          background-color: $red !important;
+          border-color: $red !important;
         }
       }
-    }
-    &.layer-0 {
       .flag {
+        z-index: 1000;
         display:block;
         border-radius: 0.5em;
-        background-color: rgba(0,0,0,0.8) !important;
+        background-color: #2b2e31f2 !important;
         transform: translate(-50%, -50%);
         &:before {
           display: none;
@@ -192,6 +220,38 @@
         display:block;
         h2, p{
           display:none;
+        }
+      }
+    }
+
+    &:hover {
+      z-index: 1000;
+
+      .ring:before {
+        background-color: $blue !important;
+        border-color: $blue !important;
+      }
+      .flag-rotated{
+        color: $blue !important;
+      }
+      .flag {
+        display:block;
+        &:after {
+          display: block;
+        }
+      }
+
+      &.errors{
+        .ring:before {
+          background-color: $red !important;
+          border-color: $red !important;
+        }
+        .flag-rotated{
+          color: $red !important;
+        }
+        .flag,
+        .flag:before{
+          background-color: $red !important;
         }
       }
     }

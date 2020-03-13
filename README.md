@@ -6,7 +6,7 @@ With this snapshot you are able to see problems that may arise from content entr
 
 A whole suite of tests are available out of the box, but you can also write your own custom tests to fit your own needs. Some examples: You could use natural language processing to make sure your language doesn't exceed a certain reading level. Or you could hook into the Google Analytics API to correlate search performance to load times. Or you could use Selenium to generate snapshots at different window sizes... really anything you can code.
 
-[See a live demo of SiteComber](https://sitecomber-ninalp.herokuapp.com/1/)
+[See a live demo of SiteComber](https://sitecomber-nytparenting.herokuapp.com/1/)
 
 ## Featured Tests
 

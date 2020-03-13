@@ -7140,8 +7140,10 @@ a.card-title {
   position: relative;
   width: 100vw;
   height: 80vh;
-  overflow: hidden;
-  margin-left: calc(-1em - ((100vw - 75em) * 0.5)); }
+  overflow: hidden; }
+  @media (min-width: 73em) {
+    .interactive-sitemap {
+      margin-left: calc(-1em - ((100vw - 75em) * 0.5)); } }
   .interactive-sitemap:after {
     box-shadow: inset 0px 0px 20px 40px #343a40;
     content: "";
@@ -7153,35 +7155,48 @@ a.card-title {
     pointer-events: none; }
   .interactive-sitemap .node {
     position: absolute; }
-    .interactive-sitemap .node:before {
-      content: "";
-      display: inline-block;
-      width: 1em;
-      height: 1em;
-      border-radius: 0.5em;
-      cursor: pointer; }
-    .interactive-sitemap .node.site:before {
-      width: 2em;
-      height: 2em;
-      border-radius: 1em;
-      background-color: #00adba; }
-    .interactive-sitemap .node.page:before {
+    .interactive-sitemap .node .ring {
+      cursor: pointer;
+      position: absolute;
+      left: -0.5em;
+      top: -0.5em;
+      z-index: 900; }
+      .interactive-sitemap .node .ring:before {
+        content: "";
+        display: inline-block;
+        width: 1em;
+        height: 1em;
+        border-radius: 0.5em; }
+    .interactive-sitemap .node.site .ring {
+      left: -1em;
+      top: -1em; }
+      .interactive-sitemap .node.site .ring:before {
+        width: 2em;
+        height: 2em;
+        border-radius: 1em;
+        background-color: #00adba; }
+    .interactive-sitemap .node.site .flag-rotated h1 {
+      margin: 0 3em; }
+    .interactive-sitemap .node.page .ring:before {
       background-color: #e9ecef; }
-    .interactive-sitemap .node.page.leaf:before {
+    .interactive-sitemap .node.page.leaf .ring:before {
       border: 0.125em solid #e9ecef;
       background-color: transparent; }
-    .interactive-sitemap .node.path:before {
+    .interactive-sitemap .node.path .ring:before {
       background-color: #6c757d; }
-    .interactive-sitemap .node.path.leaf:before {
+    .interactive-sitemap .node.path.leaf .ring:before {
       border: 0.125em solid #6c757d;
       background-color: transparent; }
+    .interactive-sitemap .node.errors .ring:before {
+      background-color: #dc3560 !important;
+      border-color: #dc3560 !important; }
     .interactive-sitemap .node .flag-rotated {
       display: none;
       position: absolute;
       transform: rotate(-45deg);
       transform-origin: 0 0;
-      left: 0.5em;
-      top: 0.5em; }
+      cursor: pointer;
+      z-index: 900; }
       .interactive-sitemap .node .flag-rotated h1 {
         font-size: 0.75rem;
         margin: 0 1em;
@@ -7190,6 +7205,7 @@ a.card-title {
       display: none;
       padding: 0.5em 1em;
       position: absolute;
+      z-index: 800;
       font-size: 0.75rem;
       line-height: normal;
       /* flag pole */
@@ -7211,7 +7227,7 @@ a.card-title {
         content: "";
         position: absolute;
         background-color: #00adba;
-        height: calc(100% + 3em);
+        height: calc(100% + 2em);
         width: 1px; }
       .interactive-sitemap .node .flag:after {
         content: "";
@@ -7225,16 +7241,16 @@ a.card-title {
         left: 0;
         opacity: 0; }
       .interactive-sitemap .node .flag.flag-up-right {
-        transform: translate(0px, -3em);
+        transform: translate(0px, -1em);
         transform-origin: left bottom;
         border-radius: 0 0.5em 0.5em 0;
         left: 50%;
-        bottom: 1rem; }
+        bottom: 0.5em; }
         .interactive-sitemap .node .flag.flag-up-right:before {
           left: 0;
           top: 0; }
       .interactive-sitemap .node .flag.flag-up-left {
-        transform: translate(0px, -3em);
+        transform: translate(0px, -1em);
         transform-origin: left bottom;
         border-radius: 0.5em 0 0 0.5em 0.5em;
         right: 50%;
@@ -7243,7 +7259,7 @@ a.card-title {
           right: 0;
           top: 0; }
       .interactive-sitemap .node .flag.flag-down-right {
-        transform: translate(0px, 3em);
+        transform: translate(0px, 1em);
         transform-origin: left bottom;
         border-radius: 0 0.5em 0.5em 0;
         left: 50%;
@@ -7252,7 +7268,7 @@ a.card-title {
           left: 0;
           bottom: 0; }
       .interactive-sitemap .node .flag.flag-down-left {
-        transform: translate(0px, 3em);
+        transform: translate(0px, 1em);
         transform-origin: left bottom;
         border-radius: 0.5em 0 0 0.5em 0.5em;
         right: 50%;
@@ -7260,19 +7276,17 @@ a.card-title {
         .interactive-sitemap .node .flag.flag-down-left:before {
           right: 0;
           bottom: 0; }
-    .interactive-sitemap .node:hover {
-      z-index: 1000; }
-      .interactive-sitemap .node:hover:before {
-        background-color: #00adba !important;
-        border-color: #00adba !important; }
-      .interactive-sitemap .node:hover .flag {
-        display: block; }
-        .interactive-sitemap .node:hover .flag:after {
-          display: block; }
+    .interactive-sitemap .node.layer-0 .ring:before {
+      background-color: #00adba !important;
+      border-color: #00adba !important; }
+    .interactive-sitemap .node.layer-0.errors .ring:before {
+      background-color: #dc3560 !important;
+      border-color: #dc3560 !important; }
     .interactive-sitemap .node.layer-0 .flag {
+      z-index: 1000;
       display: block;
       border-radius: 0.5em;
-      background-color: rgba(0, 0, 0, 0.8) !important;
+      background-color: #2b2e31f2 !important;
       transform: translate(-50%, -50%); }
       .interactive-sitemap .node.layer-0 .flag:before {
         display: none; }
@@ -7280,6 +7294,25 @@ a.card-title {
       display: block; }
       .interactive-sitemap .node.layer-1 .flag-rotated h2, .interactive-sitemap .node.layer-1 .flag-rotated p {
         display: none; }
+    .interactive-sitemap .node:hover {
+      z-index: 1000; }
+      .interactive-sitemap .node:hover .ring:before {
+        background-color: #00adba !important;
+        border-color: #00adba !important; }
+      .interactive-sitemap .node:hover .flag-rotated {
+        color: #00adba !important; }
+      .interactive-sitemap .node:hover .flag {
+        display: block; }
+        .interactive-sitemap .node:hover .flag:after {
+          display: block; }
+      .interactive-sitemap .node:hover.errors .ring:before {
+        background-color: #dc3560 !important;
+        border-color: #dc3560 !important; }
+      .interactive-sitemap .node:hover.errors .flag-rotated {
+        color: #dc3560 !important; }
+      .interactive-sitemap .node:hover.errors .flag,
+      .interactive-sitemap .node:hover.errors .flag:before {
+        background-color: #dc3560 !important; }
 
 #article article {
   max-width: 600px; }

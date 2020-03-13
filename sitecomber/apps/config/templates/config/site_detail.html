@@ -11,6 +11,8 @@
       "path": "/",
       "full_url": "{{object.domains.0}}/",
       "full_path": "/",
+      "info_url":"{% url 'site-detail' object.pk %}",
+      "errors":[],
       "children": [
     {% for key, item in object.page_results_hierarchy.items %}
     {% include 'config/partials/page_tree_json.html' with child=item %}{% if not forloop.last %},{% endif %}

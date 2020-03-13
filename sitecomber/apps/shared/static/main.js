@@ -29081,10 +29081,9 @@ $( document ).ready(function() {
  * - Add lines between connections
  * - Add ability to visualize links VS hierarchy
  * - Fix linking so you can click on a link without clicking on the node
- * - Fix upside down text in ring 2
  * - Add error indicators
- * - Have H1 link to page detail
  * - Add the ability to deep link to a selection to assist with preserving state
+ * - Better visually distinguish broken links
  *
  */
 
@@ -29109,6 +29108,7 @@ $( document ).ready(function() {
     this.isPage = this.data.url !== null;
     this.isPath = this.data.url === null;
     this.isLeaf = this.data.children.length === 0;
+    this.hasErrors = this.data.errors.length > 0;
 
     this.markupNeedsRender = true;
     this.hierarchicalChildren = [];
@@ -29135,6 +29135,9 @@ $( document ).ready(function() {
       );
       if (this.isLeaf) {
         $(this.view).addClass("leaf");
+      }
+      if(this.hasErrors){
+        $(this.view).addClass("errors");
       }
     },
     registerHierarchicalChild: function(child) {
@@ -29188,10 +29191,13 @@ $( document ).ready(function() {
       this.markupNeedsRender = false;
     },
     getMarkup: function() {
-      var html = "<span class='flag bg-info text-light'>";
+      var html = "<span class='ring'></span>";
+      html += "<span class='flag bg-info text-light'>";
 
       var label = this.isSite ? this.data.url : "/" + this.data.path + "/";
-      html += "<h1>" + label + "</h1>";
+      html += this.data.info_url
+        ? "<h1><a href='" + this.data.info_url + "'>" + label + "</a></h1>"
+        : "<h1>" + label + "</h1>";
       html +=
         "<h2><a href='" +
         this.data.full_url +
@@ -29205,9 +29211,14 @@ $( document ).ready(function() {
           ? "<p>1 child</p>"
           : "<p>" + this.data.children.length + " children</p>";
 
+      for(var i=0; i<this.data.errors.length; i++){
+        html +="<p>" + this.data.errors[i]+"</p>";
+      }
+
       html += "</span>";
 
-      html += "<span class='flag-rotated text-light'><h1>" + label + "</h1></span>";
+      html +=
+        "<span class='flag-rotated text-light'><h1>" + label + "</h1></span>";
       return html;
     },
 
@@ -29262,7 +29273,7 @@ $( document ).ready(function() {
       var node = new Node(this, parentNode, data);
 
       var ref = this;
-      $(node.view).click(function() {
+      $(node.view).find(".ring, .flag-rotated").click(function() {
         ref.onNodeClicked(node);
       });
 
@@ -29332,7 +29343,7 @@ $( document ).ready(function() {
         // );
         var ring = rings[i];
         var radius = runningRadius;
-        var thetaStep = (Math.PI * 2) / ring.length;
+        var thetaStep = (Math.PI * 2) / (ring.length);
         var currentTheta = 0;
         var wobbleTheta = 0;
         for (var m = 0; m < ring.length; m++) {
@@ -29345,41 +29356,50 @@ $( document ).ready(function() {
           var wobbleY = addWobble
             ? Math.sin(currentTheta) * 75 * Math.cos(wobbleTheta)
             : 0;
-          var targetX =
-            centerX + radius * Math.cos(currentTheta) + wobbleX;
-          var targetY =
-            centerY + radius * Math.sin(currentTheta) + wobbleY;
+          var targetX = centerX + radius * Math.cos(currentTheta) + wobbleX;
+          var targetY = centerY + radius * Math.sin(currentTheta) + wobbleY;
 
           var flagPosition = "flag-up-right";
-          if(targetX < centerX && targetY < centerY){
+          if (targetX < centerX && targetY < centerY) {
             // top left corner
-            flagPosition = i<2? "flag-up-left" : "flag-down-right";
-          }else if(targetX < centerX && targetY > centerY){
+            flagPosition = "flag-down-right";
+          } else if (targetX < centerX && targetY > centerY) {
             // bottom left corner
-            flagPosition = i<2? "flag-down-left" : "flag-up-right";
-          }else if(targetX > centerX && targetY < centerY){
+            flagPosition = "flag-up-right";
+          } else if (targetX > centerX && targetY < centerY) {
             // top right corner
-            flagPosition = i<2? "flag-up-right" : "flag-down-left";
-          }else if(targetX > centerX && targetY > centerY){
+            flagPosition = "flag-down-left";
+          } else if (targetX > centerX && targetY > centerY) {
             // bottom right corner
-            flagPosition = i<2? "flag-down-right" : "flag-up-left";
+            flagPosition = "flag-up-left";
           }
-          $(view).find(".flag").removeClass (function (index, css) {
-             return (css.match (/(^|\s)flag-\S+/g) || []).join(' ');
-          });
-          $(view).find(".flag").addClass(flagPosition);
+          $(view)
+            .find(".flag")
+            .removeClass(function(index, css) {
+              return (css.match(/(^|\s)flag-\S+/g) || []).join(" ");
+            });
+          $(view)
+            .find(".flag")
+            .addClass(flagPosition);
 
-          var degrees = (360 * currentTheta)/(Math.PI*2);
-          $(view).find(".flag-rotated").css("transform","rotate("+degrees+"deg)");
+          var degrees = (360 * currentTheta) / (Math.PI * 2);
+          var transform =
+            degrees > 90 && degrees < 270
+              ? "rotate(" +
+                degrees +
+                "deg) scaleY(-1) scaleX(-1) translateX(-100%) translateY(-0.5em)"
+              : "rotate(" + degrees + "deg) translateY(-0.5em)";
+          $(view)
+            .find(".flag-rotated")
+            .css("transform", transform);
 
           currentTheta += thetaStep;
           wobbleTheta += 0.5;
 
-          $(view).removeClass (function (index, css) {
-             return (css.match (/(^|\s)layer-\S+/g) || []).join(' ');
+          $(view).removeClass(function(index, css) {
+            return (css.match(/(^|\s)layer-\S+/g) || []).join(" ");
           });
-          $(view).addClass("layer-"+i);
-
+          $(view).addClass("layer-" + i);
 
           $(view).animate(
             {
@@ -29398,18 +29418,15 @@ $( document ).ready(function() {
           var minRadiusPerItems = approxRingCircumference / (2 * Math.PI);
           var maxRadius = 300;
           addWobble = minRadiusPerItems > maxRadius;
-          console.log(
-            "Given that there are " +
-              rings[i + 1].length +
-              " items in the next ring, we estimate the needed circumference woudl be " +
-              approxRingCircumference +
-              " therefor we should use a radius of at least " +
-              minRadiusPerItems
-          );
-          runningRadius += Math.min(
-            maxRadius,
-            Math.max(75, minRadiusPerItems)
-          );
+          // console.log(
+          //   "Given that there are " +
+          //     rings[i + 1].length +
+          //     " items in the next ring, we estimate the needed circumference woudl be " +
+          //     approxRingCircumference +
+          //     " therefor we should use a radius of at least " +
+          //     minRadiusPerItems
+          // );
+          runningRadius += Math.min(maxRadius, Math.max(100, minRadiusPerItems));
         }
       }
     },
@@ -29418,15 +29435,14 @@ $( document ).ready(function() {
       //bind events
       var parent_ref = this;
 
-      window.addEventListener('resize', function(){
+      window.addEventListener("resize", function() {
         //Wait until we are dont gettint resize events so we dont overwhelm the processor
-        clearTimeout(parent_ref.resize_timeout)
-        parent_ref.resize_timeout = setTimeout(function(){
+        clearTimeout(parent_ref.resize_timeout);
+        parent_ref.resize_timeout = setTimeout(function() {
           parent_ref.containerWidth = $(parent_ref.element).width();
           parent_ref.containerHeight = $(parent_ref.element).height();
           parent_ref.render();
         }, 250);
-
       });
     },
 
