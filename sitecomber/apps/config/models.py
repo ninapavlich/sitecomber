@@ -4,6 +4,7 @@ import json
 from urllib.parse import urlparse
 
 from django.db import models
+from django.db.models import Prefetch
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import MultipleObjectsReturned
@@ -53,15 +54,23 @@ class Site(BaseMetaData):
 
     def parse_sitemap(self):
         tests = self.tests
+        for test in tests:
+            test.setUp()
         for domain in self.sitedomain_set.filter(should_crawl=True):
             domain.parse_sitemap(tests)
+        for test in tests:
+            test.tearDown()
 
     def crawl(self, load_batch_size):
         log_memory("before crawl")
         tests = self.tests
-        log_memory("after tests")
+        for test in tests:
+            test.setUp()
+        log_memory("after tests inited")
         for domain in self.sitedomain_set.filter(should_crawl=True):
             domain.crawl(tests, load_batch_size)
+        for test in tests:
+            test.tearDown()
         log_memory("after crawl")
 
     @cached_property
@@ -78,7 +87,7 @@ class Site(BaseMetaData):
 
     @cached_property
     def page_results(self):
-        return PageResult.objects.filter(site_domain__site=self).defer('last_text_content')
+        return PageResult.objects.filter(site_domain__site=self)
 
     @cached_property
     def page_results_hierarchy(self):
@@ -87,6 +96,7 @@ class Site(BaseMetaData):
         for result in results:
             result_url_parsed = urlparse(result.url)
             result_url_parsed_split = [path for path in result_url_parsed.path.split('/') if path]
+
 
             child = tree
             last_piece = None
@@ -120,7 +130,10 @@ class Site(BaseMetaData):
 
     @cached_property
     def internal_page_results(self):
-        return self.page_results.filter(is_internal=True)
+        return self.page_results.filter(is_internal=True)\
+            .prefetch_related('pagetestresult_set')\
+            .prefetch_related('incoming_links')\
+            .prefetch_related('outgoing_links')
 
     @cached_property
     def external_page_results(self):
@@ -136,7 +149,7 @@ class Site(BaseMetaData):
 
     @cached_property
     def page_test_results(self):
-        return PageTestResult.objects.filter(page__site_domain__site=self).select_related('page').defer('data', 'page__last_text_content')
+        return PageTestResult.objects.filter(page__site_domain__site=self).select_related('page').defer('data')
 
     @cached_property
     def successful_page_test_results(self):

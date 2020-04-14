@@ -19,5 +19,15 @@
     {% for key, sub_child in child.children.items %}
     {% include 'config/partials/page_tree_json.html' with child=sub_child %}{% if not forloop.last %},{% endif %}
     {% endfor %}
+    ],
+    "incoming": [
+    {% for link in child.page.incoming_links.all %}
+    "{{link.url}}"{% if not forloop.last %},{% endif %}
+    {% endfor %}
+    ],
+    "outgoing": [
+    {% for link in child.page.outgoing_links.all %}
+    "{{link.url}}"{% if not forloop.last %},{% endif %}
+    {% endfor %}
     ]
   }

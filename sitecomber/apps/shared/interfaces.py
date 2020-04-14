@@ -25,6 +25,12 @@ class BaseSiteTest:
             return self.__doc__
         return html
 
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
     def page_parsed(self, page):
         try:
             self.on_page_parsed(page)

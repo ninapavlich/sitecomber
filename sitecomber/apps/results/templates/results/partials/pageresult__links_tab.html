@@ -1,7 +1,9 @@
 {% load results_tags %}
-<h4>Incoming links from within {{object.site_domain.site}}</h4>
+
+{% with incoming_links=object.incoming_links_with_prefetch.all %}
+<h4>{{incoming_links|length}} Incoming link{% if incoming_links|length != 1 %}s{% endif %} from within {{object.site_domain.site}}</h4>
 <ul class="list-unstyled">
-  {% for link in object.incoming_links_with_prefetch.all %}
+  {% for link in incoming_links %}
   <li class="my-1 clearfix">
     <a
       href="{% url 'page-result-detail' link.site_domain.site.pk link.pk %}"
@@ -23,9 +25,12 @@
   <li>No internal links to this page found yet.</li>
   {% endfor %}
 </ul>
-<h4>Outgoing links</h4>
+{% endwith %}
+
+{% with outgoing_links=object.outgoing_links_with_prefetch.all %}
+<h4>{{outgoing_links|length}} Outgoing link{% if incoming_links|length != 1 %}s{% endif %} from this page</h4>
 <ul class="list-unstyled">
-  {% for link in object.outgoing_links_with_prefetch.all %}
+  {% for link in outgoing_links %}
   <li class="my-1 clearfix">
     <a
       href="{% url 'page-result-detail' link.site_domain.site.pk link.pk %}"
@@ -46,3 +51,4 @@
   <li>No outgoing links found on this page.</li>
   {% endfor %}
 </ul>
+{% endwith %}

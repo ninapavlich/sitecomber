@@ -17,6 +17,8 @@ from sitecomber.apps.shared.utils import LinkParser, TitleParser, load_url
 logger = logging.getLogger('django')
 
 
+
+
 class PageResponse(BaseMetaData, BaseResponse):
     """
     Represents a single request and response from the server
@@ -36,8 +38,6 @@ class PageResponse(BaseMetaData, BaseResponse):
     load_start_time = models.DateTimeField(blank=True, null=True)
     load_end_time = models.DateTimeField(blank=True, null=True)
 
-    text_content = models.TextField(blank=True, null=True)
-
     def __str__(self):
         return u'%s at %s' % (self.response_url, self.load_end_time)
 
@@ -46,6 +46,12 @@ class PageResponse(BaseMetaData, BaseResponse):
         if self.load_end_time and self.load_start_time:
             dt = self.load_end_time - self.load_start_time
             return int(round(dt.total_seconds() * 1000))
+        return None
+
+    @cached_property
+    def text_content(self):
+        if self.pageresponsetext_set.count():
+            return self.pageresponsetext_set.first().text_content
         return None
 
     @property
@@ -93,8 +99,6 @@ class PageResponse(BaseMetaData, BaseResponse):
             load_end_time=request.load_start_time + response.elapsed,
             redirected_from=redirected_from
         )
-        if response.text:
-            r.text_content = response.text
 
         if response.headers.get('content-type'):
             r.content_type = response.headers.get('content-type')
@@ -107,6 +111,14 @@ class PageResponse(BaseMetaData, BaseResponse):
         try:
             r.response_headers = r.prepare_header_dict_for_db(dict(response.headers))
             r.save()
+
+            if response.text:
+                t, created = PageResponseText.objects.get_or_create(
+                    parent=r
+                )
+                t.text_content = response.text
+                t.save()
+
             return r
         except Exception as e:
             logger.error(u"Error saving response for URL %s: %s" % (response.url, e))
@@ -118,7 +130,6 @@ class PageResponse(BaseMetaData, BaseResponse):
         r = PageResponse(
             response_url=request.request_url,
             status_code=-1,
-            text_content=error_message,
             request=request,
             load_start_time=request.load_start_time,
             load_end_time=request.load_start_time,
@@ -126,10 +137,24 @@ class PageResponse(BaseMetaData, BaseResponse):
         )
         try:
             r.save()
+
+            t, created = PageResponseText.objects.get_or_create(
+                parent=r
+            )
+            t.text_content = error_message
+            t.save()
+
             return r
         except Exception as e:
             logger.error(u"Error saving error response for URL %s - %s: %s" % (request.request_url, error_message, e))
 
+class PageResponseText(BaseMetaData):
+
+    parent = models.ForeignKey(
+        'results.PageResponse',
+        on_delete=models.CASCADE
+    )
+    text_content = models.TextField(blank=True, null=True)
 
 class PageRequest(BaseMetaData, BaseRequest):
     """
@@ -223,7 +248,6 @@ class PageResult(BaseMetaData, BaseURL):
     last_status_code = models.IntegerField(blank=True, null=True)
     last_content_type = models.CharField(max_length=255, blank=True, null=True)
     last_content_length = models.IntegerField(blank=True, null=True)
-    last_text_content = models.TextField(blank=True, null=True)
 
     error_synopsis = models.TextField(blank=True, null=True)
     warning_synoposis = models.TextField(blank=True, null=True)
@@ -307,8 +331,13 @@ class PageResult(BaseMetaData, BaseURL):
         logger.debug(u"Should load %s? %s" % (self, do_load))
         return do_load
 
-    def load(self, user_agent, max_timeout):
+    def load(self, user_agent=None, max_timeout=None):
         logger.info(u"Loading %s" % (self))
+
+        if not user_agent:
+            user_agent = self.site_domain.site.get_user_agent()
+        if not max_timeout:
+            max_timeout = self.site_domain.site.get_max_timeout_seconds()
 
         # First clean old records
         old_records = PageRequest.objects.filter(page_result=self).exclude(retain=True).order_by('-created')
@@ -324,7 +353,6 @@ class PageResult(BaseMetaData, BaseURL):
                 parser = TitleParser()
                 parser.feed(result.response.text_content)
                 self.title = parser.title if parser.title else self.url
-                self.last_text_content = result.response.text_content
 
             self.last_load_start_time = result.response.load_start_time
             self.last_load_end_time = result.response.load_end_time
@@ -360,6 +388,12 @@ class PageResult(BaseMetaData, BaseURL):
         for request in self.pagerequest_set.all():
             if request.response:
                 return request.response
+        return None
+
+    @cached_property
+    def last_text_content(self):
+        if self.latest_response:
+            return self.latest_response.text_content
         return None
 
     @cached_property

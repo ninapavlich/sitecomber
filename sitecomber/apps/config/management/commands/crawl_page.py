@@ -35,5 +35,8 @@ class Command(BaseCommand):
 
         page.load()
         tests = page.site_domain.site.tests
+
         for test in tests:
+            test.setUp()
             test.page_parsed(page)
+            test.tearDown()

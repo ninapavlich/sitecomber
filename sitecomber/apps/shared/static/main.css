@@ -7013,6 +7013,9 @@ body {
 .breadcrumb-item + .breadcrumb-item::before {
   content: "|"; }
 
+.font-mono {
+  font-family: monospace; }
+
 article img {
   max-width: 100%; }
 
@@ -7136,11 +7139,21 @@ a.card-title {
             #links.sitemap .children .child article .card-body .flex-fill .badge {
               margin-top: 0 !important; }
 
+.screenshot img {
+  border-radius: 0.5em;
+  overflow: hidden;
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.25); }
+
+.page-detail .screenshot {
+  max-width: 600px;
+  clear: both; }
+
 .interactive-sitemap {
   position: relative;
   width: 100vw;
   height: 80vh;
-  overflow: hidden; }
+  overflow-y: hidden;
+  overflow-x: scroll; }
   @media (min-width: 73em) {
     .interactive-sitemap {
       margin-left: calc(-1em - ((100vw - 75em) * 0.5)); } }
@@ -7179,13 +7192,8 @@ a.card-title {
       margin: 0 3em; }
     .interactive-sitemap .node.page .ring:before {
       background-color: #e9ecef; }
-    .interactive-sitemap .node.page.leaf .ring:before {
-      border: 0.125em solid #e9ecef;
-      background-color: transparent; }
     .interactive-sitemap .node.path .ring:before {
-      background-color: #6c757d; }
-    .interactive-sitemap .node.path.leaf .ring:before {
-      border: 0.125em solid #6c757d;
+      border: 0.125em solid #e9ecef;
       background-color: transparent; }
     .interactive-sitemap .node.errors .ring:before {
       background-color: #dc3560 !important;
@@ -7208,6 +7216,7 @@ a.card-title {
       z-index: 800;
       font-size: 0.75rem;
       line-height: normal;
+      box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.25);
       /* flag pole */
       /* hitstate */ }
       .interactive-sitemap .node .flag a {
@@ -7222,7 +7231,8 @@ a.card-title {
       .interactive-sitemap .node .flag p {
         opacity: 0.6;
         font-size: 0.5rem;
-        margin: 0; }
+        margin: 0;
+        word-break: break-word; }
       .interactive-sitemap .node .flag:before {
         content: "";
         position: absolute;
@@ -7233,13 +7243,15 @@ a.card-title {
         content: "";
         position: absolute;
         background-color: #ff00ff;
-        height: calc(100% + 3rem);
+        height: calc(100% + 2rem);
         width: 100%;
         z-index: -1;
         display: none;
         top: 0;
         left: 0;
-        opacity: 0; }
+        opacity: 0;
+        display: none !important;
+        /* turn off for now */ }
       .interactive-sitemap .node .flag.flag-up-right {
         transform: translate(0px, -1em);
         transform-origin: left bottom;
@@ -7258,6 +7270,8 @@ a.card-title {
         .interactive-sitemap .node .flag.flag-up-left:before {
           right: 0;
           top: 0; }
+        .interactive-sitemap .node .flag.flag-up-left:after {
+          width: 200%; }
       .interactive-sitemap .node .flag.flag-down-right {
         transform: translate(0px, 1em);
         transform-origin: left bottom;
@@ -7267,6 +7281,8 @@ a.card-title {
         .interactive-sitemap .node .flag.flag-down-right:before {
           left: 0;
           bottom: 0; }
+        .interactive-sitemap .node .flag.flag-down-right:after {
+          top: -2rem; }
       .interactive-sitemap .node .flag.flag-down-left {
         transform: translate(0px, 1em);
         transform-origin: left bottom;
@@ -7276,6 +7292,9 @@ a.card-title {
         .interactive-sitemap .node .flag.flag-down-left:before {
           right: 0;
           bottom: 0; }
+        .interactive-sitemap .node .flag.flag-down-left:after {
+          width: 200%;
+          top: -2rem; }
     .interactive-sitemap .node.layer-0 .ring:before {
       background-color: #00adba !important;
       border-color: #00adba !important; }
@@ -7292,27 +7311,73 @@ a.card-title {
         display: none; }
     .interactive-sitemap .node.layer-1 .flag-rotated {
       display: block; }
-      .interactive-sitemap .node.layer-1 .flag-rotated h2, .interactive-sitemap .node.layer-1 .flag-rotated p {
+      .interactive-sitemap .node.layer-1 .flag-rotated h2,
+      .interactive-sitemap .node.layer-1 .flag-rotated p {
         display: none; }
-    .interactive-sitemap .node:hover {
+    .interactive-sitemap .node:hover, .interactive-sitemap .node.state-active, .interactive-sitemap .node.state-ancestor {
       z-index: 1000; }
-      .interactive-sitemap .node:hover .ring:before {
-        background-color: #00adba !important;
+      .interactive-sitemap .node:hover.path .ring:before, .interactive-sitemap .node.state-active.path .ring:before, .interactive-sitemap .node.state-ancestor.path .ring:before {
         border-color: #00adba !important; }
-      .interactive-sitemap .node:hover .flag-rotated {
+      .interactive-sitemap .node:hover.page .ring:before, .interactive-sitemap .node.state-active.page .ring:before, .interactive-sitemap .node.state-ancestor.page .ring:before {
+        background-color: #00adba !important; }
+      .interactive-sitemap .node:hover .flag-rotated, .interactive-sitemap .node.state-active .flag-rotated, .interactive-sitemap .node.state-ancestor .flag-rotated {
         color: #00adba !important; }
-      .interactive-sitemap .node:hover .flag {
+      .interactive-sitemap .node:hover .flag, .interactive-sitemap .node.state-active .flag, .interactive-sitemap .node.state-ancestor .flag {
+        background-color: #00adba !important;
         display: block; }
-        .interactive-sitemap .node:hover .flag:after {
+        .interactive-sitemap .node:hover .flag:after, .interactive-sitemap .node.state-active .flag:after, .interactive-sitemap .node.state-ancestor .flag:after {
           display: block; }
-      .interactive-sitemap .node:hover.errors .ring:before {
+      .interactive-sitemap .node:hover.errors .ring:before, .interactive-sitemap .node.state-active.errors .ring:before, .interactive-sitemap .node.state-ancestor.errors .ring:before {
         background-color: #dc3560 !important;
         border-color: #dc3560 !important; }
-      .interactive-sitemap .node:hover.errors .flag-rotated {
+      .interactive-sitemap .node:hover.errors .flag-rotated, .interactive-sitemap .node.state-active.errors .flag-rotated, .interactive-sitemap .node.state-ancestor.errors .flag-rotated {
         color: #dc3560 !important; }
       .interactive-sitemap .node:hover.errors .flag,
-      .interactive-sitemap .node:hover.errors .flag:before {
+      .interactive-sitemap .node:hover.errors .flag:before, .interactive-sitemap .node.state-active.errors .flag,
+      .interactive-sitemap .node.state-active.errors .flag:before, .interactive-sitemap .node.state-ancestor.errors .flag,
+      .interactive-sitemap .node.state-ancestor.errors .flag:before {
         background-color: #dc3560 !important; }
+    .interactive-sitemap .node:hover {
+      z-index: 1001; }
+  .interactive-sitemap .node {
+    visibility: hidden; }
+    .interactive-sitemap .node.state-descendent {
+      visibility: visible; }
+      .interactive-sitemap .node.state-descendent .flag-rotated,
+      .interactive-sitemap .node.state-descendent .ring {
+        opacity: 1; }
+    .interactive-sitemap .node.state-adjacentdescendent {
+      visibility: visible; }
+      .interactive-sitemap .node.state-adjacentdescendent .flag-rotated,
+      .interactive-sitemap .node.state-adjacentdescendent .ring {
+        opacity: 0.25; }
+    .interactive-sitemap .node.state-ancestor {
+      visibility: visible; }
+      .interactive-sitemap .node.state-ancestor .flag-rotated,
+      .interactive-sitemap .node.state-ancestor .ring {
+        opacity: 1; }
+    .interactive-sitemap .node.state-active {
+      visibility: visible; }
+      .interactive-sitemap .node.state-active .flag-rotated,
+      .interactive-sitemap .node.state-active .ring {
+        opacity: 1; }
+    .interactive-sitemap .node .flag-rotated {
+      display: block;
+      transform: translateY(-0.35em); }
+      .interactive-sitemap .node .flag-rotated .truncate {
+        max-width: 200px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: inline-block; }
+      .interactive-sitemap .node .flag-rotated .count {
+        overflow: hidden;
+        display: inline-block; }
+    .interactive-sitemap .node:hover .flag-rotated,
+    .interactive-sitemap .node:hover .ring {
+      opacity: 1 !important; }
+    .interactive-sitemap .node .iolinks {
+      position: absolute; }
 
 #article article {
   max-width: 600px; }

@@ -13,11 +13,14 @@
       "full_path": "/",
       "info_url":"{% url 'site-detail' object.pk %}",
       "errors":[],
+      "incoming": [],
+      "outgoing": [],
       "children": [
-    {% for key, item in object.page_results_hierarchy.items %}
-    {% include 'config/partials/page_tree_json.html' with child=item %}{% if not forloop.last %},{% endif %}
-    {% endfor %}
-    ]
+      {% for key, item in object.page_results_hierarchy.items %}
+      {% include 'config/partials/page_tree_json.html' with child=item %}{% if not forloop.last %},{% endif %}
+      {% endfor %}
+      ]
+
   }
 </script>
 {% endblock %}
@@ -32,7 +35,7 @@
 
 <article class="main">
   <h1>{{object}}</h1>
-  <h2 class="text-secondary h5">
+  <h2 class="text-secondary h5">Including domains
     {% for url in object.domains %}<a
       href="{{url}}"
       target="_blank"
@@ -48,13 +51,13 @@
       <li>Crawling has not yet started.</li>
       {% else %}
       <li>
-        Found <strong>{{object.internal_page_results|length}}</strong> internal
+        Crawler has found <strong>{{object.internal_page_results|length}}</strong> internal
         pages, with
         <strong>{{object.external_page_results|length}}</strong> outgoing links.
       </li>
       {% endif %} {% else %}
       <li>
-        (So far) Found
+        (So far) Crawler has found
         <strong>{{object.internal_page_results|length}}</strong> internal pages,
         with <strong>{{object.external_page_results|length}}</strong> outgoing
         links. <strong>{{object.uncrawled_page_results|length}}</strong> pages
@@ -72,57 +75,41 @@
       {% endif %} {% if object.internal_page_results|length > 0 %}
       <li class="clearfix">
         {% if object.pages_with_errors|length > 0 %}
-        <p class="float-left text-danger">
-          <strong>{{object.pages_with_errors|length}}</strong> pages with errors
-        </p>
-        {% endif %}
+        <span class="text-danger">
+          <strong>{{object.pages_with_errors|length}}</strong> pages with errors.
+        </span>
 
         <a
           href="{% url 'site-test-results' object.pk %}"
-          class="text-danger float-right"
+          class="text-light"
         >
-          <span class="badge badge-info p-1 ml-2">
-            Site Test Results
-          </span>
+          (See site-wide test results to review errors)
         </a>
+        {% else %}
+        <a
+          href="{% url 'site-test-results' object.pk %}"
+          class="text-light"
+        >
+          See site-wide test results.
+        </a>
+        {% endif %}
+
       </li>
       {% endif %}
     </ul>
 
 
 
-    <div class="interactive-sitemap"></div>
 
-    {% if object.internal_page_results|length > 0 %}
-    <ul class="list-unstyled clearfix">
-      <!-- <li class="float-right">
-        <a
-          href="#"
-          class="viewlink overview float-right badge badge-secondary p-1 ml-2 mt-1"
-          >Overview</a
-        >
-      </li> -->
-      <li class="float-right">
-        <a
-          href="#"
-          class="viewlink sitemap float-right badge badge-secondary p-1 ml-2 mt-1"
-          >Sitemap</a
-        >
-      </li>
-      <li class="float-right">
-        <a
-          href="#"
-          class="viewlink list float-right badge badge-info p-1 ml-2 mt-1"
-          >List</a
-        >
-      </li>
-      <li class="float-right">
-        <small class="text-muted">View pages as:</small>
-      </li>
-    </ul>
-    {% endif %}
+
   </aside>
 
+  <h2 id="sitemap-paths">Site Links by URL Path:</h2>
+  <div class="interactive-sitemap hierarchy"></div>
+
+
+  {% comment %}
+  <h2>Site Link List:</h2>
   <div class="" id="links">
 
     {% if object.root_page_result %}
@@ -131,13 +118,6 @@
 
     <ul class="list-unstyled children">
       <li class="clearfix">
-
-
-
-
-
-
-
       </li>
       {% for key, item in object.page_results_hierarchy.items %}
       <li class="clearfix">
@@ -146,7 +126,7 @@
       {% endfor %}
     </ul>
 
-    {% comment %}
+    
     <ul class="list-unstyled">
       {% for page_result in object.internal_page_results %} {% if not
       page_result.is_root %}
@@ -155,7 +135,8 @@
       </li>
       {% endif %} {% endfor %}
     </ul>
-    {% endcomment %}
+
   </div>
+  {% endcomment %}
 </article>
 {% endblock %}

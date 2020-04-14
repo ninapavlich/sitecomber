@@ -40,9 +40,15 @@ class Command(BaseCommand):
 
         site.parse_sitemap()
         tests = site.tests
+        for test in tests:
+            test.setUp()
+
         pages = site.page_results
         for page in pages:
             print("- Running tests on %s" % (page))
             for test in tests:
                 test.page_parsed(page)
             page.render_synoposes()
+
+        for test in tests:
+            test.tearDown()

@@ -10723,12 +10723,12 @@ module.exports = g;
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var bootstrap__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
 /* harmony import */ var bootstrap__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(bootstrap__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _main_scss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(7);
+/* harmony import */ var _main_scss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(9);
 /* harmony import */ var _main_scss__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_main_scss__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _svgdotjs_svg_js_dist_svg_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(5);
 /* harmony import */ var _svgdotjs_svg_js_dist_svg_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_svgdotjs_svg_js_dist_svg_js__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _scripts_sitemap_jqueryplugin_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(12);
-/* harmony import */ var _scripts_ui_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(6);
+/* harmony import */ var _scripts_sitemap_jqueryplugin_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(6);
+/* harmony import */ var _scripts_ui_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(8);
 /* harmony import */ var _scripts_ui_js__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_scripts_ui_js__WEBPACK_IMPORTED_MODULE_4__);
 
 
@@ -29016,62 +29016,10 @@ var SVG = (function () {
 
 /***/ }),
 /* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function($) {$('.card-header-tabs a').on('click', function (e) {
-  e.preventDefault()
-  $(this).tab('show')
-  window.location.hash = this.hash;
-})
-
-if(window.location.hash){
-  $('a[href="'+window.location.hash+'"]').tab('show')
-}
-
-$('.viewlink.overview').on('click', function (e) {
-  e.preventDefault()
-  $(".viewlink").removeClass('badge-info').addClass('badge-secondary');
-  $('#links').addClass('sitemap').addClass('zoomed-out');
-  $(".viewlink.overview").addClass('badge-info').removeClass('badge-secondary');
-})
-$('.viewlink.sitemap').on('click', function (e) {
-  e.preventDefault()
-  $(".viewlink").removeClass('badge-info').addClass('badge-secondary');
-  $('#links').addClass('sitemap').removeClass('zoomed-out');
-  $(".viewlink.sitemap").addClass('badge-info').removeClass('badge-secondary');
-})
-$('.viewlink.list').on('click', function (e) {
-  e.preventDefault()
-  $(".viewlink").removeClass('badge-info').addClass('badge-secondary');
-  $('#links').removeClass('sitemap').removeClass('zoomed-out');
-  $(".viewlink.list").addClass('badge-info').removeClass('badge-secondary');
-})
-
-
-
-
-$( document ).ready(function() {
-  $(".interactive-sitemap").sitemap({'data':window['sitemap_data']}); 	
-});
-
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
-
-/***/ }),
-/* 7 */
-/***/ (function(module, exports) {
-
-// removed by extract-text-webpack-plugin
-
-/***/ }),
-/* 8 */,
-/* 9 */,
-/* 10 */,
-/* 11 */,
-/* 12 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(jQuery) {/* harmony import */ var _svgdotjs_svg_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(13);
+/* WEBPACK VAR INJECTION */(function(jQuery) {/* harmony import */ var _svgdotjs_svg_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7);
 
 
 /*!
@@ -29110,6 +29058,29 @@ $( document ).ready(function() {
     this.isLeaf = this.data.children.length === 0;
     this.hasErrors = this.data.errors.length > 0;
 
+    this.iolinks = {};
+
+    for (var i = 0; i < this.data.incoming.length; i++) {
+      var link = this.data.incoming[i];
+      if (!(link in this.iolinks)) {
+        this.iolinks[link] = {
+          incoming: false,
+          outgoing: false
+        };
+      }
+      this.iolinks[link].incoming = true;
+    }
+    for (var i = 0; i < this.data.outgoing.length; i++) {
+      var link = this.data.outgoing[i];
+      if (!(link in this.iolinks)) {
+        this.iolinks[link] = {
+          incoming: false,
+          outgoing: false
+        };
+      }
+      this.iolinks[link].outgoing = true;
+    }
+
     this.markupNeedsRender = true;
     this.hierarchicalChildren = [];
     if (this.parentNode) {
@@ -29136,7 +29107,7 @@ $( document ).ready(function() {
       if (this.isLeaf) {
         $(this.view).addClass("leaf");
       }
-      if(this.hasErrors){
+      if (this.hasErrors) {
         $(this.view).addClass("errors");
       }
     },
@@ -29144,41 +29115,29 @@ $( document ).ready(function() {
       this.hierarchicalChildren.push(child);
     },
 
-    // getHierarchicalRelationships: function() {
-    //   var items = this.hierarchicalChildren.map(function(child) {
-    //     return { relationship: "child", node: child };
-    //   });
-    //   if (this.parentNode) {
-    //     items.push({
-    //       relationship: "parent",
-    //       node: this.parentNode
-    //     });
+    // populateHierarchicalRelationships: function(currentRing, ringMap) {
+    //   if (ringMap.ids.includes(this.id)) {
+    //     return;
     //   }
-    //   return items;
+    //
+    //   //assuming I am on the currentRing, add all my children to the next layer out. unless they are already in the ring?
+    //   ringMap.ids.push(this.id);
+    //   if (!ringMap[currentRing]) {
+    //     ringMap[currentRing] = [];
+    //   }
+    //   ringMap[currentRing].push(this);
+    //   for (var i = 0; i < this.hierarchicalChildren.length; i++) {
+    //     var child = this.hierarchicalChildren[i];
+    //     child.populateHierarchicalRelationships(currentRing + 1, ringMap);
+    //   }
+    //
+    //   if (this.parentNode) {
+    //     this.parentNode.populateHierarchicalRelationships(
+    //       currentRing + 1,
+    //       ringMap
+    //     );
+    //   }
     // },
-    populateHierarchicalRelationships: function(currentRing, ringMap) {
-      if (ringMap.ids.includes(this.id)) {
-        return;
-      }
-
-      //assuming I am on the currentRing, add all my children to the next layer out. unless they are already in the ring?
-      ringMap.ids.push(this.id);
-      if (!ringMap[currentRing]) {
-        ringMap[currentRing] = [];
-      }
-      ringMap[currentRing].push(this);
-      for (var i = 0; i < this.hierarchicalChildren.length; i++) {
-        var child = this.hierarchicalChildren[i];
-        child.populateHierarchicalRelationships(currentRing + 1, ringMap);
-      }
-
-      if (this.parentNode) {
-        this.parentNode.populateHierarchicalRelationships(
-          currentRing + 1,
-          ringMap
-        );
-      }
-    },
 
     render: function() {
       this.renderMarkup();
@@ -29192,18 +29151,22 @@ $( document ).ready(function() {
     },
     getMarkup: function() {
       var html = "<span class='ring'></span>";
-      html += "<span class='flag bg-info text-light'>";
+      html += "<span class='flag bg-secondary text-light'>";
 
-      var label = this.isSite ? this.data.url : "/" + this.data.path + "/";
+      var labelSuffix = this.data.children.length === 0 ? "" : "/";
+      var label = this.isSite
+        ? this.data.url
+        : "/" + this.data.path + labelSuffix;
       html += this.data.info_url
         ? "<h1><a href='" + this.data.info_url + "'>" + label + "</a></h1>"
         : "<h1>" + label + "</h1>";
-      html +=
-        "<h2><a href='" +
-        this.data.full_url +
-        "' target='_blank' text='Open in new tab'>" +
-        this.data.full_url +
-        "</a></h2>";
+      html += this.data.url
+        ? "<h2><a href='" +
+          this.data.full_url +
+          "' target='_blank' title='Open in new tab'>" +
+          this.data.full_url +
+          "</a></h2>"
+        : "";
       html +=
         this.data.children.length === 0
           ? ""
@@ -29211,14 +29174,38 @@ $( document ).ready(function() {
           ? "<p>1 child</p>"
           : "<p>" + this.data.children.length + " children</p>";
 
-      for(var i=0; i<this.data.errors.length; i++){
-        html +="<p>" + this.data.errors[i]+"</p>";
+      for (var i = 0; i < this.data.errors.length; i++) {
+        html += "<p>" + this.data.errors[i] + "</p>";
       }
+      if (this.data.info_url) {
+        html += "<p><a href='" + this.data.info_url + "'>View Details</a></p>";
 
+        // html += "<span class='iolinks'>";
+        //
+        // for (var url in this.iolinks) {
+        //   var incoming = this.iolinks[url].incoming;
+        //   var outgoing = this.iolinks[url].outgoing;
+        //   var iostr =
+        //     (incoming ? "<span>i</span>" : "") +
+        //     (outgoing ? "<span>o</span>" : "");
+        //
+        //   html += "<p data-id='" + url + "'>" + iostr + " " + url + "</p>";
+        // }
+        //
+        // html += "</span>";
+      }
       html += "</span>";
 
+      var childCount =
+        this.data.children.length > 0
+          ? " <span class='count'>(" + this.data.children.length + ")</span>"
+          : "";
       html +=
-        "<span class='flag-rotated text-light'><h1>" + label + "</h1></span>";
+        "<span class='flag-rotated text-light'><h1><span class='truncate'>" +
+        label +
+        "</span>" +
+        childCount +
+        "</h1></span>";
       return html;
     },
 
@@ -29230,6 +29217,7 @@ $( document ).ready(function() {
   };
 
   // The actual plugin constructor
+  var LINE_HEIGHT = 18;
   function Sitemap(element, options) {
     this.element = element;
     this.containerWidth = $(this.element).width();
@@ -29242,6 +29230,7 @@ $( document ).ready(function() {
     this.data = options.data;
     this.inited = false;
     this.resize_timeout = -1;
+    this.scroll_timeout = -1;
 
     this.init();
   }
@@ -29273,8 +29262,14 @@ $( document ).ready(function() {
       var node = new Node(this, parentNode, data);
 
       var ref = this;
-      $(node.view).find(".ring, .flag-rotated").click(function() {
-        ref.onNodeClicked(node);
+      $(node.view)
+        .find(".ring, .flag-rotated")
+        .click(function() {
+          ref.onNodeClicked(node);
+        });
+
+      $(node.view).mouseover(function() {
+        ref.positionFlag(node);
       });
 
       this.allNodes.push(node);
@@ -29285,27 +29280,200 @@ $( document ).ready(function() {
       }
       return node;
     },
+
+    resizeContainer(w, h) {
+      this.containerWidth = w;
+      this.containerHeight = h;
+    },
     render: function() {
+      $(this.view).removeClass(function(index, css) {
+        return (css.match(/(^|\s)mode-\S+/g) || []).join(" ");
+      });
+      $(this.view).addClass(this.mode);
+
+      this.positionFlag(this.activeNode);
+
       //Update all the markup within the nodes
       for (var i = 0; i < this.allNodes.length; i++) {
         var node = this.allNodes[i];
         node.render();
       }
 
-      var ringMap = { ids: [] };
-      this.activeNode.populateHierarchicalRelationships(0, ringMap);
-      this.distributeRings(ringMap);
-      // this.distributeRings([
-      //   { items: [{ relationship: "root", node: this.activeNode }] },
-      //   { items: firstDegreeRelationships }
-      // ]);
+      this.distributeTree(this.rootNode, this.activeNode);
+      // this.positionIOLinks();
     },
 
     onNodeClicked: function(node) {
-      this.activeNode = node;
+      if (this.activeNode === node) {
+        this.activeNode == this.activeNode.parentNode
+          ? this.activeNode.parentNode
+          : node;
+      } else {
+        this.activeNode = node;
+      }
       this.render();
     },
 
+    /**
+     * Given a map in this shape:
+     * {'id', 'children':[ {'id', 'children':[]}], 'parent':{'id', 'children':[]}}
+     *
+     * Distribute these nodes into a set of tree branches, where the item in the 0th
+     * place is at the top, and the items in the nth place are towards the bottom
+     */
+    distributeTree: function(rootNode) {
+      //Resize container height:
+      $(this.element).height(
+        LINE_HEIGHT * (rootNode.hierarchicalChildren.length + 1)
+      );
+      this.containerHeight = $(this.element).height();
+
+      var w = this.containerWidth;
+      var h = this.containerHeight;
+      var centerX = 50;
+      var centerY = 0.5 * h;
+      $(rootNode.view).animate(
+        {
+          top: centerY,
+          left: centerX
+        },
+        500
+      );
+
+      this.distributeBranch(rootNode, rootNode, centerX, centerY, h);
+    },
+
+    /**
+     * Given a node with a starting x and y, position all its children
+     */
+    distributeBranch: function(node, parentNode, x, y) {
+      var isActiveNode = node.id === this.activeNode.id;
+      var isAncestorOfActiveNode =
+        !isActiveNode && this.activeNode.id.includes(node.id);
+      var isDirectAncestorOfActiveNode =
+        !isActiveNode &&
+        this.activeNode.id
+          .split("/")
+          .slice(0, -1)
+          .join("/") === node.id;
+      var isDirectDescendentOfActiveNode = this.activeNode.hierarchicalChildren.includes(
+        node
+      );
+
+      var activePathPieces = this.activeNode.data.full_path.split("/");
+      var nodePieces = node.data.full_path.split("/");
+      var isAdjacentAncestorOfActiveNode =
+        nodePieces.length <= activePathPieces.length &&
+        activePathPieces
+          .slice(0, 0 - (activePathPieces.length - nodePieces.length) - 1)
+          .join("/") === nodePieces.slice(0, -1).join("/");
+
+      var state = "";
+      if (isActiveNode) {
+        state += "state-active ";
+      }
+      if (isAncestorOfActiveNode) {
+        state += "state-ancestor ";
+      }
+      if (isDirectAncestorOfActiveNode) {
+        state += "state-direct-ancestor ";
+      }
+      if (isDirectDescendentOfActiveNode) {
+        state += "state-descendent ";
+      }
+      if (isAdjacentAncestorOfActiveNode) {
+        state += "state-adjacentdescendent ";
+      }
+      $(node.view).removeClass(function(index, css) {
+        return (css.match(/(^|\s)state-\S+/g) || []).join(" ");
+      });
+      $(node.view).addClass(state);
+
+      var currentX = x + 250;
+      var currentY = this.getStartingY(node, parentNode, y);
+      // console.log("y?", y, "currentY? --- ", currentY);
+
+      for (var i = 0; i < node.hierarchicalChildren.length; i++) {
+        var item = node.hierarchicalChildren[i];
+        var view = item.view;
+        var targetX = currentX;
+        var targetY = currentY;
+        currentY += LINE_HEIGHT;
+        $(view).animate(
+          {
+            top: targetY,
+            left: targetX
+          },
+          500
+        );
+
+        this.distributeBranch(item, parentNode, targetX, targetY);
+      }
+
+      if (
+        (isActiveNode ||
+          isDirectDescendentOfActiveNode ||
+          isAncestorOfActiveNode) &&
+        currentY + LINE_HEIGHT > this.containerHeight
+      ) {
+        $(this.element).height(currentY + LINE_HEIGHT);
+        this.containerHeight = $(this.element).height();
+      }
+    },
+
+    getStartingY(node, parentNode, y) {
+      var isActiveNode = node.id === this.activeNode.id;
+      var isAncestorOfActiveNode =
+        !isActiveNode && this.activeNode.id.includes(node.id);
+
+      var shouldCenterChildList = isAncestorOfActiveNode;
+
+      if (shouldCenterChildList) {
+        var runningY = 0;
+        for (var i = 0; i < node.hierarchicalChildren.length; i++) {
+          var child = node.hierarchicalChildren[i];
+
+          if (
+            child.id === this.activeNode.id ||
+            this.activeNode.id.includes(child.id)
+          ) {
+            return y - runningY;
+          }
+          runningY += LINE_HEIGHT;
+        }
+        return y;
+      } else {
+        var verticalRange = node.hierarchicalChildren.length * LINE_HEIGHT;
+        return Math.max(LINE_HEIGHT, y - 0.5 * verticalRange);
+      }
+    },
+
+    positionIOLinks: function() {
+      var centerY = parseInt($(this.activeNode.view).css("top"));
+      var centerX = parseInt($(this.activeNode.view).css("left"));
+      var incomingLinks = $(this.activeNode.view).find(".incoming p");
+      var outgoingLinks = $(this.activeNode.view).find(".outgoing p");
+
+      console.log("incoming? " + incomingLinks.length);
+      console.log("outgoing? " + outgoingLinks.length);
+
+      var currentTheta = 1.5 * Math.PI;
+      var thetaStep = Math.PI / incomingLinks.length;
+      var radius = 200;
+      for (var i = 0; i < incomingLinks.length; i++) {
+        var view = incomingLinks[i];
+        var targetX = centerX + radius * Math.cos(currentTheta);
+        var targetY = centerY + radius * Math.sin(currentTheta);
+        $(view).animate(
+          {
+            top: targetY,
+            left: targetX
+          },
+          500
+        );
+        currentTheta -= currentTheta;
+      }
+    },
     /**
      * Given a map in this shape:
      * {'ids':[], '0':[], '1':[], ... 'n': []}
@@ -29329,21 +29497,10 @@ $( document ).ready(function() {
       var runningRadius = 0;
       var addWobble = false;
 
-      console.log("Ring map", ringMap);
-      console.log("going to distribute items into " + rings.length + " rings");
-
       for (var i = 0; i < rings.length; i++) {
-        // console.log(
-        //   "Ring " +
-        //     i +
-        //     " has " +
-        //     rings[i].length +
-        //     " items. Current radius is " +
-        //     runningRadius
-        // );
         var ring = rings[i];
         var radius = runningRadius;
-        var thetaStep = (Math.PI * 2) / (ring.length);
+        var thetaStep = (Math.PI * 2) / ring.length;
         var currentTheta = 0;
         var wobbleTheta = 0;
         for (var m = 0; m < ring.length; m++) {
@@ -29358,29 +29515,6 @@ $( document ).ready(function() {
             : 0;
           var targetX = centerX + radius * Math.cos(currentTheta) + wobbleX;
           var targetY = centerY + radius * Math.sin(currentTheta) + wobbleY;
-
-          var flagPosition = "flag-up-right";
-          if (targetX < centerX && targetY < centerY) {
-            // top left corner
-            flagPosition = "flag-down-right";
-          } else if (targetX < centerX && targetY > centerY) {
-            // bottom left corner
-            flagPosition = "flag-up-right";
-          } else if (targetX > centerX && targetY < centerY) {
-            // top right corner
-            flagPosition = "flag-down-left";
-          } else if (targetX > centerX && targetY > centerY) {
-            // bottom right corner
-            flagPosition = "flag-up-left";
-          }
-          $(view)
-            .find(".flag")
-            .removeClass(function(index, css) {
-              return (css.match(/(^|\s)flag-\S+/g) || []).join(" ");
-            });
-          $(view)
-            .find(".flag")
-            .addClass(flagPosition);
 
           var degrees = (360 * currentTheta) / (Math.PI * 2);
           var transform =
@@ -29413,22 +29547,63 @@ $( document ).ready(function() {
         }
 
         if (i < rings.length - 1) {
-          var nodeDiameter = 16;
-          var approxRingCircumference = nodeDiameter * rings[i + 1].length;
-          var minRadiusPerItems = approxRingCircumference / (2 * Math.PI);
+          var minRadiusPerItems = this.getApproxRingCircumference(
+            rings[i + 1].length
+          );
+          var minRadius = 100;
           var maxRadius = 300;
           addWobble = minRadiusPerItems > maxRadius;
-          // console.log(
-          //   "Given that there are " +
-          //     rings[i + 1].length +
-          //     " items in the next ring, we estimate the needed circumference woudl be " +
-          //     approxRingCircumference +
-          //     " therefor we should use a radius of at least " +
-          //     minRadiusPerItems
-          // );
-          runningRadius += Math.min(maxRadius, Math.max(100, minRadiusPerItems));
+          runningRadius += Math.min(
+            maxRadius,
+            Math.max(minRadius, minRadiusPerItems)
+          );
         }
       }
+    },
+
+    getApproxRingCircumference(totalItems) {
+      var nodeDiameter = 16;
+      var approxRingCircumference = nodeDiameter * totalItems;
+      var minRadiusPerItems = approxRingCircumference / (2 * Math.PI);
+      return minRadiusPerItems;
+    },
+
+    positionFlag(node) {
+      var targetX = node.view.getBoundingClientRect().left;
+      var targetY = node.view.getBoundingClientRect().top;
+      var midX = this.containerWidth * 0.5;
+      var midY = this.containerHeight * 0.5;
+      var flagPosition = "flag-up-right";
+      // if (targetX < midX && targetY < midY) {
+      //   // top left corner
+      //   flagPosition = "flag-down-right";
+      // } else if (targetX < midX && targetY > midY) {
+      //   // bottom left corner
+      //   flagPosition = "flag-up-right";
+      // } else if (targetX > midX && targetY < midY) {
+      //   // top right corner
+      //   flagPosition = "flag-down-left";
+      // } else if (targetX > midX && targetY > midY) {
+      //   // bottom right corner
+      //   flagPosition = "flag-up-left";
+      // }
+
+      if (targetY < midY) {
+        // top left corner
+        flagPosition = "flag-down-right";
+      } else if (targetY >= midY) {
+        // bottom left corner
+        flagPosition = "flag-up-right";
+      }
+
+      $(node.view)
+        .find(".flag")
+        .removeClass(function(index, css) {
+          return (css.match(/(^|\s)flag-\S+/g) || []).join(" ");
+        });
+      $(node.view)
+        .find(".flag")
+        .addClass(flagPosition);
     },
 
     addListeners: function() {
@@ -29439,8 +29614,18 @@ $( document ).ready(function() {
         //Wait until we are dont gettint resize events so we dont overwhelm the processor
         clearTimeout(parent_ref.resize_timeout);
         parent_ref.resize_timeout = setTimeout(function() {
-          parent_ref.containerWidth = $(parent_ref.element).width();
-          parent_ref.containerHeight = $(parent_ref.element).height();
+          parent_ref.resizeContainer(
+            $(parent_ref.element).width(),
+            $(parent_ref.element).height()
+          );
+          parent_ref.render();
+        }, 250);
+      });
+
+      window.addEventListener("scroll", function() {
+        //Wait until we are dont gettint resize events so we dont overwhelm the processor
+        clearTimeout(parent_ref.scroll_timeout);
+        parent_ref.scroll_timeout = setTimeout(function() {
           parent_ref.render();
         }, 250);
       });
@@ -29465,7 +29650,7 @@ $( document ).ready(function() {
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 13 */
+/* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -40672,6 +40857,72 @@ makeMorphable();
 //# sourceMappingURL=svg.esm.js.map
 
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(1)))
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function($) {$(".card-header-tabs a").on("click", function(e) {
+  e.preventDefault();
+  $(this).tab("show");
+  window.location.hash = this.hash;
+});
+
+if (window.location.hash) {
+  $('a[href="' + window.location.hash + '"]').tab("show");
+}
+
+$(".viewlink.overview").on("click", function(e) {
+  e.preventDefault();
+  $(".viewlink")
+    .removeClass("badge-info")
+    .addClass("badge-secondary");
+  $("#links")
+    .addClass("sitemap")
+    .addClass("zoomed-out");
+  $(".viewlink.overview")
+    .addClass("badge-info")
+    .removeClass("badge-secondary");
+});
+$(".viewlink.sitemap").on("click", function(e) {
+  e.preventDefault();
+  $(".viewlink")
+    .removeClass("badge-info")
+    .addClass("badge-secondary");
+  $("#links")
+    .addClass("sitemap")
+    .removeClass("zoomed-out");
+  $(".viewlink.sitemap")
+    .addClass("badge-info")
+    .removeClass("badge-secondary");
+});
+$(".viewlink.list").on("click", function(e) {
+  e.preventDefault();
+  $(".viewlink")
+    .removeClass("badge-info")
+    .addClass("badge-secondary");
+  $("#links")
+    .removeClass("sitemap")
+    .removeClass("zoomed-out");
+  $(".viewlink.list")
+    .addClass("badge-info")
+    .removeClass("badge-secondary");
+});
+
+$(document).ready(function() {
+  $(".interactive-sitemap.hierarchy").sitemap({
+    data: window["sitemap_data"],
+    mode: "mode-hierarchy"
+  });
+});
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
 
 /***/ })
 /******/ ]);

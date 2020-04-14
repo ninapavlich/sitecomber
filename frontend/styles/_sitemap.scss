@@ -2,7 +2,8 @@
   position: relative;
   width: 100vw;
   height: 80vh;
-  overflow: hidden;
+  overflow-y: hidden;
+  overflow-x: scroll;
 
   @media (min-width: 73em) {
     margin-left: calc(-1em - ((100vw - 75em) * 0.5));
@@ -18,14 +19,15 @@
     height: 100%;
     pointer-events: none;
   }
+
   .node {
     position: absolute;
 
-    .ring{
+    .ring {
       cursor: pointer;
       position: absolute;
-      left:-0.5em;
-      top:-0.5em;
+      left: -0.5em;
+      top: -0.5em;
       z-index: 900;
 
       &:before {
@@ -34,13 +36,11 @@
         width: 1em;
         height: 1em;
         border-radius: 0.5em;
-
       }
     }
 
-    &.site{
-
-      .ring{
+    &.site {
+      .ring {
         left: -1em;
         top: -1em;
 
@@ -51,7 +51,7 @@
           background-color: $blue;
         }
       }
-      .flag-rotated h1{
+      .flag-rotated h1 {
         margin: 0 3em;
       }
     }
@@ -59,27 +59,20 @@
     &.page .ring:before {
       background-color: $gray-200;
     }
-    &.page.leaf .ring:before {
+    &.path .ring:before {
       border: 0.125em solid $gray-200;
       background-color: transparent;
     }
-    &.path .ring:before {
-      background-color: $gray-600;
-    }
-    &.path.leaf .ring:before {
-      border: 0.125em solid $gray-600;
-      background-color: transparent;
-    }
 
-    &.errors{
+    &.errors {
       .ring:before {
         background-color: $red !important;
         border-color: $red !important;
       }
     }
 
-    .flag-rotated{
-      display:none;
+    .flag-rotated {
+      display: none;
       position: absolute;
       transform: rotate(-45deg);
       transform-origin: 0 0;
@@ -89,12 +82,12 @@
       h1 {
         font-size: 0.75rem;
         margin: 0 1em;
-        white-space:nowrap;
+        white-space: nowrap;
       }
     }
 
     .flag {
-      display:none;
+      display: none;
 
       padding: 0.5em 1em;
       position: absolute;
@@ -103,6 +96,8 @@
       font-size: 0.75rem;
       line-height: normal;
 
+      box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.25);
+
       a {
         color: #fff;
       }
@@ -110,7 +105,7 @@
       h1 {
         font-size: 0.75rem;
         margin: 0 0 0.25em 0;
-        white-space:nowrap;
+        white-space: nowrap;
       }
       h2 {
         font-size: 0.5rem;
@@ -120,9 +115,8 @@
         opacity: 0.6;
         font-size: 0.5rem;
         margin: 0;
+        word-break: break-word;
       }
-
-
 
       /* flag pole */
       &:before {
@@ -138,13 +132,14 @@
         content: "";
         position: absolute;
         background-color: #ff00ff;
-        height: calc(100% + 3rem);
+        height: calc(100% + 2rem);
         width: 100%;
         z-index: -1;
         display: none;
         top: 0;
         left: 0;
         opacity: 0;
+        display: none !important; /* turn off for now */
       }
 
       &.flag-up-right {
@@ -168,6 +163,9 @@
           right: 0;
           top: 0;
         }
+        &:after {
+          width: 200%;
+        }
       }
       &.flag-down-right {
         transform: translate(0px, 1em);
@@ -178,6 +176,9 @@
         &:before {
           left: 0;
           bottom: 0;
+        }
+        &:after {
+          top: -2rem;
         }
       }
       &.flag-down-left {
@@ -190,15 +191,19 @@
           right: 0;
           bottom: 0;
         }
+        &:after {
+          width: 200%;
+          top: -2rem;
+        }
       }
     }
 
     &.layer-0 {
-      .ring:before{
+      .ring:before {
         background-color: $blue !important;
         border-color: $blue !important;
       }
-      &.errors{
+      &.errors {
         .ring:before {
           background-color: $red !important;
           border-color: $red !important;
@@ -206,7 +211,7 @@
       }
       .flag {
         z-index: 1000;
-        display:block;
+        display: block;
         border-radius: 0.5em;
         background-color: #2b2e31f2 !important;
         transform: translate(-50%, -50%);
@@ -217,43 +222,122 @@
     }
     &.layer-1 {
       .flag-rotated {
-        display:block;
-        h2, p{
-          display:none;
+        display: block;
+        h2,
+        p {
+          display: none;
         }
       }
     }
 
-    &:hover {
+    &:hover,
+    &.state-active,
+    &.state-ancestor {
+
       z-index: 1000;
 
-      .ring:before {
-        background-color: $blue !important;
-        border-color: $blue !important;
+      &.path {
+        .ring:before {
+          border-color: $blue !important;
+        }
       }
-      .flag-rotated{
+      &.page {
+        .ring:before {
+          background-color: $blue !important;
+        }
+      }
+
+
+
+      .flag-rotated {
         color: $blue !important;
       }
       .flag {
-        display:block;
+        background-color: $blue !important;
+        display: block;
         &:after {
           display: block;
         }
       }
 
-      &.errors{
+      &.errors {
         .ring:before {
           background-color: $red !important;
           border-color: $red !important;
         }
-        .flag-rotated{
+        .flag-rotated {
           color: $red !important;
         }
         .flag,
-        .flag:before{
+        .flag:before {
           background-color: $red !important;
         }
       }
     }
+
+    &:hover{
+      z-index: 1001;
+    }
   }
+
+
+  .node {
+    visibility: hidden;
+
+    &.state-descendent {
+      visibility: visible;
+      .flag-rotated,
+      .ring {
+        opacity: 1;
+      }
+    }
+    &.state-adjacentdescendent {
+      visibility: visible;
+      .flag-rotated,
+      .ring {
+        opacity: 0.25;
+      }
+    }
+    &.state-ancestor {
+      visibility: visible;
+      .flag-rotated,
+      .ring {
+        opacity: 1;
+      }
+    }
+    &.state-active {
+      visibility: visible;
+      .flag-rotated,
+      .ring {
+        opacity: 1;
+      }
+    }
+    .flag-rotated {
+      display: block;
+      transform: translateY(-0.35em);
+      .truncate {
+        max-width: 200px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: inline-block;
+      }
+      .count {
+        overflow: hidden;
+        display: inline-block;
+      }
+    }
+    &:hover {
+      .flag-rotated,
+      .ring {
+        opacity: 1 !important;
+      }
+    }
+
+    .iolinks{
+      position:absolute;
+    }
+  }
+
+
 }

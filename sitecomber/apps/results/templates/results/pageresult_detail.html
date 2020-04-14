@@ -2,6 +2,8 @@
 {% load results_tags %}
 {% block bodyclass %}{{block.super}} page-detail{% endblock %}
 
+
+
 {% block inner %}
 
 <nav aria-label="breadcrumb" class="my-4">
@@ -31,25 +33,87 @@
       >
       {% else %}
       <span class="text-muted">Page has not yet been crawled</span> {% endif %}
+
+
+
+
     </div>
+
+
     <a
       href="{{object.url}}"
       target="_blank"
       class="float-right badge badge-info p-2"
-      >Visit &nearr;</a
+      >Visit this page &nearr;</a
     >
+
+
   </div>
+
+  <div class="row pb-4">
+
+    <div class="col-md-6">
+
+      {% get_test_result_by_type object "sitecomber_screenshots.tests.LatestScreenshotTest" as latest_screenshot_test %}
+      {% if latest_screenshot_test and latest_screenshot_test.success %}
+      <div class="screenshot">
+        <div class="">
+          <a href="{{SETTINGS.MEDIA_URL}}{{latest_screenshot_test.data_json.screenshots.0}}" target="_blank">
+            <img src="{{SETTINGS.MEDIA_URL}}{{latest_screenshot_test.data_json.screenshots.0}}" alt="Latest screenshot of {{object.url}}">
+          </a>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    <div class="col-md-6">
+      <h5>Test results for this page:</h5>
+      <ul class="list-unstyled p-2">
+
+
+        {% for result in object.test_results %}
+        <li class="my-0 ">
+
+
+            <span class="h5 font-mono text-{{result.bootstrap_class}}">
+              {% if result.bootstrap_class == 'error' %} &#215;
+              {% elif result.bootstrap_class == 'warning' %} &#33;
+              {% else %} &#10003;{% endif %}
+
+            </span>
+            <a href="{% url 'site-test-results' object.site_domain.site.pk %}#{{result.test_title}}" class="text-{{result.bootstrap_class}}" text="View site-wide report for {{result.test_title}}"><strong>{{result.test_title}}</strong></a>
+            <span class="font-italic small">{{result.message|safe}}</span>
+
+        </li>
+        {% endfor %}
+
+
+      </ul>
+    </div>
+  </div>
+
   <div class="card text-dark">
     <div class="card-header">
       <ul class="nav nav-tabs card-header-tabs" role="tablist">
+        {% comment %}
         <li class="nav-item">
           <a
-            class="nav-link active"
+            class="nav-link "
             href="#tests"
             role="tab"
             aria-controls="description"
             aria-selected="true"
             >Results Overview</a
+          >
+        </li>
+        {% endcomment %}
+        <li class="nav-item">
+          <a
+            class="nav-link active"
+            href="#links"
+            role="tab"
+            aria-controls="deals"
+            aria-selected="false"
+            >Incoming &amp; Outgoing Links</a
           >
         </li>
         <li class="nav-item">
@@ -72,6 +136,7 @@
             >SEO</a
           >
         </li>
+        {% comment %}
         <li class="nav-item">
           <a
             class="nav-link"
@@ -92,6 +157,7 @@
             >Accessibility</a
           >
         </li>
+        {% endcomment %}
         <li class="nav-item">
           <a
             class="nav-link"
@@ -102,42 +168,14 @@
             >Request Details</a
           >
         </li>
-        <li class="nav-item">
-          <a
-            class="nav-link"
-            href="#links"
-            role="tab"
-            aria-controls="deals"
-            aria-selected="false"
-            >Incoming &amp; Outgoing Links</a
-          >
-        </li>
+
       </ul>
     </div>
     <div class="card-body">
       <div class="tab-content mt-3">
-        <div class="tab-pane active px-3" id="tests" role="tabpanel">
-
-          <h4>Page Test Results</h4>
-          <ul class="list-unstyled row p-2">
 
 
-            {% for result in object.test_results %}
-            <li class="col-lg-4 col-md-6 my-0 alert alert-{{result.bootstrap_class}}">
-
-              <div  class="p-2 ">
-                <a href="{% url 'site-test-results' object.site_domain.site.pk %}#{{result.test_title}}" class="text-{{result.bootstrap_class}}" text="View site-wide report for {{result.test_title}}"><h6>{{result.test_title}}</h6></a>
-
-                {{result.message|safe}}
-              </div>
-            </li>
-            {% endfor %}
-
-
-          </ul>
-        </div>
-
-        <div class="tab-pane" id="article" role="tabpanel">
+        <div class="tab-pane " id="article" role="tabpanel">
           {% include 'results/partials/pageresult__article_tab.html' %}
         </div>
         <div class="tab-pane" id="seo" role="tabpanel">
@@ -150,7 +188,7 @@
           {% include 'results/partials/pageresult__accessibility_tab.html' %}
         </div>
         <div
-          class="tab-pane"
+          class="tab-pane "
           id="request"
           role="tabpanel"
           aria-labelledby="history-tab"
@@ -159,7 +197,7 @@
         </div>
 
         <div
-          class="tab-pane"
+          class="tab-pane active"
           id="links"
           role="tabpanel"
           aria-labelledby="deals-tab"

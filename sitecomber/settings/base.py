@@ -20,6 +20,7 @@ environ.Env.read_env(env_file=root('.env'))
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), os.pardir))
 
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
@@ -98,7 +99,8 @@ INSTALLED_APPS = [
     'sitecomber.apps.results',
 
     'sitecomber.apps.tests.core',
-    'sitecomber_article_tests.tests'
+    'sitecomber_article_tests.tests',
+    'sitecomber_screenshots.tests'
 ]
 
 
@@ -199,7 +201,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_ROOT = env("MEDIA_ROOT", default=os.path.join(
     BASE_DIR, 'uploads/sitecomber/'))
 MEDIA_URL = env("MEDIA_URL", default='/uploads/')
-
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
 
@@ -248,3 +249,8 @@ MIN_SECONDS_BETWEEN_INTERNAL_PAGE_CRAWL = int(env('MIN_SECONDS_BETWEEN_INTERNAL_
 
 # To make sure we don't "over" crawl external pages, don't crawl an external page any more frequencly than this
 MIN_SECONDS_BETWEEN_EXTERNAL_PAGE_CRAWL = int(env('MIN_SECONDS_BETWEEN_EXTERNAL_PAGE_CRAWL', default=(60 * 60 * 24)))
+
+
+TEMPLATE_SETTINGS = {
+    'MEDIA_URL':MEDIA_URL
+}
