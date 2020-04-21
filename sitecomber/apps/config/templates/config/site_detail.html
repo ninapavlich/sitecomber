@@ -4,23 +4,23 @@
 {% block js %}
 {{block.super}}
 <script>
+
   var sitemap_data =
   {
-      "name": "{{object}}",
-      "url": "{{object.domains.0}}",
-      "path": "/",
-      "full_url": "{{object.domains.0}}/",
-      "full_path": "/",
-      "info_url":"{% url 'site-detail' object.pk %}",
-      "errors":[],
-      "incoming": [],
-      "outgoing": [],
-      "children": [
-      {% for key, item in object.page_results_hierarchy.items %}
-      {% include 'config/partials/page_tree_json.html' with child=item %}{% if not forloop.last %},{% endif %}
-      {% endfor %}
-      ]
-
+    "name": "{{object}}",
+    "url": "{{object.domains.0}}",
+    "path": "/",
+    "full_url": "{{object.domains.0}}/",
+    "full_path": "/",
+    "info_url":"{% url 'site-detail' object.pk %}",
+    "errors":[],
+    "incoming": [],
+    "outgoing": [],
+    "children": [
+    {% for key, item in object.page_results_hierarchy.items %}
+    {% include 'config/partials/page_tree_json.html' with child=item %}{% if not forloop.last %},{% endif %}
+    {% endfor %}
+    ]
   }
 </script>
 {% endblock %}
@@ -35,11 +35,13 @@
 
 <article class="main">
   <h1>{{object}}</h1>
-  <h2 class="text-secondary h5">Including domains
+  <a href="{% url 'site-detail-report' object.pk %}" class="float-right badge badge-info p-2" target="_blank" download>Download Report &darr;</a>
+  <a href="{% url 'site-test-results' object.pk %}" class="float-right badge badge-secondary p-2 mr-2" >Browse Test Results</a>
+  <h2 class="text-secondary h5">Including domain{% if object.domains.length != 1%}s{% endif %}
     {% for url in object.domains %}<a
       href="{{url}}"
       target="_blank"
-      class="text-secondary"
+      class="text-secondary  font-underline"
       >{{url}}</a
     >{% if not forloop.last %}, {% endif %}{% endfor %}
   </h2>
@@ -78,22 +80,7 @@
         <span class="text-danger">
           <strong>{{object.pages_with_errors|length}}</strong> pages with errors.
         </span>
-
-        <a
-          href="{% url 'site-test-results' object.pk %}"
-          class="text-light"
-        >
-          (See site-wide test results to review errors)
-        </a>
-        {% else %}
-        <a
-          href="{% url 'site-test-results' object.pk %}"
-          class="text-light"
-        >
-          See site-wide test results.
-        </a>
         {% endif %}
-
       </li>
       {% endif %}
     </ul>
@@ -126,7 +113,7 @@
       {% endfor %}
     </ul>
 
-    
+
     <ul class="list-unstyled">
       {% for page_result in object.internal_page_results %} {% if not
       page_result.is_root %}

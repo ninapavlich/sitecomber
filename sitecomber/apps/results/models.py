@@ -315,6 +315,43 @@ class PageResult(BaseMetaData, BaseURL):
 
         return output
 
+    @classmethod
+    def get_report_header_columns(cls, report_name):
+        fields = [
+            "URL",
+            "Title",
+             "Last Crawl Start Date",
+             "Last Crawl End Date",
+             "Last Response Code",
+             ]
+        if report_name == 'internal_links':
+            fields += [
+                "Last Response Size",
+                "Incoming Links",
+                "Outgoing Links",
+            ]
+
+        return fields
+
+    def get_report_data(self, report_name):
+
+        fields = [
+            self.url,
+            self.title,
+            '' if not self.last_load_start_time else self.last_load_start_time.isoformat(),
+            '' if not self.last_load_end_time else self.last_load_end_time.isoformat(),
+            self.last_status_code
+        ]
+
+        if report_name == 'internal_links':
+            fields += [
+                self.last_content_length,
+                self.incoming_links.count(),
+                self.outgoing_links.count()
+            ]
+        return fields
+
+
     def should_load(self):
         do_load = False
         if not self.last_load_start_time:

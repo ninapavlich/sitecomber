@@ -74,8 +74,13 @@ class Site(BaseMetaData):
         log_memory("after crawl")
 
     @cached_property
+    def active_test_results(self):
+        return self.sitetestsetting_set.filter(active=True)
+
+
+    @cached_property
     def tests(self):
-        return [item.class_instance for item in self.sitetestsetting_set.filter(active=True)]
+        return [item.class_instance for item in self.active_test_results]
 
     @cached_property
     def domains(self):
@@ -188,6 +193,51 @@ class Site(BaseMetaData):
         # 2.5s SLOWER VERSION
         # return list(set([item.page for item in self.error_page_test_results if item.page.is_internal]))
 
+    def get_report_data(self):
+        sheets = [
+            {
+                "title":"Internal Links",
+                "data":self.get_internal_link_data()
+            },
+            {
+                "title":"External Links",
+                "data": self.get_external_link_data()
+            },
+            {
+                "title":"Link Map",
+                "data": self.get_link_map_data()
+            }
+        ]
+
+        for test_result in self.active_test_results:
+            sheets.append({
+                "title": test_result.test_name,
+                "data": test_result.get_test_result_data(self.page_test_results)
+            })
+
+        return sheets
+
+    def get_internal_link_data(self):
+        output = [PageResult.get_report_header_columns('internal_links')]
+        for link in self.internal_page_results:
+            output.append(link.get_report_data('internal_links'))
+        return output
+
+    def get_external_link_data(self):
+        output = [PageResult.get_report_header_columns('external_links')]
+        for link in self.external_page_results:
+            output.append(link.get_report_data('external_links'))
+        return output
+
+    def get_link_map_data(self):
+        output = [['Source URL', 'Target URL']]
+        results = self.page_results.prefetch_related('outgoing_links')
+        for result in results:
+            for outgoing_link in result.outgoing_links.all():
+                output.append([result.url, outgoing_link.url])
+        return output
+
+
     def __str__(self):
         return self.title
 
@@ -223,6 +273,13 @@ class SiteDomain(BaseMetaData, BaseURL):
             self.crawl = False
 
         super(SiteDomain, self).save(*args, **kwargs)
+
+    def clean(self):
+        # TODO --
+        # This function should handle any clean up that should happen based on a configuration change
+        # - Identify any new aliases due to http/https, or due to ignored query strings and delete duplicates
+        # - Delete any tests results that are no longer active
+        pass
 
     def parse_sitemap(self, tests):
         log_memory('---- a. Before creating root page')
@@ -426,6 +483,13 @@ class SiteTestSetting(BaseMetaData):
     def test_name(self):
         module_name, class_name = self.test.rsplit('.', 1)
         return class_name
+
+    def get_test_result_data(self, page_test_results):
+        test_results = [result for result in page_test_results if result.test == self.test]
+        output = [['Status', 'URL', 'Message']]
+        for test_result in test_results:
+            output.append([test_result.status, test_result.page.url, test_result.message])
+        return output
 
     def save(self, *args, **kwargs):
 

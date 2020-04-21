@@ -21,14 +21,14 @@
   <div class="my-4">
     <h1>Test Results for {{object}}</h1>
   </div>
-  
-  
+
+
 
   <div class="card text-dark">
     <div class="card-header">
       <ul class="nav nav-tabs card-header-tabs" role="tablist">
-        
-        {% for test_setting in object.sitetestsetting_set.all %}
+
+        {% for test_setting in object.active_test_results %}
 
 
         {% filter_page_test_results object.page_test_results test_setting.test 'error' as errors %}
@@ -45,7 +45,7 @@
             >
             <small>
               {{test_setting.test_name}}
-              
+
               {% if errors|length > 0 %}
               <span class="badge badge-danger p-1 ml-1" >
                 {{errors|length}}
@@ -61,12 +61,12 @@
           </a>
         </li>
         {% endfor %}
-        
+
       </ul>
     </div>
     <div class="card-body">
       <div class="tab-content mt-3">
-        {% for test_setting in object.sitetestsetting_set.all %}
+        {% for test_setting in object.active_test_results %}
 
 
         {% filter_page_test_results object.page_test_results test_setting.test 'error' as errors %}
@@ -75,7 +75,7 @@
         {% filter_page_test_results object.page_test_results test_setting.test 'success' as successes %}
 
         <div class="tab-pane {% if forloop.first %}active{% endif %}" id="{{test_setting.test_name}}" role="tabpanel">
-          
+
           <div class="mb-4">
             <h2>{{test_setting.test_name}}</h2>
             <div class="text-muted">{{test_setting.class_instance.description|safe}}</div>
@@ -118,7 +118,7 @@
           </ul>
           {% endif %}
 
-          
+
         </div>
         {% endfor %}
 
